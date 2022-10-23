@@ -1,31 +1,30 @@
 package algo
 
 import (
+	"goalgo/gen/gtyp"
 	"golang.org/x/exp/constraints"
-	"math"
-	"sort"
 )
 
-func Lis[T constraints.Signed](a []T) []T {
+func Lis[T constraints.Signed](a []T, b gtyp.Bounds[T]) []T {
 	n := len(a)
 	d := make([]T, n+1)
 	for i := range d {
-		d[i] = T(math.Inf(1))
+		d[i] = b.MaxValue()
 	}
-	d[0] = T(math.Inf(-1))
+	d[0] = b.MinValue()
 
-	prev := make([]T, n)
-	pos := make([]T, n+1)
+	prev := make([]int, n)
+	pos := make([]int, n+1)
 	pos[0] = -1
 
 	l := 1
-	for i, _ := range a {
-		j := sort.Search(n, func(k int) bool {
-			return d[k] == a[i]
+	for i, ai := range a {
+		j := UpperBound(d, func(v T) bool {
+			return ai < v
 		})
-		if d[j-1] < a[i] && a[i] < d[j] {
-			d[j] = a[i]
-			pos[j] = T(i)
+		if d[j-1] < ai && ai < d[j] {
+			d[j] = ai
+			pos[j] = i
 			prev[i] = pos[j-1]
 			if j > l {
 				l = j
@@ -40,5 +39,6 @@ func Lis[T constraints.Signed](a []T) []T {
 		p = prev[p]
 	}
 
+	gtyp.Reverse(ans)
 	return ans
 }
