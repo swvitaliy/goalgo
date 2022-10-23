@@ -1,11 +1,11 @@
-package main
+package gen
 
 import (
+	"goalgo/gen/gtyp"
 	"golang.org/x/exp/constraints"
-	"lis/typ"
 )
 
-func Lis[T any, LessC typ.Comparator[T]](a []T, less LessC, b typ.Bounds[T]) []T {
+func Lis[T any, LessC gtyp.Comparator[T]](a []T, less LessC, b gtyp.Bounds[T]) []T {
 	n := len(a)
 	d := make([]T, n+1)
 	for i := range d {
@@ -37,16 +37,16 @@ func Lis[T any, LessC typ.Comparator[T]](a []T, less LessC, b typ.Bounds[T]) []T
 		p = prev[p]
 	}
 
-	typ.Reverse(ans)
+	gtyp.Reverse(ans)
 	return ans
 }
 
-func LisNumbers[T constraints.Signed](a []T, b typ.Bounds[T]) []T {
-	var less = typ.LessOrdered[T]{}
+func LisNumbers[T constraints.Signed](a []T, b gtyp.Bounds[T]) []T {
+	var less = gtyp.LessOrdered[T]{}
 	return Lis(a, less, b)
 }
 
 func LisNumbers_Example() {
 	list := []int{1, 4, 6, 6, 32, 2, 7, 3, 34, 6, 6}
-	LisNumbers(list, typ.IntBounds)
+	LisNumbers(list, gtyp.IntBounds)
 }

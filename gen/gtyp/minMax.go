@@ -1,4 +1,4 @@
-package typ
+package gtyp
 
 import "golang.org/x/exp/constraints"
 

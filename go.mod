@@ -1,4 +1,4 @@
-module lis
+module goalgo
 
 go 1.18
 

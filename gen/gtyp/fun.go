@@ -1,4 +1,4 @@
-package typ
+package gtyp
 
 func Reduce[T any](list []T, acc func(res, v T) T, init T) T {
 	res := init

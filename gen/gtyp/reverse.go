@@ -1,4 +1,4 @@
-package typ
+package gtyp
 
 func Reverse[T any](a []T) {
 	var n = len(a)

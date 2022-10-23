@@ -1,8 +1,8 @@
-package main
+package gen
 
-import "lis/typ"
+import "goalgo/gen/gtyp"
 
-func UpperBound[T any, LessC typ.Comparator[T]](arr []T, x T, less LessC) int {
+func UpperBound[T any, LessC gtyp.Comparator[T]](arr []T, x T, less LessC) int {
 	l, r, m := 0, len(arr), 0
 
 	for l < r {

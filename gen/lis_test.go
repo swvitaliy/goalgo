@@ -1,15 +1,15 @@
-package main
+package gen
 
 import (
 	"fmt"
 	"github.com/google/go-cmp/cmp"
-	"lis/typ"
+	"goalgo/gen/gtyp"
 	"testing"
 )
 
 func TestLis1(t *testing.T) {
 	a := []int{1, 3, 2, 7, 0}
-	b := LisNumbers(a, typ.IntBounds)
+	b := LisNumbers(a, gtyp.IntBounds)
 
 	for _, v := range b {
 		fmt.Print(v, " ")

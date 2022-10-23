@@ -1,4 +1,4 @@
-package typ
+package gtyp
 
 import (
 	"math"
