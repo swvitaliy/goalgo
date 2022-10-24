@@ -9,7 +9,9 @@ import (
 
 func TestLis1(t *testing.T) {
 	a := []int{1, 3, 2, 7, 0}
-	b := Lis(a, gtyp.IntBounds)
+	b := Lis(a, gtyp.IntBounds, func(a, b int) bool {
+		return a < b
+	})
 
 	for _, v := range b {
 		fmt.Print(v, " ")

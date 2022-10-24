@@ -2,10 +2,9 @@ package algo
 
 import (
 	"goalgo/gen/gtyp"
-	"golang.org/x/exp/constraints"
 )
 
-func Lis[T constraints.Signed](a []T, b gtyp.Bounds[T]) []T {
+func Lis[T any](a []T, b gtyp.Bounds[T], less Comparator[T]) []T {
 	n := len(a)
 	d := make([]T, n+1)
 	for i := range d {
@@ -19,10 +18,8 @@ func Lis[T constraints.Signed](a []T, b gtyp.Bounds[T]) []T {
 
 	l := 1
 	for i, ai := range a {
-		j := UpperBound(d, func(v T) bool {
-			return ai < v
-		})
-		if d[j-1] < ai && ai < d[j] {
+		j := UpperBound(d, ai, less)
+		if less(d[j-1], ai) && less(ai, d[j]) {
 			d[j] = ai
 			pos[j] = i
 			prev[i] = pos[j-1]
