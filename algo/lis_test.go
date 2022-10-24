@@ -3,15 +3,12 @@ package algo
 import (
 	"fmt"
 	"github.com/google/go-cmp/cmp"
-	"goalgo/gen/gtyp"
 	"testing"
 )
 
 func TestLis1(t *testing.T) {
 	a := []int{1, 3, 2, 7, 0}
-	b := Lis(a, gtyp.IntBounds, func(a, b int) bool {
-		return a < b
-	})
+	b := Lis(a, IntBounds, Less[int])
 
 	for _, v := range b {
 		fmt.Print(v, " ")

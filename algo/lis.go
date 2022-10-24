@@ -1,10 +1,6 @@
 package algo
 
-import (
-	"goalgo/gen/gtyp"
-)
-
-func Lis[T any](a []T, b gtyp.Bounds[T], less Comparator[T]) []T {
+func Lis[T any](a []T, b Bounds[T], less Comparator[T]) []T {
 	n := len(a)
 	d := make([]T, n+1)
 	for i := range d {
@@ -36,6 +32,6 @@ func Lis[T any](a []T, b gtyp.Bounds[T], less Comparator[T]) []T {
 		p = prev[p]
 	}
 
-	gtyp.Reverse(ans)
+	Reverse(ans)
 	return ans
 }
