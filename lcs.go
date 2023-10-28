@@ -43,3 +43,32 @@ func Lcs[T comparable](a, b []T) []T {
 	slice.Reverse(ans)
 	return ans
 }
+
+// LcsLen returns the length of the longest common subsequence of a and b
+func LcsLen[T comparable](a, b []T) int {
+	if len(a) < len(b) {
+		a, b = b, a
+	}
+	m := len(a)
+	n := len(b)
+	// In i-th position of the c array, the i-th element is the length of the longest common subsequence of prefixes a[0:i] and b[0:i]
+	c := make([]int, n)
+	d := 0
+	for i := 1; i < m; i++ {
+		ai := a[i]
+		for j := 1; j < n; j++ {
+			bj := b[j]
+			t := c[j]
+			if ai == bj {
+				c[j] = d + 1
+			} else {
+				if c[j] < c[j-1] {
+					c[j] = c[j-1]
+				}
+			}
+			d = t
+		}
+	}
+
+	return c[n-1]
+}
