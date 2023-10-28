@@ -22,6 +22,14 @@ func MinValue[T any]() T {
 	return limits[typeOf[T]().Kind()].MinValue.(T)
 }
 
+func AddKindLimits(kind reflect.Kind, l Limits) {
+	limits[kind] = l
+}
+
+func AddTypeLimits[T any](l Limits) {
+	limits[typeOf[T]().Kind()] = l
+}
+
 func init() {
 	UseOrderedTypes()
 }

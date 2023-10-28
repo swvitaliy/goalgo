@@ -9,9 +9,14 @@ const (
 )
 
 func UseOrderedTypes() {
-	limits[reflect.Int] = Limits{
+	AddKindLimits(reflect.Int, Limits{
 		MinValue: MinInt,
 		MaxValue: MaxInt,
-	}
+	})
+	AddKindLimits(reflect.Uint, Limits{
+		MinValue: 0,
+		MaxValue: MaxUInt,
+	})
+
 	// TODO fill ordered type limits
 }
