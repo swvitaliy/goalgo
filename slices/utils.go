@@ -1,8 +1,11 @@
-package slice
+package slices
 
 import "cmp"
 
-func IsSorted[T cmp.Ordered](a []T, dir bool) bool {
+const Ascending = true
+const Descending = false
+
+func IsSorted[S ~[]T, T cmp.Ordered](a S, dir bool) bool {
 	for i := 1; i < len(a); i++ {
 		if dir == (a[i-1] > a[i]) {
 			return false
@@ -11,7 +14,7 @@ func IsSorted[T cmp.Ordered](a []T, dir bool) bool {
 	return true
 }
 
-func Reverse[T any](a []T) {
+func Reverse[S ~[]T, T any](a S) {
 	var n = len(a)
 	var m = n >> 1
 	for i := 0; i < m; i++ {
@@ -19,7 +22,7 @@ func Reverse[T any](a []T) {
 		a[i], a[j] = a[j], a[i]
 	}
 }
-func Reduce[T any](list []T, acc func(res, v T) T, init T) T {
+func Reduce[S ~[]T, T any](list S, acc func(res, v T) T, init T) T {
 	res := init
 	for _, v := range list {
 		res = acc(res, v)

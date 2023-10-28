@@ -1,8 +1,8 @@
-package slice
+package slices
 
 import "cmp"
 
-func UpperBound[T cmp.Ordered](arr []T, v T) int {
+func UpperBound[S ~[]T, T cmp.Ordered](arr S, v T) int {
 	l, r, m := 0, len(arr), 0
 
 	for l < r {

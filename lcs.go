@@ -1,10 +1,10 @@
 package goalgo
 
 import (
-	"goalgo/slice"
+	"goalgo/slices"
 )
 
-func Lcs[T comparable](a, b []T) []T {
+func Lcs[S ~[]T, T comparable](a, b S) S {
 	n, m := len(a), len(b)
 	dp := make([][]int, n+1)
 	for i := range dp {
@@ -40,12 +40,12 @@ func Lcs[T comparable](a, b []T) []T {
 		}
 	}
 
-	slice.Reverse(ans)
+	slices.Reverse(ans)
 	return ans
 }
 
 // LcsLen returns the length of the longest common subsequence of a and b
-func LcsLen[T comparable](a, b []T) int {
+func LcsLen[S ~[]T, T comparable](a, b S) int {
 	if len(a) < len(b) {
 		a, b = b, a
 	}

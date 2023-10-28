@@ -1,7 +1,7 @@
 package goalgo
 
 import (
-	"goalgo/slice"
+	"goalgo/slices"
 )
 
 const (
@@ -47,6 +47,6 @@ func Dijkstra(a [][]edge, s, t int) (int, []int) {
 		j = p[j]
 	}
 
-	slice.Reverse(ans)
+	slices.Reverse(ans)
 	return d[t], ans
 }

@@ -3,10 +3,10 @@ package goalgo
 import (
 	"cmp"
 	"goalgo/limits"
-	"goalgo/slice"
+	"goalgo/slices"
 )
 
-func Lis[T cmp.Ordered](a []T) []T {
+func Lis[S ~[]T, T cmp.Ordered](a S) S {
 	n := len(a)
 	d := make([]T, n+1)
 	for i := range d {
@@ -20,7 +20,7 @@ func Lis[T cmp.Ordered](a []T) []T {
 
 	l := 1
 	for i, ai := range a {
-		j := slice.UpperBound(d, ai)
+		j := slices.UpperBound(d, ai)
 		if cmp.Less(d[j-1], ai) && cmp.Less(ai, d[j]) {
 			d[j] = ai
 			pos[j] = i
@@ -38,6 +38,6 @@ func Lis[T cmp.Ordered](a []T) []T {
 		p = prev[p]
 	}
 
-	slice.Reverse(ans)
+	slices.Reverse(ans)
 	return ans
 }
