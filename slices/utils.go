@@ -29,3 +29,14 @@ func Reduce[S ~[]T, T any](list S, acc func(res, v T) T, init T) T {
 	}
 	return res
 }
+
+func Fill[S ~[]T, T any](a S, v T) {
+	//for i := range a {
+	//	a[i] = v
+	//}
+	// https://gist.github.com/taylorza/df2f89d5f9ab3ffd06865062a4cf015d
+	a[0] = v
+	for i := 1; i < len(a); i *= 2 {
+		copy(a[i:], a[:i])
+	}
+}
