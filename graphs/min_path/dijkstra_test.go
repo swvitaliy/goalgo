@@ -1,4 +1,4 @@
-package goalgo
+package min_path
 
 import (
 	gglCmp "github.com/google/go-cmp/cmp"
