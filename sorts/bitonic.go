@@ -10,10 +10,10 @@ func BitonicSort[T cmp.Ordered](a []T, dir bool) {
 	k := n / 2
 	BitonicSort(a[:k], dir)
 	BitonicSort(a[k:], !dir)
-	merge(a, dir)
+	bitonicMerge(a, dir)
 }
 
-func merge[T cmp.Ordered](a []T, dir bool) {
+func bitonicMerge[T cmp.Ordered](a []T, dir bool) {
 	n := len(a)
 	if n <= 1 {
 		return
@@ -24,6 +24,6 @@ func merge[T cmp.Ordered](a []T, dir bool) {
 			a[i], a[i+k] = a[i+k], a[i]
 		}
 	}
-	merge(a[:k], dir)
-	merge(a[k:], dir)
+	bitonicMerge(a[:k], dir)
+	bitonicMerge(a[k:], dir)
 }
