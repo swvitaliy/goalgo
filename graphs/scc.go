@@ -1,69 +1,56 @@
 package graphs
 
-import "fmt"
+import "goalgo/slices"
 
-var g [][]int
-var gr [][]int
-var used []bool
-var order []int
-var comp []int
+// Scc for strongly connected components
+func Scc(g, gr [][]int, n int, visit func(comp []int)) {
+	var used []bool
+	var order []int
+	var comp []int
 
-func dfs1(v int) {
-	used[v] = true
-	for _, u := range g[v] {
-		if !used[u] {
-			dfs1(u)
+	var dfs func(v int)
+	var dfsRev func(v int)
+
+	dfs = func(v int) {
+		used[v] = true
+		for _, u := range g[v] {
+			if !used[u] {
+				dfs(u)
+			}
 		}
+		order = append(order, v)
 	}
-	order = append(order, v)
-}
 
-func dfs2(v int) {
-	used[v] = true
-	comp = append(comp, v)
-	for _, u := range gr[v] {
-		if !used[u] {
-			dfs2(u)
+	dfsRev = func(v int) {
+		used[v] = true
+		comp = append(comp, v)
+		for _, u := range gr[v] {
+			if !used[u] {
+				dfsRev(u)
+			}
 		}
-	}
-}
-
-func main() {
-	var n int
-	fmt.Scanf("%d", n)
-
-	g = make([][]int, n)
-	gr = make([][]int, n)
-	for i := 0; i < n; i++ {
-		var a, b int
-		fmt.Scanf("%d %d", a, b)
-		g[a] = append(g[a], b)
-		gr[b] = append(g[b], a)
 	}
 
 	used = make([]bool, n)
-	for i := range used {
-		used[i] = false
-	}
+	slices.Fill(used, false)
 
 	order = make([]int, n)
 
 	for i := range g {
 		if !used[i] {
-			dfs1(i)
+			dfs(i)
 		}
 	}
 
-	for i := range used {
-		used[i] = false
-	}
+	slices.Fill(used, false)
 
 	comp = make([]int, 0, n)
 
 	for i := range g {
 		v := order[n-i-1]
 		if !used[v] {
-			dfs2(v)
+			dfsRev(v)
+			visit(comp)
 			comp = make([]int, 0, n)
 		}
 	}
