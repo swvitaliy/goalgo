@@ -2,6 +2,8 @@ package rmq
 
 import "golang.org/x/exp/constraints"
 
+// FenwickTree
+
 type BinaryIndexedTree[T any] []T
 
 func BuildBIT[S ~[]T, T any](a S, fn func(a, b T) T) BinaryIndexedTree[T] {
