@@ -15,11 +15,12 @@ func IsSorted[S ~[]T, T cmp.Ordered](a S, dir bool) bool {
 }
 
 func Reverse[S ~[]T, T any](a S) {
-	var n = len(a)
-	var m = n >> 1
-	for i := 0; i < m; i++ {
-		j := n - i - 1
+	i := 0
+	j := len(a) - 1
+	for i < j {
 		a[i], a[j] = a[j], a[i]
+		i++
+		j--
 	}
 }
 func Reduce[S ~[]T, T any](list S, acc func(res, v T) T, init T) T {
