@@ -1,3 +1,3 @@
 # GoAlgo
 
-Bunch of algorithms in go.
+A bunch of algorithms in golang.
