@@ -2,146 +2,136 @@ package aho_corasick
 
 // Vertex is a node in the trie
 type Vertex struct {
-	children map[byte]*Vertex
+	children map[rune]*Vertex
 	suf      *Vertex
+	output   []int
 }
 
 type Searcher struct {
-	root  *Vertex
-	tnMap map[*Vertex]int // terminal nodes map to pattern indexes
+	root *Vertex
 }
 
-type Match struct {
-	Pos          int
-	PatternIndex int
-}
-
-func (n *Vertex) AddString(s string) *Vertex {
-	for _, c := range []byte(s) {
+func (a *Searcher) AddString(s string, k int) *Vertex {
+	n := a.root
+	for _, c := range s {
 		t, ok := n.children[c]
 		if !ok {
-			t = &Vertex{make(map[byte]*Vertex), nil}
+			t = &Vertex{
+				children: make(map[rune]*Vertex),
+				suf:      nil,
+				output:   nil,
+			}
 			n.children[c] = t
 		}
 		n = t
 	}
-	n.children['$'] = &Vertex{}
+	n.output = []int{k}
 	return n
 }
 
 func NewSearcher(patterns []string) *Searcher {
-	root := &Vertex{make(map[byte]*Vertex), nil}
-	tnMap := make(map[*Vertex]int)
+	root := &Vertex{
+		children: make(map[rune]*Vertex),
+		suf:      nil,
+		output:   nil,
+	}
+
+	a := Searcher{root}
 	for i, p := range patterns {
-		termNode := root.AddString(p)
-		tnMap[termNode] = i
+		a.AddString(p, i)
 	}
-	PrepareSuffixes(root)
 
-	return &Searcher{root, tnMap}
+	a.PrepareSuffixes()
+	return &a
 }
 
-func SearchFirst(patterns []string, text string) Match {
+func SearchFirst(patterns []string, text string) (int, []int) {
 	s := NewSearcher(patterns)
-	return s.SearchFirst(text)
+	return s.searchFirst(patterns, text)
 }
 
-func (s *Searcher) SearchFirst(text string) Match {
-	var v *Vertex = s.root
-	for i, c := range []byte(text) {
-		for ; v.children[c] == nil; v = v.suf {
+func (a *Searcher) searchFirst(patterns []string, text string) (int, []int) {
+	var v *Vertex = a.root
+	for i, c := range text {
+		for v.children[c] == nil && v != a.root {
+			v = v.suf
 		}
-		v = v.children[c]
 
-		if v.children['$'] != nil {
+		if v.children[c] != nil {
+			v = v.children[c]
+		}
+
+		if v.output == nil {
 			continue
 		}
 
-		if v == s.root {
-			continue
+		if len(v.output) > 0 {
+			return i - len(patterns[v.output[0]]) + 1, v.output
 		}
-
-		return Match{i, s.tnMap[v]}
 	}
 
-	return Match{-1, -1}
+	return -1, nil
 }
 
-func SearchCount(patterns []string, text string) map[int]int {
-	s := NewSearcher(patterns)
-	return s.SearchCount(text)
-}
-
-func (s *Searcher) SearchCount(text string) map[int]int {
-	root := s.root
-	tnMap := s.tnMap
-
-	ans := make(map[int]int)
-	var v *Vertex = root
-	for _, c := range []byte(text) {
-		for ; v.children[c] == nil; v = v.suf {
-		}
-		v = v.children[c]
-
-		if v.children['$'] != nil {
-			continue
-		}
-
-		if v == root {
-			continue
-		}
-
-		ans[tnMap[v]]++
-	}
-
-	return ans
+type Match struct {
+	Pos    int
+	Output int
 }
 
 func SearchAll(patterns []string, text string) []Match {
 	s := NewSearcher(patterns)
-	return s.SearchAll(text)
+	return s.searchAll(patterns, text)
 }
 
-func (s *Searcher) SearchAll(text string) []Match {
-	root := s.root
-	tnMap := s.tnMap
-
+func (a *Searcher) searchAll(patterns []string, text string) []Match {
 	ans := make([]Match, 0)
-	var v *Vertex = root
-	for i, c := range []byte(text) {
-		for ; v.children[c] == nil; v = v.suf {
+	var v *Vertex = a.root
+	for i, c := range text {
+		for v.children[c] == nil && v != a.root {
+			v = v.suf
 		}
-		v = v.children[c]
 
-		if v.children['$'] != nil {
+		if v.children[c] != nil {
+			v = v.children[c]
+		}
+
+		if v.output == nil {
 			continue
 		}
 
-		if v == root {
-			continue
+		for _, p := range v.output {
+			ans = append(ans, Match{i - len(patterns[p]) + 1, p})
 		}
-
-		ans = append(ans, Match{i, tnMap[v]})
 	}
 
 	return ans
 }
 
-func PrepareSuffixes(root *Vertex) {
-	bfs(root)
-}
+func (a *Searcher) PrepareSuffixes() {
+	queue := make([]*Vertex, 0)
+	for _, u := range a.root.children {
+		u.suf = a.root
+		queue = append(queue, u)
+	}
 
-func bfs(root *Vertex) []*Vertex {
-	queue := []*Vertex{root}
 	for len(queue) > 0 {
 		v := queue[0]
 		queue = queue[1:]
-		for parentChar, child := range v.children {
-			parentSuf := v.suf
-			nextSuf := parentSuf.children[parentChar].suf
-			child.suf = nextSuf
-			queue = append(queue, child)
+
+		for c, u := range v.children {
+			nextSuf := v.suf
+			for nextSuf != nil && nextSuf.children[c] == nil {
+				nextSuf = nextSuf.suf
+			}
+
+			if nextSuf == nil {
+				u.suf = a.root
+			} else {
+				u.suf = nextSuf.children[c]
+			}
+
+			u.output = append(u.output, u.suf.output...)
+			queue = append(queue, u)
 		}
 	}
-	return queue
 }
