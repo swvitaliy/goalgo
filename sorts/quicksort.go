@@ -1,15 +1,14 @@
 package sorts
 
 func QuickSort(a []int, l, r int) {
-	N := len(a)
 	i := l
 	j := r
-	m := (l + r) / 2
+	pivot := a[(l+r)/2]
 	for i < j {
-		for i < N && a[i] < a[m] {
+		for a[i] < pivot {
 			i++
 		}
-		for j >= 0 && a[j] > a[m] {
+		for a[j] > pivot {
 			j--
 		}
 		if i <= j {
