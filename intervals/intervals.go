@@ -4,6 +4,9 @@ import "sort"
 
 func Merge(a [][]int) [][]int {
 	n := len(a)
+	if n == 0 {
+		return [][]int{}
+	}
 	sort.Slice(a, func(i, j int) bool { return a[i][0] < a[j][0] })
 	r := make([][]int, 0)
 	r = append(r, a[0])
