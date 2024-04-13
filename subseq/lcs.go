@@ -1,4 +1,4 @@
-package goalgo
+package subseq
 
 import (
 	"goalgo/slices"
