@@ -2,13 +2,13 @@ package pq
 
 import "cmp"
 
-type PriorValQueue[T cmp.Ordered] []T
+type PriorQueueOrdered[T cmp.Ordered] []T
 
-func NewPriorValQueue[T cmp.Ordered]() PriorValQueue[T] {
-	return make(PriorValQueue[T], 0)
+func NewPriorQueueOrdered[T cmp.Ordered]() PriorQueueOrdered[T] {
+	return make(PriorQueueOrdered[T], 0)
 }
 
-func (q *PriorValQueue[T]) sieveUp(i int) {
+func (q *PriorQueueOrdered[T]) sieveUp(i int) {
 	a := *q
 	for i > 0 {
 		p := i / 2
@@ -20,7 +20,7 @@ func (q *PriorValQueue[T]) sieveUp(i int) {
 	}
 }
 
-func (q *PriorValQueue[T]) sieveDown(i int) {
+func (q *PriorQueueOrdered[T]) sieveDown(i int) {
 	a := *q
 	n := len(a)
 
@@ -50,12 +50,12 @@ func (q *PriorValQueue[T]) sieveDown(i int) {
 	}
 }
 
-func (q *PriorValQueue[T]) Enqueue(v T) {
+func (q *PriorQueueOrdered[T]) Enqueue(v T) {
 	*q = append(*q, v)
 	q.sieveUp(len(*q) - 1)
 }
 
-func (q *PriorValQueue[T]) Dequeue() T {
+func (q *PriorQueueOrdered[T]) Dequeue() T {
 	a := *q
 	n := len(a)
 	if n == 0 {

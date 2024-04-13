@@ -8,17 +8,13 @@ type pqItem[T any, P cmp.Ordered] struct {
 	val   T
 }
 
-type PriorQueue[T any, P cmp.Ordered] []pqItem[T, P]
+type PriorQueuePair[T any, P cmp.Ordered] []pqItem[T, P]
 
-func NewPriorQueue[T any, P cmp.Ordered]() PriorQueue[T, P] {
-	return make(PriorQueue[T, P], 0)
+func NewPriorQueuePair[T any, P cmp.Ordered]() PriorQueuePair[T, P] {
+	return make(PriorQueuePair[T, P], 0)
 }
 
-func NewPQ[T any]() PriorQueue[T, int] {
-	return make(PriorQueue[T, int], 0)
-}
-
-func (q *PriorQueue[T, P]) sieveUp(i int) {
+func (q *PriorQueuePair[T, P]) sieveUp(i int) {
 	a := *q
 	for i > 0 {
 		p := i / 2
@@ -30,7 +26,7 @@ func (q *PriorQueue[T, P]) sieveUp(i int) {
 	}
 }
 
-func (q *PriorQueue[T, P]) sieveDown(i int) {
+func (q *PriorQueuePair[T, P]) sieveDown(i int) {
 	a := *q
 	n := len(a)
 
@@ -60,16 +56,16 @@ func (q *PriorQueue[T, P]) sieveDown(i int) {
 	}
 }
 
-func (q *PriorQueue[T, P]) Enqueue(p P, v T) {
+func (q *PriorQueuePair[T, P]) Enqueue(p P, v T) {
 	*q = append(*q, pqItem[T, P]{p, v})
 	q.sieveUp(len(*q) - 1)
 }
 
-func (q *PriorQueue[T, P]) Dequeue() (T, P) {
+func (q *PriorQueuePair[T, P]) Dequeue() (T, P) {
 	a := *q
 	n := len(a)
 	if n == 0 {
-		panic("cannot Dequeue value from empty PriorQueue")
+		panic("cannot Dequeue value from empty PriorQueuePair")
 	}
 	if n == 1 {
 		r := a[0]

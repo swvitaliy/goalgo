@@ -3,7 +3,7 @@ package pq
 import "testing"
 
 func TestPQueue_Enqueue_Dequeue(t *testing.T) {
-	q := NewPQ[uint]()
+	q := NewPriorQueuePair[uint, int]()
 	q.Enqueue(0, 0)
 	q.Enqueue(7, 7)
 	q.Enqueue(2, 22)

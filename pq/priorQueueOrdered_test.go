@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestPriorValQueue_Enqueue_Dequeue(t *testing.T) {
-	q := NewPriorValQueue[uint]()
+func TestPriorQueueOrdered_Enqueue_Dequeue(t *testing.T) {
+	q := NewPriorQueueOrdered[int]()
 	q.Enqueue(0)
 	q.Enqueue(22)
 	q.Enqueue(7)
