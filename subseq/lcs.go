@@ -52,23 +52,21 @@ func LcsLen[S ~[]T, T comparable](a, b S) int {
 	m := len(a)
 	n := len(b)
 	// In i-th position of the c array, the i-th element is the length of the longest common subsequence of prefixes a[0:i] and b[0:i]
-	c := make([]int, n)
+	c := make([]int, n+1)
 	d := 0
-	for i := 1; i < m; i++ {
-		ai := a[i]
-		for j := 1; j < n; j++ {
-			bj := b[j]
-			t := c[j]
-			if ai == bj {
-				c[j] = d + 1
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			t := c[j+1]
+			if a[i] == b[j] {
+				c[j+1] = d + 1
 			} else {
-				if c[j] < c[j-1] {
-					c[j] = c[j-1]
+				if c[j+1] < c[j] {
+					c[j+1] = c[j]
 				}
 			}
 			d = t
 		}
 	}
 
-	return c[n-1]
+	return c[n]
 }
