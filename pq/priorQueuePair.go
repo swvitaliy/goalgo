@@ -17,7 +17,7 @@ func NewPriorQueuePair[T any, P cmp.Ordered]() PriorQueuePair[T, P] {
 func (q *PriorQueuePair[T, P]) sieveUp(i int) {
 	a := *q
 	for i > 0 {
-		p := i / 2
+		p := (i - 1) / 2
 		if a[p].prior < a[i].prior {
 			break
 		}

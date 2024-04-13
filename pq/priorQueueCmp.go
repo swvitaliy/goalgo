@@ -27,7 +27,7 @@ func NewPriorQueueCmp[T any, F comparator[T]](less F) PriorQueueCmp[T, F] {
 func (q *PriorQueueCmp[T, F]) sieveUp(i int) {
 	a := q.data
 	for i > 0 {
-		p := i / 2
+		p := (i - 1) / 2
 		if q.less(a[p], a[i]) {
 			break
 		}

@@ -11,7 +11,7 @@ func NewPriorQueueOrdered[T cmp.Ordered]() PriorQueueOrdered[T] {
 func (q *PriorQueueOrdered[T]) sieveUp(i int) {
 	a := *q
 	for i > 0 {
-		p := i / 2
+		p := (i - 1) / 2
 		if a[p] < a[i] {
 			break
 		}
