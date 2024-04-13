@@ -1,4 +1,4 @@
-package trie
+package radix
 
 import (
 	"github.com/stretchr/testify/assert"

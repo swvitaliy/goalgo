@@ -1,38 +1,38 @@
-package trie
+package radix
 
-type RadixNode struct {
+type Node struct {
 	eow   bool
-	edges map[byte]*RadixEdge
+	edges map[rune]*Edge
 }
 
-type RadixEdge struct {
-	chars []byte
-	next  *RadixNode
+type Edge struct {
+	chars []rune
+	next  *Node
 }
 
-type RadixTrie struct {
-	root *RadixNode
+type Trie struct {
+	root *Node
 }
 
-func NewRadixTrie() *RadixTrie {
-	return &RadixTrie{
-		root: &RadixNode{false, make(map[byte]*RadixEdge)},
+func NewRadixTrie() *Trie {
+	return &Trie{
+		root: &Node{false, make(map[rune]*Edge)},
 	}
 }
 
-func (t *RadixTrie) AddString(s string) {
+func (t *Trie) AddString(s string) {
 	n := t.root
-	w := []byte(s)
+	w := []rune(s)
 	for len(w) > 0 {
 		c := w[0]
 		if n.edges == nil {
-			n.edges = make(map[byte]*RadixEdge)
+			n.edges = make(map[rune]*Edge)
 		}
 		e, ok := n.edges[c]
 		if !ok {
-			n.edges[c] = &RadixEdge{
+			n.edges[c] = &Edge{
 				chars: w,
-				next:  &RadixNode{eow: true},
+				next:  &Node{eow: true},
 			}
 			break
 		}
@@ -46,8 +46,8 @@ func (t *RadixTrie) AddString(s string) {
 		if j != m {
 			tail := e.chars[j:]
 			e.chars = e.chars[:j]
-			tailNode := &RadixNode{false, make(map[byte]*RadixEdge)}
-			tailNode.edges[tail[0]] = &RadixEdge{
+			tailNode := &Node{false, make(map[rune]*Edge)}
+			tailNode.edges[tail[0]] = &Edge{
 				chars: tail,
 				next:  e.next,
 			}
@@ -63,7 +63,7 @@ func (t *RadixTrie) AddString(s string) {
 	}
 }
 
-func findFirstDiff(a, b []byte) int {
+func findFirstDiff(a, b []rune) int {
 	if len(a) > len(b) {
 		a, b = b, a
 	}
@@ -75,9 +75,9 @@ func findFirstDiff(a, b []byte) int {
 	return len(a)
 }
 
-func (t *RadixTrie) searchRadixNode(s string) *RadixNode {
+func (t *Trie) searchRadixNode(s string) *Node {
 	n := t.root
-	w := []byte(s)
+	w := []rune(s)
 	for len(w) > 0 {
 		c := w[0]
 		e, ok := n.edges[c]
@@ -94,7 +94,7 @@ func (t *RadixTrie) searchRadixNode(s string) *RadixNode {
 	return n
 }
 
-func (t *RadixTrie) DeleteString(s string) bool {
+func (t *Trie) DeleteString(s string) bool {
 	n := t.searchRadixNode(s)
 	if n == nil {
 		return false
@@ -106,7 +106,7 @@ func (t *RadixTrie) DeleteString(s string) bool {
 	return false
 }
 
-func (t *RadixTrie) SearchString(s string) bool {
+func (t *Trie) SearchString(s string) bool {
 	n := t.searchRadixNode(s)
 	if n == nil {
 		return false
@@ -114,9 +114,9 @@ func (t *RadixTrie) SearchString(s string) bool {
 	return n.eow
 }
 
-func (t *RadixTrie) SearchPrefix(s string) bool {
+func (t *Trie) SearchPrefix(s string) bool {
 	n := t.root
-	w := []byte(s)
+	w := []rune(s)
 	i := 0
 	for len(w) > 0 {
 		c := w[0]

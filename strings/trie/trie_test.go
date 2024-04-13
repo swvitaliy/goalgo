@@ -6,12 +6,12 @@ import (
 )
 
 func TestNewTrie(t *testing.T) {
-	a := NewTrie()
+	a := NewTrieNode()
 	assert.True(t, a != nil)
 }
 
 func TestAddString(t *testing.T) {
-	a := NewTrie()
+	a := NewTrieNode()
 	a.AddString("hello")
 	assert.True(t, a.SearchPrefix("hello"))
 	assert.True(t, a.SearchString("hello"))

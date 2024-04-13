@@ -1,47 +1,50 @@
 package trie
 
-type TrieNode struct {
-	children map[byte]*TrieNode
+type Node struct {
+	children map[rune]*Node
+	term     bool
 }
 
-func NewTrie() *TrieNode {
-	return &TrieNode{make(map[byte]*TrieNode)}
+func NewTrieNode() *Node {
+	return &Node{
+		children: make(map[rune]*Node),
+		term:     false,
+	}
 }
 
-func (n *TrieNode) AddString(s string) *TrieNode {
-	for _, c := range []byte(s) {
+func (n *Node) AddString(s string) *Node {
+	for _, c := range []rune(s) {
 		t, ok := n.children[c]
 		if !ok {
-			t = &TrieNode{make(map[byte]*TrieNode)}
+			t = NewTrieNode()
 			n.children[c] = t
 		}
 		n = t
 	}
-	n.children['$'] = &TrieNode{}
+	n.term = true
 	return n
 }
 
-func (n *TrieNode) SearchString(s string) bool {
+func (n *Node) SearchString(s string) bool {
 	_, ok := n.SearchStringNode(s)
 	return ok
 }
 
-func (n *TrieNode) SearchStringNode(s string) (*TrieNode, bool) {
+func (n *Node) SearchStringNode(s string) (*Node, bool) {
 	n, hasPrefix := n.SearchPrefixNode(s)
 	if !hasPrefix {
 		return nil, false
 	}
-	_, ok := n.children['$']
-	return n, ok
+	return n, n.term
 }
 
-func (n *TrieNode) SearchPrefix(s string) bool {
+func (n *Node) SearchPrefix(s string) bool {
 	_, ok := n.SearchPrefixNode(s)
 	return ok
 }
 
-func (n *TrieNode) SearchPrefixNode(s string) (*TrieNode, bool) {
-	for _, c := range []byte(s) {
+func (n *Node) SearchPrefixNode(s string) (*Node, bool) {
+	for _, c := range []rune(s) {
 		t, ok := n.children[c]
 		if !ok {
 			return n, false
@@ -52,8 +55,8 @@ func (n *TrieNode) SearchPrefixNode(s string) (*TrieNode, bool) {
 
 }
 
-func (n *TrieNode) DeleteString(s string) {
+func (n *Node) DeleteString(s string) {
 	if n, ok := n.SearchStringNode(s); ok {
-		delete(n.children, '$')
+		n.term = false
 	}
 }
