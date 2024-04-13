@@ -8,7 +8,7 @@ func lg(x uint64) int {
 	return 63 - bits.LeadingZeros64(x)
 }
 
-func NewSparseTable[T any](n int) SparseTable[T] {
+func makeSparseTable[T any](n int) SparseTable[T] {
 	logN := lg(uint64(n)) + 1
 	a := make([][]T, logN)
 	for i := range a {
@@ -18,7 +18,7 @@ func NewSparseTable[T any](n int) SparseTable[T] {
 }
 
 func BuildSparseTable[S ~[]T, T any](a S, fn func(a, b T) T) SparseTable[T] {
-	st := NewSparseTable[T](len(a))
+	st := makeSparseTable[T](len(a))
 	if len(st) == 0 {
 		return st
 	}

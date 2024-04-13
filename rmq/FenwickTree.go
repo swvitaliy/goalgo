@@ -1,6 +1,9 @@
 package rmq
 
-import "golang.org/x/exp/constraints"
+import (
+	"goalgo/slices"
+	"golang.org/x/exp/constraints"
+)
 
 // Binary Indexed Tree
 
@@ -9,9 +12,7 @@ type FenwickTree[T any] []T
 func BuildFenwickTree[S ~[]T, T any](a S, fn func(a, b T) T) FenwickTree[T] {
 	var b FenwickTree[T] = make([]T, len(a))
 	var zero T
-	for i := range b {
-		b[i] = zero
-	}
+	slices.Fill(b, zero)
 	for i := 0; i < len(a); i++ {
 		b.Update(i, a[i], fn)
 	}
@@ -45,9 +46,7 @@ type NumericFenwickTree[T numeric] []T
 func BuildSumFenwickTree[T numeric](a []T) NumericFenwickTree[T] {
 	var b NumericFenwickTree[T] = make([]T, len(a))
 	var zero T
-	for i := range b {
-		b[i] = zero
-	}
+	slices.Fill(b, zero)
 	for i := 0; i < len(a); i++ {
 		b.Update(i, a[i])
 	}

@@ -18,3 +18,7 @@ func TestSegTree_Query(t *testing.T) {
 func sumFn(a, b int) int {
 	return a + b
 }
+
+func subFn(a, b int) int {
+	return a - b
+}
