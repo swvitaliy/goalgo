@@ -14,6 +14,8 @@ func IsSorted[S ~[]T, T cmp.Ordered](a S, dir bool) bool {
 	return true
 }
 
+// Reverse reverses the elements of the slice in place.
+// deprecated use slices.Reverse instead from base package.
 func Reverse[S ~[]T, T any](a S) {
 	i := 0
 	j := len(a) - 1
