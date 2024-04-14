@@ -7,6 +7,9 @@ const Descending = false
 
 func IsSorted[S ~[]T, T cmp.Ordered](a S, dir bool) bool {
 	for i := 1; i < len(a); i++ {
+		if a[i-1] == a[i] {
+			continue
+		}
 		if dir == (a[i-1] > a[i]) {
 			return false
 		}
