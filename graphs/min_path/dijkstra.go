@@ -1,8 +1,9 @@
 package min_path
 
 import (
-	"goalgo/pq"
-	"goalgo/slices"
+	"goalgo/heap"
+	"slices"
+	//"goalgo/slices"
 )
 
 const (
@@ -25,7 +26,7 @@ func Dijkstra(a [][]edge, s, t int) (int, []int) {
 	d[s] = 0
 	p := make([]int, n)
 	p[s] = -1
-	q := pq.NewPQ[int]()
+	q := heap.NewHeapPair[int, int]()
 	q.Enqueue(0, s)
 	for len(q) > 0 {
 		v, l := q.Dequeue()
