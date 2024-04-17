@@ -10,10 +10,10 @@ const (
 	Black
 )
 
-// CycleDFS for cycle detection
+// DetectCycleDFS for cycle detection
 // Returns index of some node of the cycle
 // Returns -1 if there is no cycle
-func CycleDFS(g [][]int) int {
+func DetectCycleDFS(g [][]int) bool {
 	n := len(g)
 	c := make([]Color, n)
 	p := make([]int, n)
@@ -22,11 +22,11 @@ func CycleDFS(g [][]int) int {
 	for i := 0; i < n; i++ {
 		t := cycleDFS(g, c, p, i)
 		if t != -1 {
-			return t
+			return true
 		}
 	}
 
-	return -1
+	return false
 }
 
 func CyclesDFS(g [][]int) []int {
@@ -59,6 +59,8 @@ func cycleDFS(g [][]int, c []Color, p []int, i int) int {
 			}
 		}
 	}
+
+	c[i] = Black
 
 	return -1
 }
