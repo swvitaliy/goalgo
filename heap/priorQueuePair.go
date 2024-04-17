@@ -1,4 +1,4 @@
-package pq
+package heap
 
 import "cmp"
 
@@ -8,13 +8,13 @@ type pqItem[T any, P cmp.Ordered] struct {
 	val   T
 }
 
-type PriorQueuePair[T any, P cmp.Ordered] []pqItem[T, P]
+type HeapPair[T any, P cmp.Ordered] []pqItem[T, P]
 
-func NewPriorQueuePair[T any, P cmp.Ordered]() PriorQueuePair[T, P] {
-	return make(PriorQueuePair[T, P], 0)
+func NewHeapPair[T any, P cmp.Ordered]() HeapPair[T, P] {
+	return make(HeapPair[T, P], 0)
 }
 
-func (q *PriorQueuePair[T, P]) sieveUp(i int) {
+func (q *HeapPair[T, P]) sieveUp(i int) {
 	a := *q
 	for i > 0 {
 		p := (i - 1) / 2
@@ -26,7 +26,7 @@ func (q *PriorQueuePair[T, P]) sieveUp(i int) {
 	}
 }
 
-func (q *PriorQueuePair[T, P]) sieveDown(i int) {
+func (q *HeapPair[T, P]) sieveDown(i int) {
 	a := *q
 	n := len(a)
 
@@ -56,16 +56,16 @@ func (q *PriorQueuePair[T, P]) sieveDown(i int) {
 	}
 }
 
-func (q *PriorQueuePair[T, P]) Enqueue(p P, v T) {
+func (q *HeapPair[T, P]) Enqueue(p P, v T) {
 	*q = append(*q, pqItem[T, P]{p, v})
 	q.sieveUp(len(*q) - 1)
 }
 
-func (q *PriorQueuePair[T, P]) Dequeue() (T, P) {
+func (q *HeapPair[T, P]) Dequeue() (T, P) {
 	a := *q
 	n := len(a)
 	if n == 0 {
-		panic("cannot Dequeue value from empty PriorQueuePair")
+		panic("cannot Dequeue value from empty HeapPair")
 	}
 	if n == 1 {
 		r := a[0]

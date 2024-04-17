@@ -1,4 +1,4 @@
-package pq
+package heap
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -7,7 +7,7 @@ import (
 )
 
 func TestPQueue_Enqueue_Dequeue(t *testing.T) {
-	q := NewPriorQueuePair[uint, int]()
+	q := NewHeapPair[uint, int]()
 	q.Enqueue(0, 0)
 	q.Enqueue(7, 7)
 	q.Enqueue(2, 22)
@@ -23,7 +23,7 @@ func TestPQueue_Enqueue_Dequeue(t *testing.T) {
 }
 func TestPriorQueuePair1(t *testing.T) {
 	a := []int{6, 9, 11, 15, 3, 8, 9, 2, 11, 7, 13, 12, 1, 9}
-	q := NewPriorQueuePair[int, int]()
+	q := NewHeapPair[int, int]()
 	for _, ai := range a {
 		q.Enqueue(ai, ai)
 	}

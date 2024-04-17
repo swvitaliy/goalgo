@@ -1,14 +1,14 @@
-package pq
+package heap
 
 import "cmp"
 
-type PriorQueueOrdered[T cmp.Ordered] []T
+type HeapOrdered[T cmp.Ordered] []T
 
-func NewPriorQueueOrdered[T cmp.Ordered]() PriorQueueOrdered[T] {
-	return make(PriorQueueOrdered[T], 0)
+func NewHeapOrdered[T cmp.Ordered]() HeapOrdered[T] {
+	return make(HeapOrdered[T], 0)
 }
 
-func (q *PriorQueueOrdered[T]) sieveUp(i int) {
+func (q *HeapOrdered[T]) sieveUp(i int) {
 	a := *q
 	for i > 0 {
 		p := (i - 1) / 2
@@ -20,7 +20,7 @@ func (q *PriorQueueOrdered[T]) sieveUp(i int) {
 	}
 }
 
-func (q *PriorQueueOrdered[T]) sieveDown(i int) {
+func (q *HeapOrdered[T]) sieveDown(i int) {
 	a := *q
 	n := len(a)
 
@@ -50,12 +50,12 @@ func (q *PriorQueueOrdered[T]) sieveDown(i int) {
 	}
 }
 
-func (q *PriorQueueOrdered[T]) Enqueue(v T) {
+func (q *HeapOrdered[T]) Enqueue(v T) {
 	*q = append(*q, v)
 	q.sieveUp(len(*q) - 1)
 }
 
-func (q *PriorQueueOrdered[T]) Dequeue() T {
+func (q *HeapOrdered[T]) Dequeue() T {
 	a := *q
 	n := len(a)
 	if n == 0 {
