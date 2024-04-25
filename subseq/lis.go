@@ -9,9 +9,7 @@ import (
 func Lis[S ~[]T, T cmp.Ordered](a S) S {
 	n := len(a)
 	d := make([]T, n+1)
-	for i := range d {
-		d[i] = limits.MaxValue[T]()
-	}
+	slices.Fill(d, limits.MaxValue[T]())
 	d[0] = limits.MinValue[T]()
 
 	prev := make([]int, n)
@@ -25,9 +23,7 @@ func Lis[S ~[]T, T cmp.Ordered](a S) S {
 			d[j] = ai
 			pos[j] = i
 			prev[i] = pos[j-1]
-			if j > l {
-				l = j
-			}
+			j = max(j, l)
 		}
 	}
 
@@ -40,4 +36,21 @@ func Lis[S ~[]T, T cmp.Ordered](a S) S {
 
 	slices.Reverse(ans)
 	return ans
+}
+
+func LisLen[S ~[]T, T cmp.Ordered](a S) int {
+	n := len(a)
+	d := make([]T, n+1)
+	slices.Fill(d, limits.MaxValue[T]())
+	d[0] = limits.MinValue[T]()
+	l := 1
+	for _, ai := range a {
+		j := slices.UpperBound(d, ai)
+		if cmp.Less(d[j-1], ai) && cmp.Less(ai, d[j]) {
+			d[j] = ai
+			j = max(j, l)
+		}
+	}
+
+	return l
 }
