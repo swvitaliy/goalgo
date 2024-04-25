@@ -23,7 +23,7 @@ func (dsu *DSU) DFS(g [][]int, q [][]Query, v int) {
 	}
 }
 
-func LCA(g [][]int, q [][]Query) {
+func GraphLca(g [][]int, q [][]Query) {
 	a := NewDSU(len(g))
 	a.DFS(g, q, 0)
 }
