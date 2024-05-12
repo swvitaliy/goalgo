@@ -13,7 +13,7 @@ type edge struct {
 // KraskalMST for minimum spanning tree
 func KraskalMST(g []edge, n int) []edge {
 	m := len(g)
-	var res []edge
+	res := make([]edge, 0, m)
 	sort.Slice(g, func(i, j int) bool {
 		return g[i].w < g[j].w
 	})

@@ -1,6 +1,16 @@
 package graphs
 
-import "goalgo/slices"
+import goalSlices "goalgo/slices"
+
+func MakeReversedGraph(g [][]int, n int) [][]int {
+	gr := make([][]int, n)
+	for i := range g {
+		for _, v := range g[i] {
+			gr[v] = append(gr[v], i)
+		}
+	}
+	return gr
+}
 
 // Scc for strongly connected components
 func Scc(g, gr [][]int, n int, visit func(comp []int)) {
@@ -32,7 +42,7 @@ func Scc(g, gr [][]int, n int, visit func(comp []int)) {
 	}
 
 	used = make([]bool, n)
-	slices.Fill(used, false)
+	goalSlices.Fill(used, false)
 
 	order = make([]int, n)
 
@@ -42,7 +52,7 @@ func Scc(g, gr [][]int, n int, visit func(comp []int)) {
 		}
 	}
 
-	slices.Fill(used, false)
+	goalSlices.Fill(used, false)
 
 	comp = make([]int, 0, n)
 
