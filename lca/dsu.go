@@ -16,6 +16,7 @@ func NewDSU(n int) *DSU {
 	}
 
 	for i := 0; i < n; i++ {
+		ans.p[i] = i
 		ans.r[i] = 1
 		ans.u[i] = false
 	}
