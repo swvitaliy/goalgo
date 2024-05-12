@@ -18,6 +18,11 @@ func TestDijkstra1(t *testing.T) {
 	e[2] = []edge{
 		{3, 7},
 	}
+	e[3] = []edge{}
+	e[4] = []edge{
+		{0, 8},
+		{2, 2},
+	}
 	w, path := Dijkstra(e, 0, 3)
 	if w != 8 {
 		t.Error()
