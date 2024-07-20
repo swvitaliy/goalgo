@@ -3,11 +3,22 @@ package multiset
 import (
 	"github.com/emirpasic/gods/v2/trees/btree"
 	"github.com/stretchr/testify/assert"
-	"goalgo/utils"
+	"log"
 	"testing"
 )
 
-var Must = utils.MakeMust2Func[int]("Key is not in the multiset")
+type Must2Func[T any] func(T, bool) T
+
+func MakeMust2Func[T any](pattern string) Must2Func[T] {
+	return func(x T, ok bool) T {
+		if !ok {
+			log.Fatalf(pattern)
+		}
+		return x
+	}
+}
+
+var Must = MakeMust2Func[int]("Key is not in the multiset")
 
 func TestMsPut1(t *testing.T) {
 	q := btree.New[int, int](3)
