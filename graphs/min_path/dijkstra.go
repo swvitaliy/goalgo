@@ -2,7 +2,7 @@ package min_path
 
 import (
 	"github.com/emirpasic/gods/v2/sets/treeset"
-	"goalgo/misc"
+	"goalgo/common"
 	goalSlices "goalgo/slices"
 )
 
@@ -27,8 +27,8 @@ func Dijkstra(a [][]edge, s, t int) (int, []int) {
 	p := make([]int, n)
 	p[s] = -1
 
-	q := treeset.NewWith(misc.PriorPairCmp[int, int])
-	q.Add(misc.MakePriorPair(0, s))
+	q := treeset.NewWith(common.PriorPairCmp[int, int])
+	q.Add(common.MakePriorPair(0, s))
 	for q.Size() > 0 {
 		it := q.Iterator()
 		it.First()
@@ -40,10 +40,10 @@ func Dijkstra(a [][]edge, s, t int) (int, []int) {
 		}
 		for _, e := range a[v] {
 			if d[v]+e.weight < d[e.to] {
-				q.Remove(misc.MakePriorPair(d[e.to], e.to))
+				q.Remove(common.MakePriorPair(d[e.to], e.to))
 				d[e.to] = d[v] + e.weight
 				p[e.to] = v
-				q.Add(misc.MakePriorPair(d[e.to], e.to))
+				q.Add(common.MakePriorPair(d[e.to], e.to))
 			}
 		}
 	}
