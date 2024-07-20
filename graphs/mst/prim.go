@@ -2,8 +2,8 @@ package mst
 
 import (
 	"github.com/emirpasic/gods/v2/sets/treeset"
+	"goalgo/common"
 	"goalgo/limits"
-	"goalgo/misc"
 	"goalgo/slices"
 	"math"
 )
@@ -41,8 +41,8 @@ func PrimMST(s ndx, g [][]adjEdge) []ndx {
 	p := make([]ndx, n)
 	p[s] = -1
 
-	q := treeset.NewWith(misc.PriorPairCmp[wei, ndx])
-	q.Add(misc.MakePriorPair(wei(0), s))
+	q := treeset.NewWith(common.PriorPairCmp[wei, ndx])
+	q.Add(common.MakePriorPair(wei(0), s))
 	for q.Size() > 0 {
 		it := q.Iterator()
 		it.First()
@@ -50,10 +50,10 @@ func PrimMST(s ndx, g [][]adjEdge) []ndx {
 		q.Remove(it.Value())
 		for _, e := range g[v] {
 			if e.w < d[e.t] {
-				q.Remove(misc.MakePriorPair(d[e.t], e.t))
+				q.Remove(common.MakePriorPair(d[e.t], e.t))
 				d[e.t] = e.w
 				p[e.t] = v
-				q.Add(misc.MakePriorPair(d[e.t], e.t))
+				q.Add(common.MakePriorPair(d[e.t], e.t))
 			}
 		}
 	}
