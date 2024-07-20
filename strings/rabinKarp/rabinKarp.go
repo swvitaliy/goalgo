@@ -1,4 +1,4 @@
-package strings
+package rabinKarp
 
 const p = 1000000007
 
@@ -23,8 +23,8 @@ func initPP(n int) {
 	}
 }
 
-// RabinKarpSearch searches for s in t
-func RabinKarpSearch(s, t string) int {
+// Search searches for s in t
+func Search(s, t string) int {
 	n := len(s)
 	m := len(t)
 
