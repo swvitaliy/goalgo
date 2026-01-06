@@ -2,9 +2,10 @@ package subseq
 
 import (
 	"fmt"
+	"testing"
+
 	gglCmp "github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestLis1(t *testing.T) {

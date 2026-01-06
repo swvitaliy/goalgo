@@ -1,8 +1,9 @@
 package min_path
 
 import (
-	gglCmp "github.com/google/go-cmp/cmp"
 	"testing"
+
+	gglCmp "github.com/google/go-cmp/cmp"
 )
 
 func TestDijkstra1(t *testing.T) {

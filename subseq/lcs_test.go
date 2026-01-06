@@ -1,8 +1,9 @@
 package subseq
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLcs1(t *testing.T) {

@@ -1,9 +1,10 @@
 package mst
 
 import (
-	"github.com/stretchr/testify/assert"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Returns a list of edges representing the minimum spanning tree of the input graph.

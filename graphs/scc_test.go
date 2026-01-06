@@ -1,9 +1,10 @@
 package graphs
 
 import (
-	"github.com/stretchr/testify/assert"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestScc_Single(t *testing.T) {

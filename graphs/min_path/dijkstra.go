@@ -1,9 +1,10 @@
 package min_path
 
 import (
-	"github.com/emirpasic/gods/v2/sets/treeset"
 	"goalgo/common"
 	goalSlices "goalgo/slices"
+
+	"github.com/emirpasic/gods/v2/sets/treeset"
 )
 
 const (

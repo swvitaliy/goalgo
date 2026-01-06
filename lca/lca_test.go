@@ -1,9 +1,10 @@
 package lca
 
 import (
-	"github.com/stretchr/testify/assert"
 	"goalgo/trees/bst"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBstLca(t *testing.T) {

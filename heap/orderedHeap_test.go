@@ -1,9 +1,10 @@
 package heap
 
 import (
-	"github.com/stretchr/testify/assert"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestOrderedHeap_Insert_Extract(t *testing.T) {

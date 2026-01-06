@@ -1,8 +1,9 @@
 package aho_corasick
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFindAll1(t *testing.T) {

@@ -1,11 +1,12 @@
 package mst
 
 import (
-	"github.com/emirpasic/gods/v2/sets/treeset"
 	"goalgo/common"
 	"goalgo/limits"
 	"goalgo/slices"
 	"math"
+
+	"github.com/emirpasic/gods/v2/sets/treeset"
 )
 
 type ndx int

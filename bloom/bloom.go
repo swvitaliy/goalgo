@@ -1,8 +1,9 @@
 package bloom
 
 import (
-	"github.com/spaolacci/murmur3"
 	"hash"
+
+	"github.com/spaolacci/murmur3"
 )
 
 type BF struct {

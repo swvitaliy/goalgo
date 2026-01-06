@@ -2,6 +2,7 @@ package rmq
 
 import (
 	"goalgo/slices"
+
 	"golang.org/x/exp/constraints"
 )
 

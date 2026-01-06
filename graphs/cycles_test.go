@@ -1,9 +1,10 @@
 package graphs
 
 import (
-	"github.com/stretchr/testify/assert"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDetectCycles(t *testing.T) {

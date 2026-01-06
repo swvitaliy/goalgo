@@ -1,8 +1,9 @@
 package mst
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // returns a list of length n with the parent of each vertex in the MST

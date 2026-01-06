@@ -1,9 +1,10 @@
 package sorts
 
 import (
-	"github.com/stretchr/testify/assert"
 	"goalgo/slices"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBitonicSort(t *testing.T) {
