@@ -2,13 +2,22 @@ package skip_list
 
 import (
 	"cmp"
+	"iter"
 	"math/rand/v2"
 )
 
 const (
-	p        = 0.5
-	maxLevel = 16
+	probability = 0.5
+	maxLevel    = 16
 )
+
+func randomLevel() uint64 {
+	var lvl uint64 = 1
+	for rand.Float64() < probability && lvl < maxLevel {
+		lvl++
+	}
+	return lvl
+}
 
 type Key cmp.Ordered
 type Value any
@@ -25,7 +34,7 @@ type SkipList[K Key, V Value] struct {
 	head  *Node[K, V]
 }
 
-func NewSkipList[K Key, V Value](maxLevel uint64) *SkipList[K, V] {
+func NewSkipList[K Key, V Value]() *SkipList[K, V] {
 	return &SkipList[K, V]{
 		level: 1,
 		size:  0,
@@ -35,9 +44,38 @@ func NewSkipList[K Key, V Value](maxLevel uint64) *SkipList[K, V] {
 	}
 }
 
-func (sl *SkipList[K, V]) SearchNode(target K) *Node[K, V] {
-	node := sl.head
-	for i := sl.level - 1; i >= 0; i-- {
+func FromSliceOfKeys[K Key](a []K) *SkipList[K, struct{}] {
+	sl := NewSkipList[K, struct{}]()
+	for _, v := range a {
+		sl.Insert(v, struct{}{})
+	}
+	return sl
+}
+
+func FromSliceOfValues[V Value](a []V) *SkipList[int, V] {
+	sl := NewSkipList[int, V]()
+	for i, v := range a {
+		sl.Insert(i, v)
+	}
+	return sl
+}
+
+type Pair[K Key, V Value] struct {
+	Key   K
+	Value V
+}
+
+func FromSliceOfPairs[K Key, V Value](a []Pair[K, V]) *SkipList[K, V] {
+	sl := NewSkipList[K, V]()
+	for _, p := range a {
+		sl.Insert(p.Key, p.Value)
+	}
+	return sl
+}
+
+func (csl *SkipList[K, V]) SearchNode(target K) *Node[K, V] {
+	node := csl.head
+	for i := csl.level - 1; i >= 0; i-- {
 		for node != nil && node.next[i].key < target {
 			node = node.next[i]
 		}
@@ -52,8 +90,8 @@ func (sl *SkipList[K, V]) SearchNode(target K) *Node[K, V] {
 	return nil
 }
 
-func (sl *SkipList[K, V]) Search(target K) (value V, ok bool) {
-	node := sl.SearchNode(target)
+func (csl *SkipList[K, V]) Search(target K) (value V, ok bool) {
+	node := csl.SearchNode(target)
 	if node == nil {
 		ok = false
 		return
@@ -61,10 +99,10 @@ func (sl *SkipList[K, V]) Search(target K) (value V, ok bool) {
 	return node.value, true
 }
 
-func (sl *SkipList[K, V]) Insert(key K, value V) *Node[K, V] {
+func (csl *SkipList[K, V]) Insert(key K, value V) *Node[K, V] {
 	update := make([]*Node[K, V], maxLevel)
-	node := sl.head
-	for i := sl.level - 1; i >= 0; i-- {
+	node := csl.head
+	for i := csl.level - 1; i >= 0; i-- {
 		for node != nil && node.next[i].key < key {
 			node = node.next[i]
 		}
@@ -81,11 +119,11 @@ func (sl *SkipList[K, V]) Insert(key K, value V) *Node[K, V] {
 		return node
 	}
 	lvl := randomLevel()
-	if lvl > sl.level {
-		for i := sl.level; i < lvl; i++ {
-			update[i] = sl.head
+	if lvl > csl.level {
+		for i := csl.level; i < lvl; i++ {
+			update[i] = csl.head
 		}
-		sl.level = lvl
+		csl.level = lvl
 	}
 
 	newNode := &Node[K, V]{
@@ -97,14 +135,14 @@ func (sl *SkipList[K, V]) Insert(key K, value V) *Node[K, V] {
 		newNode.next[i] = update[i].next[i]
 		update[i].next[i] = newNode
 	}
-	sl.size++
+	csl.size++
 	return newNode
 }
 
-func (sl *SkipList[K, V]) Delete(key K) bool {
+func (csl *SkipList[K, V]) Delete(key K) bool {
 	update := make([]*Node[K, V], maxLevel)
-	node := sl.head
-	for i := sl.level - 1; i >= 0; i-- {
+	node := csl.head
+	for i := csl.level - 1; i >= 0; i-- {
 		for node.next[i] != nil && node.next[i].key < key {
 			node = node.next[i]
 		}
@@ -116,24 +154,35 @@ func (sl *SkipList[K, V]) Delete(key K) bool {
 		return false
 	}
 
-	for i := uint64(0); i < sl.level; i++ {
+	for i := uint64(0); i < csl.level; i++ {
 		if update[i].next[i] != node {
 			break
 		}
 		update[i].next[i] = node.next[i]
 	}
 
-	for sl.level > 1 && sl.head.next[sl.level-1] == nil {
-		sl.level--
+	for csl.level > 1 && csl.head.next[csl.level-1] == nil {
+		csl.level--
 	}
-	sl.size--
+	csl.size--
 	return true
 }
 
-func randomLevel() uint64 {
-	var lvl uint64 = 1
-	for rand.Float64() < 0.5 && lvl < maxLevel {
-		lvl++
+func (csl *SkipList[K, V]) Range(b, e K) iter.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		node := csl.head
+		for i := csl.level - 1; i >= 0; i-- {
+			for node.next[i] != nil && node.next[i].key < b {
+				node = node.next[i]
+			}
+		}
+
+		node = node.next[0]
+		for node != nil && node.key <= e {
+			if !yield(node.key, node.value) {
+				return
+			}
+			node = node.next[0]
+		}
 	}
-	return lvl
 }
