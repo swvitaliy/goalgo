@@ -1,4 +1,4 @@
-package skip_list
+package skiplist
 
 import (
 	"slices"
@@ -17,35 +17,35 @@ func TestSkipList_RangeInts(t *testing.T) {
 	}{
 		{
 			name:     "empty skip list",
-			skipList: FromSliceOfKeys([]int{}),
+			skipList: NewFromSliceOfKeys(RandomGenerator, []int{}),
 			begin:    0,
 			end:      10,
 			result:   []int{},
 		},
 		{
 			name:     "simple range - range more left",
-			skipList: FromSliceOfKeys([]int{1, 2, 3}),
+			skipList: NewFromSliceOfKeys(RandomGenerator, []int{1, 2, 3}),
 			begin:    -1,
 			end:      0,
 			result:   []int{},
 		},
 		{
 			name:     "simple range - range more right",
-			skipList: FromSliceOfKeys([]int{1, 2, 3}),
+			skipList: NewFromSliceOfKeys(RandomGenerator, []int{1, 2, 3}),
 			begin:    10,
 			end:      12,
 			result:   []int{},
 		},
 		{
-			name:     "simple range - range exactly coinsident with skip list first/last keys",
-			skipList: FromSliceOfKeys([]int{1, 2, 3}),
+			name:     "simple range - range exactly coincident with skip list first/last keys",
+			skipList: NewFromSliceOfKeys(RandomGenerator, []int{1, 2, 3}),
 			begin:    1,
 			end:      3,
 			result:   []int{1, 2, 3},
 		},
 		{
 			name:     "unordered skip list",
-			skipList: FromSliceOfKeys([]int{7, 0, 12, 5, 63, 24, 76}),
+			skipList: NewFromSliceOfKeys(RandomGenerator, []int{7, 0, 12, 5, 63, 24, 76}),
 			begin:    5,
 			end:      65,
 			result:   []int{5, 7, 12, 24, 63},

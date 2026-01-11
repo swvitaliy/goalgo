@@ -1,6 +1,8 @@
-package skip_list
+package skiplist
 
 import (
+	"iter"
+	"sort"
 	"sync/atomic"
 	"unsafe"
 )
@@ -13,17 +15,45 @@ type ConcurrentNode[K Key, V Value] struct {
 }
 
 type ConcurrentSkipList[K Key, V Value] struct {
-	head  *ConcurrentNode[K, V]
-	level int32
+	head           *ConcurrentNode[K, V]
+	level          int32
+	levelGenerator levelGenerator
 }
 
-func NewConcurrentSkipList[K Key, V Value]() *ConcurrentSkipList[K, V] {
+func NewConcurrentSkipList[K Key, V Value](lg levelGenerator) *ConcurrentSkipList[K, V] {
 	var zeroKey K
 	var zeroVal V
 	head := newNode[K, V](zeroKey, zeroVal, maxLevel)
 	return &ConcurrentSkipList[K, V]{
-		head: head,
+		head:           head,
+		levelGenerator: lg,
 	}
+}
+
+func NewConcurrentFromKeysIter[K Key](lg levelGenerator, it iter.Seq[K]) *ConcurrentSkipList[K, struct{}] {
+	sl := NewConcurrentSkipList[K, struct{}](lg)
+	for v := range it {
+		sl.Insert(v, struct{}{})
+	}
+	return sl
+}
+
+func NewConcurrentFromValuesIter[V Value](lg levelGenerator, it iter.Seq[V]) *ConcurrentSkipList[int, V] {
+	sl := NewConcurrentSkipList[int, V](lg)
+	i := 0
+	for v := range it {
+		sl.Insert(i, v)
+		i++
+	}
+	return sl
+}
+
+func NewConcurrentFromPairsIter[K Key, V Value](lg levelGenerator, it iter.Seq[Pair[K, V]]) *ConcurrentSkipList[K, V] {
+	sl := NewConcurrentSkipList[K, V](lg)
+	for p := range it {
+		sl.Insert(p.Key, p.Value)
+	}
+	return sl
 }
 
 func newNode[K Key, V Value](key K, value V, level int) *ConcurrentNode[K, V] {
@@ -56,7 +86,7 @@ retry:
 		curr, _ = loadNext(pred, level)
 		for {
 			if curr == nil {
-				brea
+				break
 			}
 			succ, mark = loadNext(curr, level)
 			for mark {
@@ -112,7 +142,7 @@ func (csl *ConcurrentSkipList[K, V]) Contains(key K) (*V, bool) {
 // Insert (returns true if inserted, false if key already present)
 func (csl *ConcurrentSkipList[K, V]) Insert(key K, value V) bool {
 	type node = ConcurrentNode[K, V]
-	level := int(randomLevel())
+	level := int(csl.levelGenerator.NextLevel())
 	var preds = make([]*node, maxLevel)
 	var succs = make([]*node, maxLevel)
 
@@ -151,6 +181,62 @@ func (csl *ConcurrentSkipList[K, V]) Insert(key K, value V) bool {
 			atomic.CompareAndSwapInt32(&csl.level, currentLevel, int32(level))
 		}
 		return true
+	}
+}
+
+func (csl *ConcurrentSkipList[K, V]) BulkInsert(keys []K, values []V) {
+	if len(keys) != len(values) {
+		panic("keys and values length mismatch")
+	}
+
+	type insertNode struct {
+		key   K
+		value V
+		level int
+	}
+
+	nodes := make([]insertNode, len(keys))
+	for i := range keys {
+		nodes[i] = insertNode{
+			key:   keys[i],
+			value: values[i],
+			level: int(csl.levelGenerator.NextLevel()),
+		}
+	}
+
+	sort.Slice(nodes, func(i, j int) bool { return nodes[i].key < nodes[j].key })
+
+	type nodeType = ConcurrentNode[K, V]
+
+	// Shared traversal
+	update := make([]*nodeType, maxLevel)
+	current := csl.head
+
+	for _, n := range nodes {
+		for i := maxLevel - 1; i >= 0; i-- {
+			for next := current.next[i].Load(); next != nil && next.key < n.key; next = current.next[i].Load() {
+				current = next
+			}
+			update[i] = current
+		}
+
+		node := &ConcurrentNode[K, V]{
+			key:   n.key,
+			value: n.value,
+			next:  make([]atomic.Pointer[nodeType], n.level),
+		}
+
+		for i := 0; i < n.level; i++ {
+			node.next[i] = atomic.Pointer[nodeType]{}
+			for {
+				next := update[i].next[i].Load()
+				node.next[i].Store(next)
+				if update[i].next[i].CompareAndSwap(next, node) {
+					break
+				}
+			}
+		}
+		current = node
 	}
 }
 
@@ -196,6 +282,72 @@ func (csl *ConcurrentSkipList[K, V]) Delete(key K) bool {
 		// try to physically remove by swinging preds' pointers
 		csl.find(key, preds, succs) // helps unlink
 		return true
+	}
+}
+
+func (csl *ConcurrentSkipList[K, V]) BulkDelete(keys []K) {
+	if len(keys) == 0 {
+		return
+	}
+
+	// сортируем ключи для shared traversal
+	sort.Slice(keys, func(i, j int) bool { return keys[i] < keys[j] })
+
+	update := make([]*ConcurrentNode[K, V], maxLevel)
+	current := csl.head
+
+	for _, key := range keys {
+		// shared traversal по уровням
+		for i := maxLevel - 1; i >= 0; i-- {
+			for {
+				next, marked := loadNext(current, i)
+				if next == nil || next.key >= key {
+					break
+				}
+				current = next
+				if marked {
+					// пропускаем logically deleted узлы
+					continue
+				}
+			}
+			update[i] = current
+		}
+
+		// target node на уровне 0
+		target, _ := loadNext(current, 0)
+		if target == nil || target.key != key {
+			// ключ не найден
+			continue
+		}
+
+		// помечаем узел как удалённый на уровне 0
+		for {
+			ok := casNext(current, 0, target, false, target, true)
+			if ok {
+				break
+			}
+			// если кто-то уже пометил узел, выходим
+			_, alreadyMarked := loadNext(current, 0)
+			if alreadyMarked {
+				break
+			}
+		}
+
+		// unlink верхних уровней
+		for i := len(target.next) - 1; i >= 1; i-- { // верхние уровни
+			for {
+				next, marked := loadNext(target, i)
+				if marked {
+					next = nil
+				}
+				if casNext(update[i], int32(i), target, false, next, false) {
+					break
+				}
+			}
+		}
+
+		// продолжаем traversal с последнего удалённого узла
+		current = target
 	}
 }
 
