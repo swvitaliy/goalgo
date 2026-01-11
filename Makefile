@@ -10,6 +10,14 @@ fmt:
 lint:
 	golangci-lint run ./...
 
+.PHONY: bench
+bench:
+	go test -v -bench=. ./...
+
+.PHONY: fuzz
+fuzz:
+	go test -v -fuzz=Fuzz -fuzztime=10s ./...:w
+
 bench_hashes_100k:
 	N=100000 go test -bench=. -benchmem ./hashes | tee ./hashes/bench_results_100k.txt
 
