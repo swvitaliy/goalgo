@@ -1,0 +1,78 @@
+goos: linux
+goarch: amd64
+pkg: goalgo/hashes
+cpu: Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz
+BenchmarkHRW_Distribution/nodes_3-8  	1000000000	         0.7897 ns/op	       0 B/op	       0 allocs/op
+--- BENCH: BenchmarkHRW_Distribution/nodes_3-8
+    hashes_test.go:38: HRW with 3 nodes: variance from uniform = 0.000000
+    hashes_test.go:38: HRW with 3 nodes: variance from uniform = 0.000000
+    hashes_test.go:38: HRW with 3 nodes: variance from uniform = 0.000000
+    hashes_test.go:38: HRW with 3 nodes: variance from uniform = 0.000000
+    hashes_test.go:38: HRW with 3 nodes: variance from uniform = 0.000000
+    hashes_test.go:38: HRW with 3 nodes: variance from uniform = 0.000000
+    hashes_test.go:38: HRW with 3 nodes: variance from uniform = 0.000000
+    hashes_test.go:38: HRW with 3 nodes: variance from uniform = 0.000000
+    hashes_test.go:38: HRW with 3 nodes: variance from uniform = 0.000000
+    hashes_test.go:38: HRW with 3 nodes: variance from uniform = 0.000000
+	... [output truncated]
+BenchmarkHRW_Distribution/nodes_5-8  	       1	1031237428 ns/op	79723464 B/op	 9999932 allocs/op
+--- BENCH: BenchmarkHRW_Distribution/nodes_5-8
+    hashes_test.go:38: HRW with 5 nodes: variance from uniform = 0.000000
+BenchmarkHRW_Distribution/nodes_10-8 	       1	1130151591 ns/op	79723664 B/op	 9999937 allocs/op
+--- BENCH: BenchmarkHRW_Distribution/nodes_10-8
+    hashes_test.go:38: HRW with 10 nodes: variance from uniform = 0.000000
+BenchmarkHRW_Distribution/nodes_20-8 	       1	1015335613 ns/op	79724752 B/op	 9999951 allocs/op
+--- BENCH: BenchmarkHRW_Distribution/nodes_20-8
+    hashes_test.go:38: HRW with 20 nodes: variance from uniform = 0.000000
+BenchmarkHRW_Distribution/nodes_50-8 	       1	1725062567 ns/op	79726848 B/op	 9999982 allocs/op
+--- BENCH: BenchmarkHRW_Distribution/nodes_50-8
+    hashes_test.go:38: HRW with 50 nodes: variance from uniform = 0.000000
+BenchmarkHRW_Distribution/nodes_100-8         	       1	2318272400 ns/op	79731360 B/op	10000038 allocs/op
+--- BENCH: BenchmarkHRW_Distribution/nodes_100-8
+    hashes_test.go:38: HRW with 100 nodes: variance from uniform = 0.000000
+BenchmarkWRH_Distribution/nodes_3-8           	       1	1560922831 ns/op	79723240 B/op	 9999927 allocs/op
+--- BENCH: BenchmarkWRH_Distribution/nodes_3-8
+    hashes_test.go:67: WRH with 3 nodes: variance from uniform = 0.000000
+BenchmarkWRH_Distribution/nodes_5-8           	       1	2131583121 ns/op	79723448 B/op	 9999930 allocs/op
+--- BENCH: BenchmarkWRH_Distribution/nodes_5-8
+    hashes_test.go:67: WRH with 5 nodes: variance from uniform = 0.000000
+BenchmarkWRH_Distribution/nodes_10-8          	       1	3530437827 ns/op	79724408 B/op	 9999940 allocs/op
+--- BENCH: BenchmarkWRH_Distribution/nodes_10-8
+    hashes_test.go:67: WRH with 10 nodes: variance from uniform = 0.000000
+BenchmarkWRH_Distribution/nodes_20-8          	       1	5979558726 ns/op	79726920 B/op	 9999956 allocs/op
+--- BENCH: BenchmarkWRH_Distribution/nodes_20-8
+    hashes_test.go:67: WRH with 20 nodes: variance from uniform = 0.000000
+BenchmarkWRH_Distribution/nodes_50-8          	       1	12874355719 ns/op	79731640 B/op	 9999988 allocs/op
+--- BENCH: BenchmarkWRH_Distribution/nodes_50-8
+    hashes_test.go:67: WRH with 50 nodes: variance from uniform = 0.000000
+BenchmarkWRH_Distribution/nodes_100-8         	       1	24087611798 ns/op	79740872 B/op	10000043 allocs/op
+--- BENCH: BenchmarkWRH_Distribution/nodes_100-8
+    hashes_test.go:67: WRH with 100 nodes: variance from uniform = 0.000000
+BenchmarkConsistent_Distribution/nodes_3-8    	      12	  83641596 ns/op	 6643749 B/op	  833328 allocs/op
+--- BENCH: BenchmarkConsistent_Distribution/nodes_3-8
+    hashes_test.go:95: Consistent with 3 nodes: variance from uniform = 0.039804
+    hashes_test.go:95: Consistent with 3 nodes: variance from uniform = 0.039804
+    hashes_test.go:95: Consistent with 3 nodes: variance from uniform = 0.039804
+    hashes_test.go:95: Consistent with 3 nodes: variance from uniform = 0.039804
+    hashes_test.go:95: Consistent with 3 nodes: variance from uniform = 0.039804
+    hashes_test.go:95: Consistent with 3 nodes: variance from uniform = 0.039804
+    hashes_test.go:95: Consistent with 3 nodes: variance from uniform = 0.039804
+    hashes_test.go:95: Consistent with 3 nodes: variance from uniform = 0.039804
+    hashes_test.go:95: Consistent with 3 nodes: variance from uniform = 0.039804
+BenchmarkConsistent_Distribution/nodes_5-8    	       1	1060386450 ns/op	79724208 B/op	 9999947 allocs/op
+--- BENCH: BenchmarkConsistent_Distribution/nodes_5-8
+    hashes_test.go:95: Consistent with 5 nodes: variance from uniform = 0.026199
+BenchmarkConsistent_Distribution/nodes_10-8   	       1	1041598835 ns/op	79724840 B/op	 9999963 allocs/op
+--- BENCH: BenchmarkConsistent_Distribution/nodes_10-8
+    hashes_test.go:95: Consistent with 10 nodes: variance from uniform = 0.005207
+BenchmarkConsistent_Distribution/nodes_20-8   	       1	1096367033 ns/op	79728928 B/op	10000002 allocs/op
+--- BENCH: BenchmarkConsistent_Distribution/nodes_20-8
+    hashes_test.go:95: Consistent with 20 nodes: variance from uniform = 0.002524
+BenchmarkConsistent_Distribution/nodes_50-8   	       1	1221272036 ns/op	79734136 B/op	10000097 allocs/op
+--- BENCH: BenchmarkConsistent_Distribution/nodes_50-8
+    hashes_test.go:95: Consistent with 50 nodes: variance from uniform = 0.000301
+BenchmarkConsistent_Distribution/nodes_100-8  	       1	1324827715 ns/op	79744920 B/op	10000248 allocs/op
+--- BENCH: BenchmarkConsistent_Distribution/nodes_100-8
+    hashes_test.go:95: Consistent with 100 nodes: variance from uniform = 0.000101
+PASS
+ok  	goalgo/hashes	97.032s
