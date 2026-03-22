@@ -9,3 +9,6 @@ fmt:
 .PHONY: lint
 lint:
 	golangci-lint run ./...
+
+bench_hashes:
+	go test -bench=. -benchmem ./hashes | tee ./hashes/bench_results.txt
