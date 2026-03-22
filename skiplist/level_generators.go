@@ -6,7 +6,14 @@ import (
 	"golang.org/x/exp/rand"
 )
 
+// Генераторы уровней для вставки ключей в skiplist
+
+// RandomGenerator - рандомный генератор для случайной вставки
 var RandomGenerator = NewRandomLevelGenerator(uint64(time.Now().UnixNano()))
+
+// BatchFriendlyGenerator - генератор для вставки ключей, которые идут в порядке возрастания (или близко к нему).
+// Такой генератор будет выдавать уровни, которые не слишком сильно отличаются от предыдущего,
+// что поможет избежать длинных "хвостов" в skiplist при вставке отсортированных данных.
 var BatchFriendlyGenerator = NewBatchLevelGenerator(uint64(time.Now().UnixNano()))
 
 // RandomLevelGenerator - генератор уровней для случайной вставки
