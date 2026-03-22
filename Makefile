@@ -10,5 +10,11 @@ fmt:
 lint:
 	golangci-lint run ./...
 
-bench_hashes:
-	go test -bench=. -benchmem ./hashes | tee ./hashes/bench_results.txt
+bench_hashes_100k:
+	N=100000 go test -bench=. -benchmem ./hashes | tee ./hashes/bench_results_100k.txt
+
+bench_hashes_1M:
+	N=1000000 go test -bench=. -benchmem ./hashes | tee ./hashes/bench_results_1M.txt
+
+bench_hashes_10M:
+	N=10000000 go test -bench=. -benchmem ./hashes | tee ./hashes/bench_results_10M.txt
