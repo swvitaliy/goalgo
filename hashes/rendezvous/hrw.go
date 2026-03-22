@@ -1,36 +1,36 @@
 package rendezvous
 
+import "github.com/cespare/xxhash/v2"
+
 type HashFunc[K comparable] func(key K) uint64
 
 // HRW implements the HRW Rendezvous algorithm
 // for selecting a node based on a key.
 // Inspired by https://github.com/dgryski/go-rendezvous/blob/master/rdv.go
-type HRW[K comparable] struct {
-	hash    HashFunc[K]
+type HRW struct {
 	nhashes []uint64
 }
 
 // NewHRW creates a new HRW instance with the given nodes and hash function.
-func NewHRW[K comparable](nodes []K, hash HashFunc[K]) *HRW[K] {
-	return &HRW[K]{
-		hash:    hash,
-		nhashes: sliceMap(nodes, hash),
+func NewHRW(nodes []string) *HRW {
+	return &HRW{
+		nhashes: sliceMap(nodes),
 	}
 }
 
-func sliceMap[T any, R any](a []T, fn func(T) R) []R {
-	res := make([]R, len(a))
+func sliceMap(a []string) []uint64 {
+	res := make([]uint64, len(a))
 	for i, v := range a {
-		res[i] = fn(v)
+		res[i] = xxhash.Sum64String(v)
 	}
 	return res
 }
 
 // Lookup returns the index of the node that should be selected for the given key.
-func (h *HRW[K]) Lookup(key K) int {
+func (h *HRW) Lookup(key []byte) int {
 	var maxHash uint64 = 0
 	maxIndex := -1
-	khash := h.hash(key)
+	khash := xxhash.Sum64(key)
 	for i, nhash := range h.nhashes {
 		hash := xorshiftMult64(khash ^ nhash)
 		if hash > maxHash {

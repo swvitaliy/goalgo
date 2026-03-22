@@ -3,45 +3,38 @@ package consistent
 import (
 	"sort"
 	"sync"
+
+	"github.com/cespare/xxhash/v2"
 )
 
 const (
 	prime = 16777619 // A prime number used for hashing
 )
 
-type HashFunc[K comparable] func(key K) uint64
-
-type HashRing[K comparable] struct {
-	hash     HashFunc[K]
+type HashRing struct {
 	replicas int
 	nhashes  []uint64
-	ring     map[uint64]K
+	ring     map[uint64]string
 	mu       sync.RWMutex
 }
 
-// NewHashingRing creates a new consistent hash instance with the given nodes and hash function.
-func NewHashingRing[K comparable](nodes []K, replicas int, hash HashFunc[K]) *HashRing[K] {
-	h := &HashRing[K]{
-		hash:     hash,
+// NewHashRing creates a new consistent hash instance with the given nodes and hash function.
+func NewHashRing(replicas int) *HashRing {
+	h := &HashRing{
 		replicas: replicas,
-		nhashes:  make([]uint64, 0, replicas*len(nodes)),
-		ring:     make(map[uint64]K, len(nodes)),
+		nhashes:  make([]uint64, 0),
+		ring:     make(map[uint64]string),
 	}
-
-	for _, node := range nodes {
-		h.Add(node)
-	}
-
 	return h
 }
 
 // Add adds a new node to the consistent hash ring.
-func (h *HashRing[K]) Add(node K) {
+func (h *HashRing) Add(node string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
 	for i := 0; i < h.replicas; i++ {
-		hash := xorshiftMult64(h.hash(node) ^ (uint64(i) * prime))
+		hash := xorshiftMult64(xxhash.Sum64String(node) ^ (uint64(i) * prime))
 		h.ring[hash] = node
 		h.nhashes = append(h.nhashes, hash)
 	}
@@ -52,12 +45,12 @@ func (h *HashRing[K]) Add(node K) {
 }
 
 // Remove removes a node from the consistent hash ring.
-func (h *HashRing[K]) Remove(node K) {
+func (h *HashRing) Remove(node string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
 	for i := 0; i < h.replicas; i++ {
-		hash := xorshiftMult64(h.hash(node) ^ (uint64(i) * prime))
+		hash := xorshiftMult64(xxhash.Sum64String(node) ^ (uint64(i) * prime))
 		delete(h.ring, hash)
 		for j, nhash := range h.nhashes {
 			if nhash == hash {
@@ -69,15 +62,15 @@ func (h *HashRing[K]) Remove(node K) {
 }
 
 // Lookup returns the node for the given key.
-func (h *HashRing[K]) Lookup(key K) K {
+func (h *HashRing) Lookup(key []byte) string {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 
 	if len(h.nhashes) == 0 {
-		return *new(K) // Return zero value of K if no nodes are present
+		return ""
 	}
 
-	hash := h.hash(key)
+	hash := xxhash.Sum64(key)
 
 	// Find the first hash that is greater than or equal to the key hash
 	i := sort.Search(len(h.nhashes), func(i int) bool {

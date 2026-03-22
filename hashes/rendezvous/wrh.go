@@ -1,48 +1,59 @@
 package rendezvous
 
-import "math"
+import (
+	"math"
 
-type hashedNode[K comparable] struct {
-	key    K
-	nhash  uint64
-	weight float64
+	"github.com/cespare/xxhash/v2"
+)
+
+type wrhNode struct {
+	key       string
+	hash      uint64
+	invWeight float64
 }
 
 // WRH implements the Weighted Rendezvous Hashing algorithm
 // for selecting a node based on a key.
 // Inspired by https://github.com/dgryski/go-rendezvous/blob/master/rdv.go
-type WRH[K comparable] struct {
-	hash    HashFunc[K]
-	nhashes []hashedNode[K]
+type WRH struct {
+	nodes []wrhNode
 }
 
 // NewWRH creates a new Weighted Rendezvous Hash instance with the given nodes and hash function.
-func NewWRH[K comparable](nodes map[K]float64, hash HashFunc[K]) *WRH[K] {
-	return &WRH[K]{
-		hash:    hash,
-		nhashes: convHashedNodes(nodes, hash),
+func NewWRH(nodes map[string]float64) *WRH {
+	return &WRH{
+		nodes: sliceOfNodes(nodes),
 	}
 }
 
-func convHashedNodes[K comparable](nodes map[K]float64, hash HashFunc[K]) []hashedNode[K] {
-	nhashes := make([]hashedNode[K], len(nodes))
+func sliceOfNodes(nodes map[string]float64) []wrhNode {
+	result := make([]wrhNode, len(nodes))
+	i := 0
 	for k, v := range nodes {
-		nhashes[hash(k)] = hashedNode[K]{k, hash(k), v}
+		invWeight := 0.0
+		if v > 0 {
+			invWeight = 1.0 / v
+		}
+		result[i] = wrhNode{k, xxhash.Sum64String(k), invWeight}
+		i++
 	}
-	return nhashes
+	return result
 }
 
 // Lookup returns the index of the node that should be selected for the given key.
-func (h *WRH[K]) Lookup(key K) K {
-	var maxScore float64 = 0
-	var resultNode K
-	khash := h.hash(key)
-	for _, node := range h.nhashes {
-		hash := xorshiftMult64(khash ^ node.nhash)
+func (h *WRH) Lookup(key []byte) string {
+	var minScore float64 = math.Inf(1)
+	var resultNode string
+	khash := xxhash.Sum64(key)
+	for _, node := range h.nodes {
+		if node.invWeight == 0.0 {
+			continue
+		}
+		hash := xorshiftMult64(khash ^ node.hash)
 		u := float64(hash) / float64(math.MaxUint64)
-		score := -math.Log(u) / node.weight
-		if score > maxScore {
-			maxScore = score
+		s := -math.Log(u) * node.invWeight
+		if s < minScore {
+			minScore = s
 			resultNode = node.key
 		}
 	}
