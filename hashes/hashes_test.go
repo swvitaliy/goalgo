@@ -2,6 +2,7 @@ package hashes
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"testing"
 
@@ -10,6 +11,18 @@ import (
 )
 
 // benchmark of change distributions for different hash functions (hrw, wrh, consistent)
+
+func readn() int {
+	n := 10_000_000 // default
+
+	if v := os.Getenv("N"); v != "" {
+		if parsed, err := strconv.Atoi(v); err == nil {
+			n = parsed
+		}
+	}
+
+	return n
+}
 
 func BenchmarkHRW_Distribution(b *testing.B) {
 	numNodesList := []int{3, 5, 10, 20, 50, 100}
@@ -21,7 +34,7 @@ func BenchmarkHRW_Distribution(b *testing.B) {
 			}
 			hrw := rendezvous.NewHRW(nodes)
 			counts := make(map[int]int)
-			totalCalls := 10000000
+			totalCalls := readn()
 			for i := 0; i < totalCalls; i++ {
 				key := []byte(strconv.Itoa(i))
 				nodeIndex := hrw.Lookup(key)
@@ -50,7 +63,7 @@ func BenchmarkWRH_Distribution(b *testing.B) {
 			}
 			wrh := rendezvous.NewWRH(weightedNodes)
 			counts := make(map[string]int)
-			totalCalls := 10000000
+			totalCalls := readn()
 			for i := 0; i < totalCalls; i++ {
 				key := []byte(strconv.Itoa(i))
 				node := wrh.Lookup(key)
@@ -78,7 +91,7 @@ func BenchmarkConsistent_Distribution(b *testing.B) {
 				ring.Add(fmt.Sprintf("node%d", i))
 			}
 			counts := make(map[string]int)
-			totalCalls := 10000000
+			totalCalls := readn()
 			for i := 0; i < totalCalls; i++ {
 				key := []byte(strconv.Itoa(i))
 				node := ring.Lookup(key)
