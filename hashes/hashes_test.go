@@ -27,12 +27,12 @@ func readn() int {
 func BenchmarkHRW_Distribution(b *testing.B) {
 	numNodesList := []int{3, 5, 10, 20, 50, 100}
 	for _, numNodes := range numNodesList {
+		nodes := make([]string, numNodes)
+		for i := 0; i < numNodes; i++ {
+			nodes[i] = fmt.Sprintf("node%d", i)
+		}
+		hrw := rendezvous.NewHRW(nodes)
 		b.Run(fmt.Sprintf("nodes_%d", numNodes), func(b *testing.B) {
-			nodes := make([]string, numNodes)
-			for i := 0; i < numNodes; i++ {
-				nodes[i] = fmt.Sprintf("node%d", i)
-			}
-			hrw := rendezvous.NewHRW(nodes)
 			counts := make(map[int]int)
 			totalCalls := readn()
 			for i := 0; i < totalCalls; i++ {
@@ -56,12 +56,12 @@ func BenchmarkHRW_Distribution(b *testing.B) {
 func BenchmarkWRH_Distribution(b *testing.B) {
 	numNodesList := []int{3, 5, 10, 20, 50, 100}
 	for _, numNodes := range numNodesList {
+		weightedNodes := make(map[string]float64)
+		for i := 0; i < numNodes; i++ {
+			weightedNodes[fmt.Sprintf("node%d", i)] = 1.0
+		}
+		wrh := rendezvous.NewWRH(weightedNodes)
 		b.Run(fmt.Sprintf("nodes_%d", numNodes), func(b *testing.B) {
-			weightedNodes := make(map[string]float64)
-			for i := 0; i < numNodes; i++ {
-				weightedNodes[fmt.Sprintf("node%d", i)] = 1.0
-			}
-			wrh := rendezvous.NewWRH(weightedNodes)
 			counts := make(map[string]int)
 			totalCalls := readn()
 			for i := 0; i < totalCalls; i++ {
@@ -85,11 +85,11 @@ func BenchmarkWRH_Distribution(b *testing.B) {
 func BenchmarkConsistent_Distribution(b *testing.B) {
 	numNodesList := []int{3, 5, 10, 20, 50, 100}
 	for _, numNodes := range numNodesList {
+		ring := consistent.NewHashRing(100)
+		for i := 0; i < numNodes; i++ {
+			ring.Add(fmt.Sprintf("node%d", i))
+		}
 		b.Run(fmt.Sprintf("nodes_%d", numNodes), func(b *testing.B) {
-			ring := consistent.NewHashRing(1) // 1 replica per node for uniformity
-			for i := 0; i < numNodes; i++ {
-				ring.Add(fmt.Sprintf("node%d", i))
-			}
 			counts := make(map[string]int)
 			totalCalls := readn()
 			for i := 0; i < totalCalls; i++ {

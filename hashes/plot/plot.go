@@ -11,21 +11,21 @@ import (
 )
 
 func main() {
-	// Данные из бенчмарков (время в секундах на 10M вызовов)
+	// Данные из бенчмарков (ns/op из bench_results_100k.txt, конвертировано в микросекунды)
 	hrwNodes := []float64{3, 5, 10, 20, 50, 100}
-	hrwTimes := []float64{0.0007897, 1.031237428, 1.130151591, 1.015335613, 1.725062567, 2.3182724}
+	hrwTimes := []float64{0.7362, 0.8826, 0.7510, 1.028, 1.568, 2.443}
 
 	wrhNodes := []float64{3, 5, 10, 20, 50, 100}
-	wrhTimes := []float64{1.560922831, 2.131583121, 3.530437827, 5.979558726, 12.874355719, 24.087611798}
+	wrhTimes := []float64{1.725, 2.068, 3.519, 5.054, 11.63, 26.24}
 
 	consistentNodes := []float64{3, 5, 10, 20, 50, 100}
-	consistentTimes := []float64{0.083641596, 1.06038645, 1.041598835, 1.096367033, 1.221272036, 1.324827715}
+	consistentTimes := []float64{1.211, 1.091, 1.250, 1.457, 1.613, 1.667}
 
 	// Построение графика для HRW
 	p1 := plot.New()
 	p1.Title.Text = "HRW Execution Time vs Number of Nodes"
 	p1.X.Label.Text = "Number of Nodes"
-	p1.Y.Label.Text = "Time (seconds)"
+	p1.Y.Label.Text = "Time (microseconds)"
 
 	hrwPts := make(plotter.XYs, len(hrwNodes))
 	for i := range hrwPts {
@@ -46,7 +46,7 @@ func main() {
 	p2 := plot.New()
 	p2.Title.Text = "WRH Execution Time vs Number of Nodes"
 	p2.X.Label.Text = "Number of Nodes"
-	p2.Y.Label.Text = "Time (seconds)"
+	p2.Y.Label.Text = "Time (microseconds)"
 
 	wrhPts := make(plotter.XYs, len(wrhNodes))
 	for i := range wrhPts {
@@ -67,7 +67,7 @@ func main() {
 	p3 := plot.New()
 	p3.Title.Text = "Consistent Execution Time vs Number of Nodes"
 	p3.X.Label.Text = "Number of Nodes"
-	p3.Y.Label.Text = "Time (seconds)"
+	p3.Y.Label.Text = "Time (microseconds)"
 
 	consistentPts := make(plotter.XYs, len(consistentNodes))
 	for i := range consistentPts {

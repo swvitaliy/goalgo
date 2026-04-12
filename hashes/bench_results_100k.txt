@@ -2,7 +2,7 @@ goos: linux
 goarch: amd64
 pkg: goalgo/hashes
 cpu: Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz
-BenchmarkHRW_Distribution/nodes_3-8  	1000000000	         0.006206 ns/op	       0 B/op	       0 allocs/op
+BenchmarkHRW_Distribution/nodes_3-8  	1000000000	         0.007362 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkHRW_Distribution/nodes_3-8
     hashes_test.go:51: HRW with 3 nodes: variance from uniform = 0.000004
     hashes_test.go:51: HRW with 3 nodes: variance from uniform = 0.000004
@@ -10,7 +10,7 @@ BenchmarkHRW_Distribution/nodes_3-8  	1000000000	         0.006206 ns/op	       
     hashes_test.go:51: HRW with 3 nodes: variance from uniform = 0.000004
     hashes_test.go:51: HRW with 3 nodes: variance from uniform = 0.000004
     hashes_test.go:51: HRW with 3 nodes: variance from uniform = 0.000004
-BenchmarkHRW_Distribution/nodes_5-8  	1000000000	         0.007081 ns/op	       0 B/op	       0 allocs/op
+BenchmarkHRW_Distribution/nodes_5-8  	1000000000	         0.008826 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkHRW_Distribution/nodes_5-8
     hashes_test.go:51: HRW with 5 nodes: variance from uniform = 0.000001
     hashes_test.go:51: HRW with 5 nodes: variance from uniform = 0.000001
@@ -18,7 +18,7 @@ BenchmarkHRW_Distribution/nodes_5-8  	1000000000	         0.007081 ns/op	       
     hashes_test.go:51: HRW with 5 nodes: variance from uniform = 0.000001
     hashes_test.go:51: HRW with 5 nodes: variance from uniform = 0.000001
     hashes_test.go:51: HRW with 5 nodes: variance from uniform = 0.000001
-BenchmarkHRW_Distribution/nodes_10-8 	1000000000	         0.007437 ns/op	       0 B/op	       0 allocs/op
+BenchmarkHRW_Distribution/nodes_10-8 	1000000000	         0.007510 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkHRW_Distribution/nodes_10-8
     hashes_test.go:51: HRW with 10 nodes: variance from uniform = 0.000001
     hashes_test.go:51: HRW with 10 nodes: variance from uniform = 0.000001
@@ -26,7 +26,7 @@ BenchmarkHRW_Distribution/nodes_10-8 	1000000000	         0.007437 ns/op	       
     hashes_test.go:51: HRW with 10 nodes: variance from uniform = 0.000001
     hashes_test.go:51: HRW with 10 nodes: variance from uniform = 0.000001
     hashes_test.go:51: HRW with 10 nodes: variance from uniform = 0.000001
-BenchmarkHRW_Distribution/nodes_20-8 	1000000000	         0.008406 ns/op	       0 B/op	       0 allocs/op
+BenchmarkHRW_Distribution/nodes_20-8 	1000000000	         0.01028 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkHRW_Distribution/nodes_20-8
     hashes_test.go:51: HRW with 20 nodes: variance from uniform = 0.000000
     hashes_test.go:51: HRW with 20 nodes: variance from uniform = 0.000000
@@ -34,7 +34,7 @@ BenchmarkHRW_Distribution/nodes_20-8 	1000000000	         0.008406 ns/op	       
     hashes_test.go:51: HRW with 20 nodes: variance from uniform = 0.000000
     hashes_test.go:51: HRW with 20 nodes: variance from uniform = 0.000000
     hashes_test.go:51: HRW with 20 nodes: variance from uniform = 0.000000
-BenchmarkHRW_Distribution/nodes_50-8 	1000000000	         0.01242 ns/op	       0 B/op	       0 allocs/op
+BenchmarkHRW_Distribution/nodes_50-8 	1000000000	         0.01568 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkHRW_Distribution/nodes_50-8
     hashes_test.go:51: HRW with 50 nodes: variance from uniform = 0.000000
     hashes_test.go:51: HRW with 50 nodes: variance from uniform = 0.000000
@@ -42,7 +42,7 @@ BenchmarkHRW_Distribution/nodes_50-8 	1000000000	         0.01242 ns/op	       0
     hashes_test.go:51: HRW with 50 nodes: variance from uniform = 0.000000
     hashes_test.go:51: HRW with 50 nodes: variance from uniform = 0.000000
     hashes_test.go:51: HRW with 50 nodes: variance from uniform = 0.000000
-BenchmarkHRW_Distribution/nodes_100-8         	1000000000	         0.01941 ns/op	       0 B/op	       0 allocs/op
+BenchmarkHRW_Distribution/nodes_100-8         	1000000000	         0.02443 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkHRW_Distribution/nodes_100-8
     hashes_test.go:51: HRW with 100 nodes: variance from uniform = 0.000000
     hashes_test.go:51: HRW with 100 nodes: variance from uniform = 0.000000
@@ -51,7 +51,7 @@ BenchmarkHRW_Distribution/nodes_100-8         	1000000000	         0.01941 ns/op
     hashes_test.go:51: HRW with 100 nodes: variance from uniform = 0.000000
     hashes_test.go:51: HRW with 100 nodes: variance from uniform = 0.000000
     hashes_test.go:51: HRW with 100 nodes: variance from uniform = 0.000000
-BenchmarkWRH_Distribution/nodes_3-8           	1000000000	         0.01425 ns/op	       0 B/op	       0 allocs/op
+BenchmarkWRH_Distribution/nodes_3-8           	1000000000	         0.01725 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkWRH_Distribution/nodes_3-8
     hashes_test.go:80: WRH with 3 nodes: variance from uniform = 0.000004
     hashes_test.go:80: WRH with 3 nodes: variance from uniform = 0.000004
@@ -59,7 +59,7 @@ BenchmarkWRH_Distribution/nodes_3-8           	1000000000	         0.01425 ns/op
     hashes_test.go:80: WRH with 3 nodes: variance from uniform = 0.000004
     hashes_test.go:80: WRH with 3 nodes: variance from uniform = 0.000004
     hashes_test.go:80: WRH with 3 nodes: variance from uniform = 0.000004
-BenchmarkWRH_Distribution/nodes_5-8           	1000000000	         0.01900 ns/op	       0 B/op	       0 allocs/op
+BenchmarkWRH_Distribution/nodes_5-8           	1000000000	         0.02068 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkWRH_Distribution/nodes_5-8
     hashes_test.go:80: WRH with 5 nodes: variance from uniform = 0.000001
     hashes_test.go:80: WRH with 5 nodes: variance from uniform = 0.000001
@@ -68,7 +68,7 @@ BenchmarkWRH_Distribution/nodes_5-8           	1000000000	         0.01900 ns/op
     hashes_test.go:80: WRH with 5 nodes: variance from uniform = 0.000001
     hashes_test.go:80: WRH with 5 nodes: variance from uniform = 0.000001
     hashes_test.go:80: WRH with 5 nodes: variance from uniform = 0.000001
-BenchmarkWRH_Distribution/nodes_10-8          	1000000000	         0.03192 ns/op	       0 B/op	       0 allocs/op
+BenchmarkWRH_Distribution/nodes_10-8          	1000000000	         0.03519 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkWRH_Distribution/nodes_10-8
     hashes_test.go:80: WRH with 10 nodes: variance from uniform = 0.000001
     hashes_test.go:80: WRH with 10 nodes: variance from uniform = 0.000001
@@ -77,7 +77,8 @@ BenchmarkWRH_Distribution/nodes_10-8          	1000000000	         0.03192 ns/op
     hashes_test.go:80: WRH with 10 nodes: variance from uniform = 0.000001
     hashes_test.go:80: WRH with 10 nodes: variance from uniform = 0.000001
     hashes_test.go:80: WRH with 10 nodes: variance from uniform = 0.000001
-BenchmarkWRH_Distribution/nodes_20-8          	1000000000	         0.05353 ns/op	       0 B/op	       0 allocs/op
+    hashes_test.go:80: WRH with 10 nodes: variance from uniform = 0.000001
+BenchmarkWRH_Distribution/nodes_20-8          	1000000000	         0.05054 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkWRH_Distribution/nodes_20-8
     hashes_test.go:80: WRH with 20 nodes: variance from uniform = 0.000000
     hashes_test.go:80: WRH with 20 nodes: variance from uniform = 0.000000
@@ -87,7 +88,7 @@ BenchmarkWRH_Distribution/nodes_20-8          	1000000000	         0.05353 ns/op
     hashes_test.go:80: WRH with 20 nodes: variance from uniform = 0.000000
     hashes_test.go:80: WRH with 20 nodes: variance from uniform = 0.000000
     hashes_test.go:80: WRH with 20 nodes: variance from uniform = 0.000000
-BenchmarkWRH_Distribution/nodes_50-8          	1000000000	         0.1148 ns/op	       0 B/op	       0 allocs/op
+BenchmarkWRH_Distribution/nodes_50-8          	1000000000	         0.1163 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkWRH_Distribution/nodes_50-8
     hashes_test.go:80: WRH with 50 nodes: variance from uniform = 0.000000
     hashes_test.go:80: WRH with 50 nodes: variance from uniform = 0.000000
@@ -100,7 +101,7 @@ BenchmarkWRH_Distribution/nodes_50-8          	1000000000	         0.1148 ns/op	
     hashes_test.go:80: WRH with 50 nodes: variance from uniform = 0.000000
     hashes_test.go:80: WRH with 50 nodes: variance from uniform = 0.000000
 	... [output truncated]
-BenchmarkWRH_Distribution/nodes_100-8         	1000000000	         0.2166 ns/op	       0 B/op	       0 allocs/op
+BenchmarkWRH_Distribution/nodes_100-8         	1000000000	         0.2624 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkWRH_Distribution/nodes_100-8
     hashes_test.go:80: WRH with 100 nodes: variance from uniform = 0.000000
     hashes_test.go:80: WRH with 100 nodes: variance from uniform = 0.000000
@@ -113,53 +114,53 @@ BenchmarkWRH_Distribution/nodes_100-8         	1000000000	         0.2166 ns/op	
     hashes_test.go:80: WRH with 100 nodes: variance from uniform = 0.000000
     hashes_test.go:80: WRH with 100 nodes: variance from uniform = 0.000000
 	... [output truncated]
-BenchmarkConsistent_Distribution/nodes_3-8    	1000000000	         0.008039 ns/op	       0 B/op	       0 allocs/op
+BenchmarkConsistent_Distribution/nodes_3-8    	1000000000	         0.01211 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkConsistent_Distribution/nodes_3-8
-    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.039899
-    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.039899
-    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.039899
-    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.039899
-    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.039899
-    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.039899
-BenchmarkConsistent_Distribution/nodes_5-8    	1000000000	         0.008485 ns/op	       0 B/op	       0 allocs/op
+    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.000521
+    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.000521
+    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.000521
+    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.000521
+    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.000521
+    hashes_test.go:108: Consistent with 3 nodes: variance from uniform = 0.000521
+BenchmarkConsistent_Distribution/nodes_5-8    	1000000000	         0.01091 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkConsistent_Distribution/nodes_5-8
-    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.026191
-    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.026191
-    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.026191
-    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.026191
-    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.026191
-    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.026191
-BenchmarkConsistent_Distribution/nodes_10-8   	1000000000	         0.009203 ns/op	       0 B/op	       0 allocs/op
+    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.000191
+    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.000191
+    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.000191
+    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.000191
+    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.000191
+    hashes_test.go:108: Consistent with 5 nodes: variance from uniform = 0.000191
+BenchmarkConsistent_Distribution/nodes_10-8   	1000000000	         0.01250 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkConsistent_Distribution/nodes_10-8
-    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.005184
-    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.005184
-    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.005184
-    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.005184
-    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.005184
-    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.005184
-BenchmarkConsistent_Distribution/nodes_20-8   	1000000000	         0.01053 ns/op	       0 B/op	       0 allocs/op
+    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.000074
+    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.000074
+    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.000074
+    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.000074
+    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.000074
+    hashes_test.go:108: Consistent with 10 nodes: variance from uniform = 0.000074
+BenchmarkConsistent_Distribution/nodes_20-8   	1000000000	         0.01457 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkConsistent_Distribution/nodes_20-8
-    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.002494
-    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.002494
-    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.002494
-    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.002494
-    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.002494
-    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.002494
-BenchmarkConsistent_Distribution/nodes_50-8   	1000000000	         0.01080 ns/op	       0 B/op	       0 allocs/op
+    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.000023
+    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.000023
+    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.000023
+    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.000023
+    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.000023
+    hashes_test.go:108: Consistent with 20 nodes: variance from uniform = 0.000023
+BenchmarkConsistent_Distribution/nodes_50-8   	1000000000	         0.01613 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkConsistent_Distribution/nodes_50-8
-    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000299
-    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000299
-    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000299
-    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000299
-    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000299
-    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000299
-BenchmarkConsistent_Distribution/nodes_100-8  	1000000000	         0.01060 ns/op	       0 B/op	       0 allocs/op
+    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000004
+    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000004
+    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000004
+    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000004
+    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000004
+    hashes_test.go:108: Consistent with 50 nodes: variance from uniform = 0.000004
+BenchmarkConsistent_Distribution/nodes_100-8  	1000000000	         0.01667 ns/op	       0 B/op	       0 allocs/op
 --- BENCH: BenchmarkConsistent_Distribution/nodes_100-8
-    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000102
-    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000102
-    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000102
-    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000102
-    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000102
-    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000102
+    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000001
+    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000001
+    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000001
+    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000001
+    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000001
+    hashes_test.go:108: Consistent with 100 nodes: variance from uniform = 0.000001
 PASS
-ok  	goalgo/hashes	6.270s
+ok  	goalgo/hashes	7.611s
