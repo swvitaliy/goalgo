@@ -45,3 +45,27 @@ func TestHashRing_Distribution(t *testing.T) {
 		}
 	}
 }
+
+func TestHashRing_Distribution_100_nodes(t *testing.T) {
+	ring := NewHashRing(100)
+	for i := 0; i < 100; i++ {
+		ring.Add("node" + strconv.Itoa(i))
+	}
+
+	counts := make(map[string]int)
+	totalCalls := 1000000
+	for i := 0; i < totalCalls; i++ {
+		key := []byte(strconv.Itoa(i))
+		node := ring.Lookup(key)
+		counts[node]++
+	}
+
+	expected := 1.0 / 100.0
+	eps := 0.01
+	for node, count := range counts {
+		actual := float64(count) / float64(totalCalls)
+		if math.Abs(actual-expected) > eps {
+			t.Errorf("Node %s: expected ~%.3f, got %.3f", node, expected, actual)
+		}
+	}
+}
