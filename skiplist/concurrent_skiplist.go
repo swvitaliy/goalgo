@@ -82,7 +82,7 @@ func (csl *ConcurrentSkipList[K, V]) find(key K, preds, succs []*ConcurrentNode[
 	)
 retry:
 	pred = csl.head
-	for level := maxLevel - 1; level >= 0; level-- {
+	for level := int(maxLevel - 1); level >= 0; level-- {
 		curr, _ = loadNext(pred, level)
 		for {
 			if curr == nil {
@@ -298,7 +298,7 @@ func (csl *ConcurrentSkipList[K, V]) BulkDelete(keys []K) {
 
 	for _, key := range keys {
 		// shared traversal по уровням
-		for i := maxLevel - 1; i >= 0; i-- {
+		for i := int(maxLevel - 1); i >= 0; i-- {
 			for {
 				next, marked := loadNext(current, i)
 				if next == nil || next.key >= key {
@@ -334,9 +334,9 @@ func (csl *ConcurrentSkipList[K, V]) BulkDelete(keys []K) {
 		}
 
 		// unlink верхних уровней
-		for i := len(target.next) - 1; i >= 1; i-- { // верхние уровни
+		for i := int64(len(target.next) - 1); i >= 1; i-- { // верхние уровни
 			for {
-				next, marked := loadNext(target, i)
+				next, marked := loadNext(target, int(i))
 				if marked {
 					next = nil
 				}

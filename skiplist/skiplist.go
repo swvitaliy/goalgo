@@ -96,8 +96,8 @@ func NewFromPairsIter[K Key, V Value](lg levelGenerator, it iter.Seq[Pair[K, V]]
 // SearchNode ищет узел по ключу
 func (sl *SkipList[K, V]) SearchNode(target K) *Node[K, V] {
 	node := sl.head
-	for i := sl.level - 1; i >= 0; i-- {
-		for node != nil && node.next[i].key < target {
+	for i := int64(sl.level - 1); i >= 0; i-- {
+		for node != nil && node.next[i] != nil && node.next[i].key < target {
 			node = node.next[i]
 		}
 	}
@@ -132,7 +132,7 @@ func (sl *SkipList[K, V]) BatchSearchNodes(keys []K) []*Node[K, V] {
 	results := make([]*Node[K, V], len(keys))
 	for i, key := range keys {
 		curr := sl.head
-		for lvl := sl.level - 1; lvl >= 0; lvl-- {
+		for lvl := int64(sl.level - 1); lvl >= 0; lvl-- {
 			next := curr.next[lvl]
 			if lvl == 0 {
 				prefetch(next)
@@ -153,8 +153,8 @@ func (sl *SkipList[K, V]) BatchSearchNodes(keys []K) []*Node[K, V] {
 func (sl *SkipList[K, V]) Insert(key K, value V) *Node[K, V] {
 	update := make([]*Node[K, V], maxLevel)
 	node := sl.head
-	for i := sl.level - 1; i >= 0; i-- {
-		for node != nil && node.next[i].key < key {
+	for i := int64(sl.level - 1); i >= 0; i-- {
+		for node != nil && node.next[i] != nil && node.next[i].key < key {
 			node = node.next[i]
 		}
 		update[i] = node
@@ -193,7 +193,7 @@ func (sl *SkipList[K, V]) Insert(key K, value V) *Node[K, V] {
 func (sl *SkipList[K, V]) Delete(key K) bool {
 	update := make([]*Node[K, V], maxLevel)
 	node := sl.head
-	for i := sl.level - 1; i >= 0; i-- {
+	for i := int64(sl.level - 1); i >= 0; i-- {
 		for node.next[i] != nil && node.next[i].key < key {
 			node = node.next[i]
 		}
@@ -222,7 +222,7 @@ func (sl *SkipList[K, V]) Delete(key K) bool {
 func (sl *SkipList[K, V]) Range(b, e K) iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		node := sl.head
-		for i := sl.level - 1; i >= 0; i-- {
+		for i := int64(sl.level - 1); i >= 0; i-- {
 			for node.next[i] != nil && node.next[i].key < b {
 				node = node.next[i]
 			}
