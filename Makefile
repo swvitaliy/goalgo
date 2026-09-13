@@ -33,3 +33,20 @@ hashes_plot:
 skiplist_bench:
 	go test -bench=. -benchmem ./skiplist | tee ./skiplist/bench_results.txt
 
+
+# The go binary on PATH is an older launcher that rejects GOEXPERIMENT before it
+# switches toolchains, so the resolved 1.27 toolchain is invoked directly.
+GO_SIMD_ROOT := $(shell go env GOROOT)
+GO_SIMD := GOROOT=$(GO_SIMD_ROOT) GOTOOLCHAIN=local GOEXPERIMENT=simd $(GO_SIMD_ROOT)/bin/go
+
+.PHONY: roaring_test
+roaring_test:
+	$(GO_SIMD) test -race ./roaring_bitmaps/...
+
+.PHONY: roaring_bench
+roaring_bench:
+	$(GO_SIMD) test -bench=. -benchmem ./roaring_bitmaps/... | tee ./roaring_bitmaps/bench_results.txt
+
+.PHONY: roaring_fuzz
+roaring_fuzz:
+	$(GO_SIMD) test -run=Fuzz -fuzz=Fuzz -fuzztime=30s ./roaring_bitmaps/...
