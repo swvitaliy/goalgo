@@ -92,15 +92,15 @@ dump of the sorted `uint32` values, rebuilt on the other side.
 From `bench_results.csv` (medians of 10 runs, 200k values per dataset):
 
 - **Run containers are what v2 buys, and only on data that has runs.** On `runs`
-  `And` drops from 26.1us (v1) to 1.6us (v2), `AndNot` from 15.2us to 1.7us,
-  `Or` from 15.5us to 2.4us. `AndCardinality` does not move (1.45us vs 1.39us):
+  `And` drops from 26.8us (v1) to 1.5us (v2), `AndNot` from 14.5us to 1.8us,
+  `Or` from 13.8us to 2.2us. `AndCardinality` does not move (1.51us vs 1.33us):
   v1 already fuses AND and popcount in one SIMD pass without writing a result, so
   there was nothing left to save.
-- **They also cost something.** `Contains` on `runs` goes from 6.1ns to 17.1ns —
+- **They also cost something.** `Contains` on `runs` goes from 5.6ns to 17.4ns —
   a binary search over intervals instead of one bit test. Point lookups pay for
   what set operations gain.
-- **On `sparse` v2 and v3 are slower than v1, by 1.2-1.4x on `And` depending on
-  the run (the confidence intervals there are 12-16%).** Nothing there
+- **On `sparse` v2 and v3 are slower than v1, by up to 1.5x on `And` depending on
+  the run (the confidence intervals there reach 30%).** Nothing there
   is run-shaped; what shows is the container struct. Carrying a third encoding
   costs one slice header, which puts v2's container in the 64-byte size class
   against v1's 48, and a sparse operation allocates ~32k of them. Packing the
@@ -109,8 +109,8 @@ From `bench_results.csv` (medians of 10 runs, 200k values per dataset):
 - **On `zipf` the three are within noise of each other.**
 - **v3 against a raw dump:** on `runs` the stream is 0.008 bytes per value
   against 4, and both directions are two to three orders of magnitude faster
-  (`ToBytes` 0.6us vs 234us, `FromBytes` 1.9us vs 1171us). On `sparse` there is
-  little to compress (3.3 vs 4 bytes per value) but decoding is still 2.9x faster
+  (`ToBytes` 0.6us vs 226us, `FromBytes` 1.9us vs 1152us). On `sparse` there is
+  little to compress (3.3 vs 4 bytes per value) but decoding is still 2.7x faster
   because the format lands directly in containers instead of re-inserting values.
 
 `report.html` is a self-contained page — findings plus every chart inlined —

@@ -19,20 +19,19 @@
 </g>
 <text x="37.394" y="-22.093" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
-<text x="34.616" y="-86.62" transform="scale(1, -1)"
+<text x="34.616" y="-97.53" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">3 ms</text>
-<text x="34.616" y="-151.15" transform="scale(1, -1)"
+<text x="34.616" y="-172.97" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">6 ms</text>
 <path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M56.286,91.342L64.286,91.342" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M56.286,155.87L64.286,155.87" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M60.286,48.324L64.286,48.324" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M60.286,69.833L64.286,69.833" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M60.286,112.85L64.286,112.85" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M60.286,134.36L64.286,134.36" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M60.286,177.38L64.286,177.38" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,102.25L64.286,102.25" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,177.69L64.286,177.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,51.96L64.286,51.96" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,77.106L64.286,77.106" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,127.4L64.286,127.4" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,152.54L64.286,152.54" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M64.286,26.814L64.286,186.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M70.036,26.814L70.036,153.59L100.04,153.59L100.04,26.814Z" style="fill:#F15A60" />
+<path d="M70.036,26.814L70.036,168.47L100.04,168.47L100.04,26.814Z" style="fill:#F15A60" />
 <path d="M219.62,26.814L219.62,186.58L249.62,186.58L249.62,26.814Z" style="fill:#F15A60" />
 <path d="M369.2,26.814L369.2,183.44L399.2,183.44L399.2,26.814Z" style="fill:#F15A60" />
 </g>

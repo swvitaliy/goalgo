@@ -19,18 +19,18 @@
 </g>
 <text x="45.378" y="-22.093" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
-<text x="34.616" y="-94.575" transform="scale(1, -1)"
+<text x="34.616" y="-92.111" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">800 µs</text>
-<text x="35.099" y="-167.06" transform="scale(1, -1)"
+<text x="35.099" y="-162.13" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">1.6 ms</text>
 <path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M64.269,99.297L72.269,99.297" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M64.269,171.78L72.269,171.78" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,63.056L72.269,63.056" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,135.54L72.269,135.54" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,96.832L72.269,96.832" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,166.85L72.269,166.85" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,61.823L72.269,61.823" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,131.84L72.269,131.84" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M72.269,26.814L72.269,186.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M78.019,26.814L78.019,186.58L108.02,186.58L108.02,26.814Z" style="fill:#F15A60" />
-<path d="M223.61,26.814L223.61,184.54L253.61,184.54L253.61,26.814Z" style="fill:#F15A60" />
-<path d="M369.2,26.814L369.2,183.37L399.2,183.37L399.2,26.814Z" style="fill:#F15A60" />
+<path d="M78.019,26.814L78.019,174.28L108.02,174.28L108.02,26.814Z" style="fill:#F15A60" />
+<path d="M223.61,26.814L223.61,186.58L253.61,186.58L253.61,26.814Z" style="fill:#F15A60" />
+<path d="M369.2,26.814L369.2,184.85L399.2,184.85L399.2,26.814Z" style="fill:#F15A60" />
 </g>
 </svg>
