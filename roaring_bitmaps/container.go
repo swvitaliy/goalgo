@@ -1,4 +1,4 @@
-package roaringv2
+package roaring_bitmaps
 
 import (
 	"slices"
@@ -33,8 +33,9 @@ type bitmapWords = [simdops.BitmapWords]uint64
 // The field order and widths are deliberate. Sparse data produces tens of
 // thousands of these per operation, so the struct is kept inside a small size
 // class: card is int32 because a container never holds more than 65536 values,
-// and the bitmap is a pointer rather than a slice. Carrying the third encoding
-// costs one extra slice header over the two-encoding container of v1.
+// and the bitmap is a pointer rather than a slice. The third encoding costs one
+// extra slice header over a two-encoding container, and is what keeps this at 64
+// bytes rather than 48.
 type container struct {
 	arr  []uint16     // kindArray, sorted and duplicate-free
 	runs []interval   // kindRun, sorted, disjoint and non-adjacent

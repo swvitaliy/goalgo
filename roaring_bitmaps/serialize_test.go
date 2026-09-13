@@ -1,4 +1,4 @@
-package roaringv3
+package roaring_bitmaps
 
 import (
 	"encoding/binary"

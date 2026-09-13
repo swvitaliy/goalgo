@@ -9,25 +9,39 @@
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Select, zipf</text>
 <text x="82.258" y="-12.186" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">array</text>
-<text x="349.2" y="-12.186" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">v3</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
 <g transform="rotate(90)">
 <text x="71.874" y="30.755" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
 </g>
 <text x="39.616" y="-22.093" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
-<text x="39.616" y="-86.353" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">8 ns</text>
-<text x="34.616" y="-150.61" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">16 ns</text>
+<text x="39.616" y="-65.843" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">5 ns</text>
+<text x="34.616" y="-109.59" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 ns</text>
+<text x="34.616" y="-153.34" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">15 ns</text>
 <path d="M58.508,26.814L66.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M58.508,91.074L66.508,91.074" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M58.508,155.33L66.508,155.33" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M62.508,58.944L66.508,58.944" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M62.508,123.2L66.508,123.2" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,70.565L66.508,70.565" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,114.31L66.508,114.31" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,158.07L66.508,158.07" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,35.565L66.508,35.565" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,44.315L66.508,44.315" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,53.065L66.508,53.065" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,61.815L66.508,61.815" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,79.315L66.508,79.315" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,88.065L66.508,88.065" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,96.815L66.508,96.815" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,105.56L66.508,105.56" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,123.06L66.508,123.06" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,131.82L66.508,131.82" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,140.57L66.508,140.57" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,149.32L66.508,149.32" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,166.82L66.508,166.82" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M66.508,26.814L66.508,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M77.526,26.814L77.526,40.732L107.53,40.732L107.53,26.814Z" style="fill:#F15A60" />
+<path d="M77.526,26.814L77.526,39.929L107.53,39.929L107.53,26.814Z" style="fill:#F15A60" />
 <path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
 <path d="M77.526,26.814L77.526,26.814L107.53,26.814L107.53,26.814Z" style="fill:#7AC36A" />
 <path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />

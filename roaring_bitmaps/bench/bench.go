@@ -1,9 +1,8 @@
-// Package bench drives v1, v2 and v3 through the same workloads so the three
-// container models can be compared directly.
+// Package bench drives the bitmap through the same workloads with and without
+// RunOptimize, so the value of run containers can be read off directly.
 //
-// The versions have identical public APIs but distinct types, so each is wrapped
-// in a thin adapter behind one interface. The wrappers only forward calls; any
-// difference the benchmarks show comes from the container model, not from here.
+// The bitmap is wrapped in a thin adapter behind one interface so the binary
+// operations can be written once; the wrapper only forwards calls.
 package bench
 
 import (
@@ -11,12 +10,10 @@ import (
 	"os"
 	"strconv"
 
-	roaringv1 "goalgo/roaring_bitmaps/v1"
-	roaringv2 "goalgo/roaring_bitmaps/v2"
-	roaringv3 "goalgo/roaring_bitmaps/v3"
+	roaring "goalgo/roaring_bitmaps"
 )
 
-// Bitmap is the slice of the API every version shares.
+// Bitmap is the slice of the API the benchmarks use.
 type Bitmap interface {
 	Add(v uint32) bool
 	Contains(v uint32) bool
@@ -28,71 +25,38 @@ type Bitmap interface {
 	AndCardinality(other Bitmap) int
 }
 
-type v1Bitmap struct{ *roaringv1.Bitmap }
+type bitmap struct{ *roaring.Bitmap }
 
-func (b v1Bitmap) And(other Bitmap) Bitmap {
-	return v1Bitmap{b.Bitmap.And(other.(v1Bitmap).Bitmap)}
+func (b bitmap) And(other Bitmap) Bitmap {
+	return bitmap{b.Bitmap.And(other.(bitmap).Bitmap)}
 }
-func (b v1Bitmap) Or(other Bitmap) Bitmap { return v1Bitmap{b.Bitmap.Or(other.(v1Bitmap).Bitmap)} }
-func (b v1Bitmap) AndNot(other Bitmap) Bitmap {
-	return v1Bitmap{b.Bitmap.AndNot(other.(v1Bitmap).Bitmap)}
+func (b bitmap) Or(other Bitmap) Bitmap { return bitmap{b.Bitmap.Or(other.(bitmap).Bitmap)} }
+func (b bitmap) AndNot(other Bitmap) Bitmap {
+	return bitmap{b.Bitmap.AndNot(other.(bitmap).Bitmap)}
 }
-func (b v1Bitmap) Xor(other Bitmap) Bitmap { return v1Bitmap{b.Bitmap.Xor(other.(v1Bitmap).Bitmap)} }
-func (b v1Bitmap) AndCardinality(other Bitmap) int {
-	return b.Bitmap.AndCardinality(other.(v1Bitmap).Bitmap)
-}
-
-type v2Bitmap struct{ *roaringv2.Bitmap }
-
-func (b v2Bitmap) And(other Bitmap) Bitmap {
-	return v2Bitmap{b.Bitmap.And(other.(v2Bitmap).Bitmap)}
-}
-func (b v2Bitmap) Or(other Bitmap) Bitmap { return v2Bitmap{b.Bitmap.Or(other.(v2Bitmap).Bitmap)} }
-func (b v2Bitmap) AndNot(other Bitmap) Bitmap {
-	return v2Bitmap{b.Bitmap.AndNot(other.(v2Bitmap).Bitmap)}
-}
-func (b v2Bitmap) Xor(other Bitmap) Bitmap { return v2Bitmap{b.Bitmap.Xor(other.(v2Bitmap).Bitmap)} }
-func (b v2Bitmap) AndCardinality(other Bitmap) int {
-	return b.Bitmap.AndCardinality(other.(v2Bitmap).Bitmap)
+func (b bitmap) Xor(other Bitmap) Bitmap { return bitmap{b.Bitmap.Xor(other.(bitmap).Bitmap)} }
+func (b bitmap) AndCardinality(other Bitmap) int {
+	return b.Bitmap.AndCardinality(other.(bitmap).Bitmap)
 }
 
-type v3Bitmap struct{ *roaringv3.Bitmap }
-
-func (b v3Bitmap) And(other Bitmap) Bitmap {
-	return v3Bitmap{b.Bitmap.And(other.(v3Bitmap).Bitmap)}
-}
-func (b v3Bitmap) Or(other Bitmap) Bitmap { return v3Bitmap{b.Bitmap.Or(other.(v3Bitmap).Bitmap)} }
-func (b v3Bitmap) AndNot(other Bitmap) Bitmap {
-	return v3Bitmap{b.Bitmap.AndNot(other.(v3Bitmap).Bitmap)}
-}
-func (b v3Bitmap) Xor(other Bitmap) Bitmap { return v3Bitmap{b.Bitmap.Xor(other.(v3Bitmap).Bitmap)} }
-func (b v3Bitmap) AndCardinality(other Bitmap) int {
-	return b.Bitmap.AndCardinality(other.(v3Bitmap).Bitmap)
-}
-
-type version struct {
+// variant is one way of using the bitmap. There is one implementation; what
+// the benchmarks compare is whether RunOptimize was applied, which is the only
+// thing that ever produces run containers. The difference between the two
+// variants in any chart is exactly what that encoding buys, or costs.
+type variant struct {
 	name string
 	new  func(values ...uint32) Bitmap
 }
 
-// versions lists the implementations under comparison, each built the way it is
-// meant to be used. v2 and v3 exist for their run containers, so their
-// constructors include RunOptimize: the difference between v1 and v2 in any chart
-// is exactly what that encoding buys, or costs.
-func versions() []version {
-	return []version{
-		{name: "v1", new: func(values ...uint32) Bitmap {
-			return v1Bitmap{roaringv1.New(values...)}
+func variants() []variant {
+	return []variant{
+		{name: "off", new: func(values ...uint32) Bitmap {
+			return bitmap{roaring.New(values...)}
 		}},
-		{name: "v2", new: func(values ...uint32) Bitmap {
-			b := roaringv2.New(values...)
+		{name: "on", new: func(values ...uint32) Bitmap {
+			b := roaring.New(values...)
 			b.RunOptimize()
-			return v2Bitmap{b}
-		}},
-		{name: "v3", new: func(values ...uint32) Bitmap {
-			b := roaringv3.New(values...)
-			b.RunOptimize()
-			return v3Bitmap{b}
+			return bitmap{b}
 		}},
 	}
 }
@@ -103,7 +67,7 @@ type dataset struct {
 }
 
 // datasetSize is the number of values per dataset. Override it with ROARING_N to
-// see how the versions separate as the data grows.
+// see how the variants separate as the data grows.
 func datasetSize() int {
 	if s := os.Getenv("ROARING_N"); s != "" {
 		if n, err := strconv.Atoi(s); err == nil && n > 0 {
@@ -117,9 +81,9 @@ func datasetSize() int {
 //
 //   - sparse: random values across 2^31. Every chunk holds a handful of values, so
 //     everything is a tiny array container and per-container overhead dominates.
-//   - runs: stretches of 512 consecutive values separated by random gaps. In v1
-//     these fill bitmap containers; in v2 and v3 they collapse into a few
-//     intervals each. This is the shape run containers were built for.
+//   - runs: stretches of 512 consecutive values separated by random gaps.
+//     Without RunOptimize these fill bitmap containers; with it they collapse
+//     into a few intervals each. This is the shape run containers were built for.
 //   - zipf: a skewed distribution with a crowded low end and a sparse tail, so one
 //     bitmap mixes bitmap, array and run containers the way real data does.
 func datasets(offset uint32) []dataset {

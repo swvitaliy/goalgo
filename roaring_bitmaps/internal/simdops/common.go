@@ -1,7 +1,7 @@
 // Package simdops holds the bit-level primitives shared by every Roaring bitmap
 // version in this directory.
 //
-// Keeping them in one place is deliberate: v1, v2 and v3 differ only in their
+// Keeping them in one place is deliberate: v1, v2 and v2 differ only in their
 // container model, so benchmarks comparing the three measure that model rather
 // than accidental differences in the low-level code.
 //

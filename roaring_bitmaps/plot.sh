@@ -3,8 +3,9 @@
 #
 # Usage: roaring_bitmaps/plot.sh [input.txt] [outdir]
 #
-# Benchmark cases are named version=<v>/data=<shape> (codec=<c>/data=<shape> for
-# serialisation), which is what lets benchdraw slice one run by dimension.
+# Benchmark cases are named runopt=<on|off>/data=<shape> (codec=raw|roaring and
+# method=array|roaring for serialisation and Rank/Select), which is what lets benchdraw
+# slice one run by dimension.
 #
 # There is one chart per operation and dataset rather than one per operation with
 # the datasets side by side: timings differ by orders of magnitude between the
@@ -28,7 +29,7 @@ echo "plots from $input:"
 
 for op in Build Contains And Or AndNot Xor AndCardinality; do
 	for data in sparse runs zipf; do
-		draw "${op,,}_${data}" "Benchmark$op/data=$data" version ns/op "$op, $data"
+		draw "${op,,}_${data}" "Benchmark$op/data=$data" runopt ns/op "$op, $data"
 	done
 done
 

@@ -1,4 +1,4 @@
-package roaringv3
+package roaring_bitmaps
 
 import (
 	"math/rand/v2"

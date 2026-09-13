@@ -1,12 +1,21 @@
-// Package roaringv1 implements Roaring bitmaps with the two classic container
-// types: a sorted uint16 array for sparse chunks and a 64Ki-bit bitmap for dense
-// ones. It is the baseline of the three versions in this directory; v2 adds run
-// containers and v3 adds serialisation on top, so benchmarking the three against
-// each other isolates what each addition is worth.
+// Package roaring_bitmaps is a Roaring bitmap: a compressed set of uint32 values
+// split into 65536-value chunks, each stored in whichever of three encodings is
+// cheapest for its contents — a sorted uint16 array, a 64Ki-bit bitmap, or a
+// list of runs.
 //
-// The hot paths run on the shared internal/simdops primitives, which need amd64
-// with AVX-512 and GOEXPERIMENT=simd.
-package roaringv1
+// Run encoding is never chosen on its own. Containers keep the shape an
+// operation produced until RunOptimize is called, which is the same bargain the
+// reference C implementation strikes: scanning for runs costs a pass over the
+// data, so the caller decides when it is worth paying. Operations between two
+// run containers stay in interval arithmetic and never materialise the values.
+//
+// ToBytes/FromBytes speak the portable format shared with the C and Java
+// implementations; Rank/Select answer positional queries from the containers
+// plus a lazily built prefix-sum cache.
+//
+// The hot paths run on internal/simdops, which is AVX-512 under
+// GOEXPERIMENT=simd on amd64 and plain Go otherwise.
+package roaring_bitmaps
 
 import (
 	"slices"
@@ -21,6 +30,11 @@ import (
 type Bitmap struct {
 	keys  []uint16     // high 16 bits of each chunk, ascending
 	conts []*container // chunk contents, parallel to keys
+
+	// prefix[i] is the number of values in the first i containers, built on
+	// demand by Rank/Select and dropped by any change to the contents. It turns
+	// both queries from a walk over the containers into a binary search.
+	prefix []int
 }
 
 // New returns a Bitmap holding the given values.
@@ -35,6 +49,7 @@ func lo(v uint32) uint16 { return uint16(v) }
 
 // Add inserts v and reports whether the set changed.
 func (b *Bitmap) Add(v uint32) bool {
+	b.prefix = nil
 	k := hi(v)
 	i, found := slices.BinarySearch(b.keys, k)
 	if !found {
@@ -46,6 +61,7 @@ func (b *Bitmap) Add(v uint32) bool {
 // AddMany inserts every value, reusing the container lookup for runs of values
 // that share a key.
 func (b *Bitmap) AddMany(values ...uint32) {
+	b.prefix = nil
 	var (
 		lastKey  uint16
 		lastCont *container
@@ -65,6 +81,7 @@ func (b *Bitmap) AddMany(values ...uint32) {
 
 // Remove deletes v and reports whether the set changed.
 func (b *Bitmap) Remove(v uint32) bool {
+	b.prefix = nil
 	i, found := slices.BinarySearch(b.keys, hi(v))
 	if !found {
 		return false
@@ -257,6 +274,35 @@ func (b *Bitmap) String() string {
 	}
 	sb.WriteByte('}')
 	return sb.String()
+}
+
+// RunOptimize re-encodes every chunk as runs where that is the smallest of the
+// three representations, and reports whether any chunk changed. It is the only
+// path that produces run containers.
+func (b *Bitmap) RunOptimize() bool {
+	changed := false
+	for _, c := range b.conts {
+		before := c.kind
+		c.runOptimize()
+		changed = changed || c.kind != before
+	}
+	return changed
+}
+
+// Stats reports how many chunks use each encoding, for benchmarks and for seeing
+// what RunOptimize actually did.
+func (b *Bitmap) Stats() (arrays, bitmaps, runs int) {
+	for _, c := range b.conts {
+		switch c.kind {
+		case kindArray:
+			arrays++
+		case kindBitmap:
+			bitmaps++
+		case kindRun:
+			runs++
+		}
+	}
+	return arrays, bitmaps, runs
 }
 
 func (b *Bitmap) insertAt(i int, k uint16, c *container) {

@@ -9,8 +9,8 @@
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Auxiliary state, sparse</text>
 <text x="65.866" y="-12.186" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">array</text>
-<text x="349.2" y="-12.186" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">v3</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
 <g transform="rotate(90)">
 <text x="58.759" y="30.755" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">aux-bytes/value</text>

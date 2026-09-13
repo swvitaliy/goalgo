@@ -1,16 +1,14 @@
 # Roaring bitmaps with Go 1.27 vectorisation
 
-Three implementations of the same data structure, sharing one set of SIMD
-primitives, so that benchmarking them against each other measures the container
-model rather than differences in how well each was optimised.
+A Roaring bitmap over a small set of SIMD primitives, with a benchmark suite
+built to show what each of its optimisations is worth: run containers, the
+portable serialisation format, and positional queries.
 
 | Package | What it adds |
 |---|---|
 | `internal/simdops` | the bit-level primitives: bitwise ops fused with population count, sorted-array intersection, range edits — in a vector build and a scalar one |
-| `v1` | array and bitmap containers |
-| `v2` | run containers and `RunOptimize` |
-| `v3` | portable-format serialisation, `Rank`/`Select` |
-| `bench` | one workload driving all three |
+| `roaring_bitmaps` (this directory) | the bitmap: array, bitmap and run containers, `RunOptimize`, portable-format serialisation, `Rank`/`Select` |
+| `bench` | the workloads, each run with and without `RunOptimize` |
 
 ## Building
 
@@ -58,8 +56,8 @@ copy used here is also patched to pad the plot area, drop the legend and axis
 label, colour each bar separately and label the time axis in ns/us/ms rather
 than raw nanoseconds.
 
-Case names have the form `version=v2/data=runs` (`codec=raw/data=runs` for
-serialisation), which is what lets both `benchstat -col` and `benchdraw` slice
+Case names have the form `runopt=on/data=runs` (`codec=raw/data=runs`,
+`method=array/data=runs` for serialisation and Rank/Select), which is what lets both `benchstat -col` and `benchdraw` slice
 a single run by dimension.
 
 ## What the vectorisation actually buys
@@ -82,47 +80,45 @@ cover only the pure bitwise loops and drop to `archsimd` everywhere else.
 
 ## What the benchmarks show
 
-`bench/` builds each version the way it is meant to be used — v2 and v3 with
-`RunOptimize` applied — and runs all three over the same three datasets: `sparse`
-(random values across 2^31, every chunk a tiny array), `runs` (stretches of 512
-consecutive values, the shape run containers exist for) and `zipf` (a skewed
-distribution that mixes container kinds). Serialisation has no counterpart in
-v1/v2, so it is compared against the alternative one would ship without it: a
-dump of the sorted `uint32` values, rebuilt on the other side.
+`bench/` runs every workload twice over the same three datasets: `runopt=off`
+builds the bitmap and leaves it alone, `runopt=on` calls `RunOptimize` first.
+`RunOptimize` is the only thing that ever produces run containers, so the
+difference between the two is exactly what run containers buy or cost. The
+datasets: `sparse` (random values across 2^31, every chunk a tiny array),
+`runs` (stretches of 512 consecutive values, the shape run containers exist
+for) and `zipf` (a skewed distribution that mixes container kinds).
+Serialisation and Rank/Select have no "off" variant, so each is compared with
+the alternative one would keep without it: a sorted `[]uint32` beside the
+bitmap (`codec=raw|roaring`, `method=array|roaring`), prepared once rather than
+on every call.
 
 From `bench_results.csv` (medians of 10 runs, 200k values per dataset):
 
-- **Run containers are what v2 buys, and only on data that has runs.** On `runs`
-  `And` drops from 24.9us (v1) to 1.5us (v2), `AndNot` from 13.8us to 1.8us,
-  `Or` from 14.2us to 2.3us. `AndCardinality` does not move (1.38us vs 1.17us):
-  v1 already fuses AND and popcount in one SIMD pass without writing a result, so
-  there was nothing left to save.
-- **They also cost something.** `Contains` on `runs` goes from 5.8ns to 16.4ns —
+- **Run containers are worth an order of magnitude on data that has runs.**
+  On `runs`, `And` goes from 23.9us to 1.5us (16x), `AndNot` from 14.5us to
+  1.9us (8x), `Or` from 14.3us to 2.4us (6x), `Xor` from 14.8us to 5.4us (3x).
+  Operations between two run containers stay in interval arithmetic and never
+  materialise the values.
+- **They also cost something.** `Contains` on `runs` goes from 5.8ns to 16.5ns —
   a binary search over intervals instead of one bit test. Point lookups pay for
   what set operations gain.
-- **On `sparse` v2 and v3 are slower than v1, by up to 1.5x on `And` depending on
-  the run (the confidence intervals there reach 30%).** Nothing there
-  is run-shaped; what shows is the container struct. Carrying a third encoding
-  costs one slice header, which puts v2's container in the 64-byte size class
-  against v1's 48, and a sparse operation allocates ~32k of them. Packing the
-  struct (`card int32`, bitmap as an array pointer) took this gap down from 1.85x;
-  the remainder is that size class plus a longer type switch.
-- **On `zipf` the three are within noise of each other.**
-- **Rank/Select trade speed for memory.** They are compared with a sorted copy
-  of the values kept beside the bitmap (`method=array|v3`). The copy answers
-  `Select` in 2ns against 14–75ns for v3 — an index is unbeatable — but costs 4
-  bytes per value, where v3's prefix-sum cache costs one int per container
-  (0.0006–1.3 bytes per value). `Rank` is even: a binary search over the keys
-  plus a popcount inside one container, twice as fast as the copy on `runs`.
-- **v3 against a raw dump:** on `runs` the stream is 0.008 bytes per value
-  against 4, and both directions are two to three orders of magnitude faster
-  (`ToBytes` 0.6us vs 211us, `FromBytes` 1.8us vs 1165us). On `sparse` there is
-  little to compress (3.3 vs 4 bytes per value) but decoding is still 2.8x faster
-  because the format lands directly in containers instead of re-inserting values.
-
-`report.html` is a self-contained page — findings plus every chart inlined —
-that opens straight from disk. `plot.sh` renders one chart per operation and dataset into `plots/` (the datasets
-differ by orders of magnitude, so a shared axis would hide the fast cases).
+- **On `sparse` and `zipf` the two variants are the same bitmap.** `RunOptimize`
+  finds nothing worth re-encoding, and every difference (0.8–1.2x) is inside the
+  15–23% confidence intervals. (Measured earlier against a separate
+  two-container implementation, merely carrying the third encoding cost one
+  slice header per container — 64 bytes against 48 — visible as 5–35% on
+  `sparse`; with a single implementation both variants pay it.)
+- **Serialisation wins only where run containers do.** On `runs` the stream is
+  0.008 bytes per value against 4, writing is 180x faster and reading 120x,
+  because containers land in place. On `sparse` and `zipf` the sorted copy is a
+  plain memory pass and beats the format: writing 3.6x and reading 6x faster on
+  `sparse`, 1.2x and 1.8x on `zipf`, with 3.3 and 2.1 bytes per value saved
+  against 4.
+- **Rank/Select trade speed for memory.** The sorted copy answers `Select` in
+  ~1.5ns against 14–76ns — an index is unbeatable — but costs 4 bytes per value
+  where the prefix-sum cache costs one int per container (0.0006–1.3 bytes per
+  value). `Rank` is even: 1.1–1.3x slower than the copy on `zipf` and `sparse`,
+  twice as fast on `runs`.
 
 ## Correctness
 

@@ -7,35 +7,29 @@
 <path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
 <text x="149.54" y="-175.45" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">FromBytes, sparse</text>
-<text x="87.536" y="-12.186" transform="scale(1, -1)"
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
-<text x="349.2" y="-12.186" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">v3</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
 <g transform="rotate(90)">
-<text x="69.568" y="30.755" transform="scale(1, -1)"
+<text x="71.874" y="30.755" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
 </g>
-<text x="44.894" y="-22.093" transform="scale(1, -1)"
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
-<text x="34.616" y="-92.024" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2.5 ms</text>
-<text x="42.116" y="-161.96" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">5 ms</text>
-<path d="M63.786,26.814L71.786,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M63.786,96.746L71.786,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M63.786,166.68L71.786,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M67.786,40.801L71.786,40.801" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M67.786,54.787L71.786,54.787" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M67.786,68.773L71.786,68.773" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M67.786,82.759L71.786,82.759" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M67.786,110.73L71.786,110.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M67.786,124.72L71.786,124.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M67.786,138.7L71.786,138.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M67.786,152.69L71.786,152.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M71.786,26.814L71.786,166.97" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M80.031,26.814L80.031,166.97L110.03,166.97L110.03,26.814Z" style="fill:#F15A60" />
+<text x="34.616" y="-87.435" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">800 µs</text>
+<text x="35.099" y="-152.78" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">1.6 ms</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,92.157L72.269,92.157" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,157.5L72.269,157.5" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,59.485L72.269,59.485" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,124.83L72.269,124.83" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M80.514,26.814L80.514,50.258L110.51,50.258L110.51,26.814Z" style="fill:#F15A60" />
 <path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
-<path d="M80.031,26.814L80.031,26.814L110.03,26.814L110.03,26.814Z" style="fill:#7AC36A" />
-<path d="M339.2,26.814L339.2,77.475L369.2,77.475L369.2,26.814Z" style="fill:#7AC36A" />
+<path d="M80.514,26.814L80.514,26.814L110.51,26.814L110.51,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
 </g>
 </svg>
