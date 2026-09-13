@@ -5,15 +5,15 @@
 	xmlns:xlink="http://www.w3.org/1999/xlink">
 <g transform="scale(1, -1) translate(0, -199)">
 <path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
-<text x="141.72" y="-175.45" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Serialised size, sparse</text>
+<text x="145.38" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Auxiliary state, runs</text>
 <text x="65.866" y="-12.186" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">array</text>
 <text x="349.2" y="-12.186" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">v3</text>
 <g transform="rotate(90)">
-<text x="69.42" y="30.755" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">bytes/value</text>
+<text x="58.759" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">aux-bytes/value</text>
 </g>
 <text x="34.616" y="-22.093" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0</text>
@@ -27,9 +27,9 @@
 <path d="M46.116,61.78L50.116,61.78" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M46.116,131.71L50.116,131.71" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M50.116,26.814L50.116,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M58.361,26.814L58.361,166.68L88.361,166.68L88.361,26.814Z" style="fill:#F15A60" />
+<path d="M61.135,26.814L61.135,166.68L91.135,166.68L91.135,26.814Z" style="fill:#F15A60" />
 <path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
-<path d="M58.361,26.814L58.361,26.814L88.361,26.814L88.361,26.814Z" style="fill:#7AC36A" />
-<path d="M339.2,26.814L339.2,142.48L369.2,142.48L369.2,26.814Z" style="fill:#7AC36A" />
+<path d="M61.135,26.814L61.135,26.814L91.135,26.814L91.135,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,26.834L369.2,26.834L369.2,26.814Z" style="fill:#7AC36A" />
 </g>
 </svg>

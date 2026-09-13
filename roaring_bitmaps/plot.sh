@@ -37,3 +37,9 @@ for data in sparse runs zipf; do
 	draw "tobytes_${data}" "BenchmarkToBytes/data=$data" codec ns/op "ToBytes, $data"
 	draw "frombytes_${data}" "BenchmarkFromBytes/data=$data" codec ns/op "FromBytes, $data"
 done
+
+for data in sparse runs zipf; do
+	draw "rank_${data}" "BenchmarkRank/data=$data" method ns/op "Rank, $data"
+	draw "select_${data}" "BenchmarkSelect/data=$data" method ns/op "Select, $data"
+	draw "aux_${data}" "BenchmarkRank/data=$data" method aux-bytes/value "Auxiliary state, $data"
+done

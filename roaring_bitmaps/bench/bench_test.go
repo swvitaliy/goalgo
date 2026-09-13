@@ -2,6 +2,7 @@ package bench
 
 import (
 	"encoding/binary"
+	"sort"
 	"strconv"
 	"testing"
 
@@ -189,6 +190,126 @@ func BenchmarkFromBytes(b *testing.B) {
 			}
 		}
 	})
+}
+
+// Rank and Select exist only in v3, so like serialisation they are compared
+// against what one would do without them: keep a sorted copy of the values next
+// to the bitmap and answer from it — a binary search for Rank, an index for
+// Select. That copy is fast but costs 4 bytes per value on top of the bitmap;
+// v3 answers from the containers plus a prefix-sum cache of one int per
+// container. Cases are tagged method=array and method=v3, and each reports the
+// bytes of auxiliary state per value so the trade-off is on the chart.
+
+type positional struct {
+	name string
+	// prepare builds whatever the method needs beside the bitmap and returns
+	// the two query functions plus the size of that state in bytes.
+	prepare func(bm *roaringv3.Bitmap) (rank func(uint32) int, sel func(int) uint32, auxBytes int)
+}
+
+func positionals() []positional {
+	return []positional{
+		{
+			name: "array",
+			prepare: func(bm *roaringv3.Bitmap) (func(uint32) int, func(int) uint32, int) {
+				values := bm.ToArray()
+				rank := func(v uint32) int {
+					return sort.Search(len(values), func(i int) bool { return values[i] > v })
+				}
+				sel := func(i int) uint32 { return values[i] }
+				return rank, sel, 4 * len(values)
+			},
+		},
+		{
+			name: "v3",
+			prepare: func(bm *roaringv3.Bitmap) (func(uint32) int, func(int) uint32, int) {
+				sel := func(i int) uint32 {
+					v, _ := bm.Select(i)
+					return v
+				}
+				// The prefix-sum cache: one int per container plus a sentinel.
+				arrays, bitmaps, runs := bm.Stats()
+				return bm.Rank, sel, 8 * (arrays + bitmaps + runs + 1)
+			},
+		},
+	}
+}
+
+func eachPositional(b *testing.B, fn func(b *testing.B, rank func(uint32) int, sel func(int) uint32, bm *roaringv3.Bitmap, values []uint32)) {
+	for _, ds := range datasets(0) {
+		bm := roaringv3.New(ds.values...)
+		bm.RunOptimize()
+		for _, m := range positionals() {
+			b.Run("method="+m.name+"/data="+ds.name, func(b *testing.B) {
+				rank, sel, aux := m.prepare(bm)
+				b.ReportAllocs()
+				b.ResetTimer()
+				fn(b, rank, sel, bm, ds.values)
+				b.ReportMetric(float64(aux)/float64(bm.Cardinality()), "aux-bytes/value")
+			})
+		}
+	}
+}
+
+// BenchmarkRank asks for the rank of values drawn from the set itself.
+func BenchmarkRank(b *testing.B) {
+	eachPositional(b, func(b *testing.B, rank func(uint32) int, _ func(int) uint32, _ *roaringv3.Bitmap, values []uint32) {
+		i, sum := 0, 0
+		for b.Loop() {
+			sum += rank(values[i])
+			if i++; i == len(values) {
+				i = 0
+			}
+		}
+		if sum == 0 {
+			b.Fatal("ranks summed to zero: the benchmark is not doing the work it claims")
+		}
+	})
+}
+
+// BenchmarkSelect asks for positions spread across the whole set.
+func BenchmarkSelect(b *testing.B) {
+	eachPositional(b, func(b *testing.B, _ func(uint32) int, sel func(int) uint32, bm *roaringv3.Bitmap, _ []uint32) {
+		n := bm.Cardinality()
+		i, sum := 0, uint64(0)
+		for b.Loop() {
+			sum += uint64(sel(i))
+			if i += 7919; i >= n {
+				i -= n
+			}
+		}
+		if sum == 0 {
+			b.Fatal("selected values summed to zero: the benchmark is not doing the work it claims")
+		}
+	})
+}
+
+// TestPositionalsAgree checks that both methods answer the same.
+func TestPositionalsAgree(t *testing.T) {
+	t.Parallel()
+
+	for _, ds := range datasets(0) {
+		t.Run(ds.name, func(t *testing.T) {
+			t.Parallel()
+
+			bm := roaringv3.New(ds.values...)
+			bm.RunOptimize()
+			ms := positionals()
+			rankA, selA, _ := ms[0].prepare(bm)
+			rankB, selB, _ := ms[1].prepare(bm)
+			n := bm.Cardinality()
+			for i := 0; i < n; i += 997 {
+				if a, b := selA(i), selB(i); a != b {
+					t.Fatalf("Select(%d): array %d, v3 %d", i, a, b)
+				}
+			}
+			for _, v := range ds.values[:200] {
+				if a, b := rankA(v), rankB(v); a != b {
+					t.Fatalf("Rank(%d): array %d, v3 %d", v, a, b)
+				}
+			}
+		})
+	}
 }
 
 // TestVersionsAgree guards the comparison itself: a benchmark of three

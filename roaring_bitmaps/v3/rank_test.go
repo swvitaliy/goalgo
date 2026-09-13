@@ -124,3 +124,38 @@ func FuzzRankSelectAgainstReference(f *testing.F) {
 		require.Equal(t, wantRank, b.Rank(probe))
 	})
 }
+
+// TestRankSelectAfterMutation guards the prefix-sum cache: answers must follow
+// every Add and Remove, not the state the cache was built from.
+func TestRankSelectAfterMutation(t *testing.T) {
+	t.Parallel()
+
+	values := append(sequence(0, 9000), sequence(1<<20, 50)...)
+	b := New(values...)
+	b.RunOptimize()
+
+	check := func(stage string) {
+		t.Helper()
+		want := b.ToArray()
+		for i, v := range want {
+			require.Equal(t, i+1, b.Rank(v), "%s: Rank(%d)", stage, v)
+			got, ok := b.Select(i)
+			require.True(t, ok, "%s: Select(%d)", stage, i)
+			require.Equal(t, v, got, "%s: Select(%d)", stage, i)
+		}
+		_, ok := b.Select(len(want))
+		require.False(t, ok, "%s: Select past the end", stage)
+	}
+
+	check("initial")
+
+	require.True(t, b.Add(5<<16+7)) // a brand-new container in the middle
+	require.False(t, b.Add(3))      // already present; Add must still invalidate
+	check("after adds")
+
+	require.True(t, b.Remove(1<<20))
+	for v := uint32(0); v < 9000; v++ {
+		b.Remove(v) // empties and drops the first container entirely
+	}
+	check("after removes")
+}

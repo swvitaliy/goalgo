@@ -12,7 +12,7 @@
 <text x="349.2" y="-12.186" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">v3</text>
 <g transform="rotate(90)">
-<text x="69.991" y="30.755" transform="scale(1, -1)"
+<text x="69.568" y="30.755" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
 </g>
 <text x="44.894" y="-22.093" transform="scale(1, -1)"
@@ -32,8 +32,10 @@
 <path d="M67.786,124.72L71.786,124.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M67.786,138.7L71.786,138.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M67.786,152.69L71.786,152.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M71.786,26.814L71.786,167.82" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M80.031,26.814L80.031,167.82L110.03,167.82L110.03,26.814Z" style="fill:#F15A60" />
-<path d="M339.2,26.814L339.2,79.619L369.2,79.619L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M71.786,26.814L71.786,166.97" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M80.031,26.814L80.031,166.97L110.03,166.97L110.03,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M80.031,26.814L80.031,26.814L110.03,26.814L110.03,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,77.475L369.2,77.475L369.2,26.814Z" style="fill:#7AC36A" />
 </g>
 </svg>

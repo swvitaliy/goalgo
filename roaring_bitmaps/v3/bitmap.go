@@ -24,6 +24,11 @@ import (
 type Bitmap struct {
 	keys  []uint16     // high 16 bits of each chunk, ascending
 	conts []*container // chunk contents, parallel to keys
+
+	// prefix[i] is the number of values in the first i containers, built on
+	// demand by Rank/Select and dropped by any change to the contents. It turns
+	// both queries from a walk over the containers into a binary search.
+	prefix []int
 }
 
 // New returns a Bitmap holding the given values.
@@ -38,6 +43,7 @@ func lo(v uint32) uint16 { return uint16(v) }
 
 // Add inserts v and reports whether the set changed.
 func (b *Bitmap) Add(v uint32) bool {
+	b.prefix = nil
 	k := hi(v)
 	i, found := slices.BinarySearch(b.keys, k)
 	if !found {
@@ -49,6 +55,7 @@ func (b *Bitmap) Add(v uint32) bool {
 // AddMany inserts every value, reusing the container lookup for runs of values
 // that share a key.
 func (b *Bitmap) AddMany(values ...uint32) {
+	b.prefix = nil
 	var (
 		lastKey  uint16
 		lastCont *container
@@ -68,6 +75,7 @@ func (b *Bitmap) AddMany(values ...uint32) {
 
 // Remove deletes v and reports whether the set changed.
 func (b *Bitmap) Remove(v uint32) bool {
+	b.prefix = nil
 	i, found := slices.BinarySearch(b.keys, hi(v))
 	if !found {
 		return false

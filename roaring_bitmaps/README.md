@@ -54,8 +54,9 @@ go install golang.org/x/perf/cmd/benchstat@latest
 dependency at a pseudo-version the proxy no longer serves. Build it from a
 checkout instead, dropping its `tools.go` (which only pins the linter it uses on
 itself) and bumping the `go` directive so module pruning skips the rest. The
-copy used here is also patched to pad the plot area, drop the legend and label
-the time axis in ns/us/ms rather than raw nanoseconds.
+copy used here is also patched to pad the plot area, drop the legend and axis
+label, colour each bar separately and label the time axis in ns/us/ms rather
+than raw nanoseconds.
 
 Case names have the form `version=v2/data=runs` (`codec=raw/data=runs` for
 serialisation), which is what lets both `benchstat -col` and `benchdraw` slice
@@ -92,11 +93,11 @@ dump of the sorted `uint32` values, rebuilt on the other side.
 From `bench_results.csv` (medians of 10 runs, 200k values per dataset):
 
 - **Run containers are what v2 buys, and only on data that has runs.** On `runs`
-  `And` drops from 26.8us (v1) to 1.5us (v2), `AndNot` from 14.5us to 1.8us,
-  `Or` from 13.8us to 2.2us. `AndCardinality` does not move (1.51us vs 1.33us):
+  `And` drops from 24.9us (v1) to 1.5us (v2), `AndNot` from 13.8us to 1.8us,
+  `Or` from 14.2us to 2.3us. `AndCardinality` does not move (1.38us vs 1.17us):
   v1 already fuses AND and popcount in one SIMD pass without writing a result, so
   there was nothing left to save.
-- **They also cost something.** `Contains` on `runs` goes from 5.6ns to 17.4ns —
+- **They also cost something.** `Contains` on `runs` goes from 5.8ns to 16.4ns —
   a binary search over intervals instead of one bit test. Point lookups pay for
   what set operations gain.
 - **On `sparse` v2 and v3 are slower than v1, by up to 1.5x on `And` depending on
@@ -107,10 +108,16 @@ From `bench_results.csv` (medians of 10 runs, 200k values per dataset):
   struct (`card int32`, bitmap as an array pointer) took this gap down from 1.85x;
   the remainder is that size class plus a longer type switch.
 - **On `zipf` the three are within noise of each other.**
+- **Rank/Select trade speed for memory.** They are compared with a sorted copy
+  of the values kept beside the bitmap (`method=array|v3`). The copy answers
+  `Select` in 2ns against 14–75ns for v3 — an index is unbeatable — but costs 4
+  bytes per value, where v3's prefix-sum cache costs one int per container
+  (0.0006–1.3 bytes per value). `Rank` is even: a binary search over the keys
+  plus a popcount inside one container, twice as fast as the copy on `runs`.
 - **v3 against a raw dump:** on `runs` the stream is 0.008 bytes per value
   against 4, and both directions are two to three orders of magnitude faster
-  (`ToBytes` 0.6us vs 226us, `FromBytes` 1.9us vs 1152us). On `sparse` there is
-  little to compress (3.3 vs 4 bytes per value) but decoding is still 2.7x faster
+  (`ToBytes` 0.6us vs 211us, `FromBytes` 1.8us vs 1165us). On `sparse` there is
+  little to compress (3.3 vs 4 bytes per value) but decoding is still 2.8x faster
   because the format lands directly in containers instead of re-inserting values.
 
 `report.html` is a self-contained page — findings plus every chart inlined —

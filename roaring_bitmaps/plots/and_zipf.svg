@@ -19,31 +19,27 @@
 </g>
 <text x="45.378" y="-22.093" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
-<text x="34.616" y="-72.904" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">250 µs</text>
-<text x="34.616" y="-123.72" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">500 µs</text>
-<text x="34.616" y="-174.53" transform="scale(1, -1)"
-	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">750 µs</text>
+<text x="34.616" y="-86.975" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">300 µs</text>
+<text x="34.616" y="-151.86" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">600 µs</text>
 <path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M64.269,77.626L72.269,77.626" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M64.269,128.44L72.269,128.44" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M64.269,179.25L72.269,179.25" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,36.977L72.269,36.977" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,47.139L72.269,47.139" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,57.301L72.269,57.301" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,67.464L72.269,67.464" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,87.788L72.269,87.788" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,97.95L72.269,97.95" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,108.11L72.269,108.11" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,118.28L72.269,118.28" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,138.6L72.269,138.6" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,148.76L72.269,148.76" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,158.92L72.269,158.92" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M68.269,169.09L72.269,169.09" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,91.697L72.269,91.697" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,156.58L72.269,156.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,48.442L72.269,48.442" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,70.069L72.269,70.069" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,113.32L72.269,113.32" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,134.95L72.269,134.95" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,178.21L72.269,178.21" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M72.269,26.814L72.269,186.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M78.019,26.814L78.019,186.58L108.02,186.58L108.02,26.814Z" style="fill:#F15A60" />
-<path d="M223.61,26.814L223.61,185.11L253.61,185.11L253.61,26.814Z" style="fill:#F15A60" />
-<path d="M369.2,26.814L369.2,171.51L399.2,171.51L399.2,26.814Z" style="fill:#F15A60" />
+<path d="M223.61,26.814L223.61,26.814L253.61,26.814L253.61,26.814Z" style="fill:#F15A60" />
+<path d="M369.2,26.814L369.2,26.814L399.2,26.814L399.2,26.814Z" style="fill:#F15A60" />
+<path d="M78.019,26.814L78.019,26.814L108.02,26.814L108.02,26.814Z" style="fill:#7AC36A" />
+<path d="M223.61,26.814L223.61,178.09L253.61,178.09L253.61,26.814Z" style="fill:#7AC36A" />
+<path d="M369.2,26.814L369.2,26.814L399.2,26.814L399.2,26.814Z" style="fill:#7AC36A" />
+<path d="M78.019,26.814L78.019,26.814L108.02,26.814L108.02,26.814Z" style="fill:#5A9BD4" />
+<path d="M223.61,26.814L223.61,26.814L253.61,26.814L253.61,26.814Z" style="fill:#5A9BD4" />
+<path d="M369.2,26.814L369.2,183.01L399.2,183.01L399.2,26.814Z" style="fill:#5A9BD4" />
 </g>
 </svg>
