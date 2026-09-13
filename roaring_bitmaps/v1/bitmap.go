@@ -1,5 +1,3 @@
-//go:build goexperiment.simd && amd64
-
 // Package roaringv1 implements Roaring bitmaps with the two classic container
 // types: a sorted uint16 array for sparse chunks and a 64Ki-bit bitmap for dense
 // ones. It is the baseline of the three versions in this directory; v2 adds run

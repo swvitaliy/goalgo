@@ -1,5 +1,3 @@
-//go:build goexperiment.simd && amd64
-
 package roaringv2
 
 import "goalgo/roaring_bitmaps/internal/simdops"

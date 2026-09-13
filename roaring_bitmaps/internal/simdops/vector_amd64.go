@@ -1,20 +1,5 @@
 //go:build goexperiment.simd && amd64
 
-// Package simdops holds the vector primitives shared by every Roaring bitmap
-// version in this directory.
-//
-// Keeping them in one place is deliberate: v1, v2 and v3 differ only in their
-// container model, so benchmarks comparing the three measure that model rather
-// than accidental differences in the vector code.
-//
-// The primitives are built on simd/archsimd rather than the portable simd
-// package. The portable package offers no population count and no way to turn a
-// comparison mask into bits, and nearly every hot Roaring operation needs one or
-// the other, so the portable API would only cover the handful of pure bitwise
-// loops while the rest dropped to archsimd anyway.
-//
-// Requires AVX-512 F/BW/VL plus VPOPCNTDQ (population count) and VBMI2
-// (compress). Init panics when the CPU lacks them.
 package simdops
 
 import (
@@ -24,9 +9,8 @@ import (
 	"simd/archsimd"
 )
 
-// BitmapWords is the number of 64-bit words in a bitmap container, covering the
-// full 65536-value key space of a single container.
-const BitmapWords = 1024
+// Vectorized reports that this build uses the AVX-512 primitives.
+const Vectorized = true
 
 const (
 	words64 = 8  // uint64 lanes in a 512-bit vector
@@ -256,40 +240,134 @@ func hsum(v archsimd.Uint64x8) int {
 	return int(out[0] + out[1] + out[2] + out[3] + out[4] + out[5] + out[6] + out[7])
 }
 
-func checkTriple(dst, a, b []uint64) int {
-	if len(a) != len(b) || len(dst) != len(a) {
-		panic(fmt.Sprintf("simdops: length mismatch dst=%d a=%d b=%d", len(dst), len(a), len(b)))
+// IntersectArrays writes the intersection of the sorted, duplicate-free arrays a
+// and b into dst and returns how many values were written. dst must have room for
+// min(len(a), len(b)) values and must not alias a or b.
+func IntersectArrays(dst, a, b []uint16) int {
+	if len(a) == 0 || len(b) == 0 {
+		return 0
 	}
-	return len(dst)
+	small, large := a, b
+	if len(small) > len(large) {
+		small, large = large, small
+	}
+	if len(large)/len(small) >= gallopRatio {
+		return intersectGallop(dst, small, large)
+	}
+	return intersectMerge(dst, a, b)
 }
 
-// PopcountPrefix returns the number of set bits among the first nbits bits of bm.
-func PopcountPrefix(bm []uint64, nbits int) int {
-	full := nbits / 64
-	n := Popcount(bm[:full])
-	if rem := nbits % 64; rem > 0 {
-		n += bits.OnesCount64(bm[full] & (^uint64(0) >> uint(64-rem)))
+// intersectMerge walks both arrays in 32-value blocks. For each pair of blocks it
+// tests all 32x32 value combinations with 32 broadcast comparisons, accumulating
+// one bit per matching lane of a, then compresses those lanes straight into dst.
+func intersectMerge(dst, a, b []uint16) int {
+	var buf [words16]uint16
+	n, i, j := 0, 0, 0
+
+	for i+words16 <= len(a) && j+words16 <= len(b) {
+		va := archsimd.LoadUint16x32(a[i:])
+		matched := uint32(0)
+		for k := 0; k < words16; k++ {
+			matched |= va.Equal(archsimd.BroadcastUint16x32(b[j+k])).ToBits()
+		}
+		if matched != 0 {
+			va.Compress(archsimd.Mask16x32FromBits(matched)).StoreArray(&buf)
+			n += copy(dst[n:], buf[:bits.OnesCount32(matched)])
+		}
+
+		// Advance past whichever block ends first; on a tie both are exhausted.
+		lastA, lastB := a[i+words16-1], b[j+words16-1]
+		if lastA <= lastB {
+			i += words16
+		}
+		if lastB <= lastA {
+			j += words16
+		}
+	}
+
+	return n + intersectLinear(dst[n:], a[i:], b[j:])
+}
+
+// intersectGallop probes the large array for each value of the small one: an
+// exponential search narrows the range to at most one vector, which a single
+// broadcast comparison then tests.
+func intersectGallop(dst, small, large []uint16) int {
+	n, lo := 0, 0
+	for _, x := range small {
+		if lo >= len(large) || large[len(large)-1] < x {
+			break
+		}
+
+		// Exponential search for an upper bound, starting where the previous
+		// value left off: small is sorted, so the window only moves forward.
+		hi, step := lo, 1
+		for hi < len(large) && large[hi] < x {
+			lo = hi + 1
+			hi += step
+			step *= 2
+		}
+		// Make the range half-open and inclusive of the first index known to
+		// hold a value >= x, so a hit at that index is not searched past.
+		if hi = min(hi+1, len(large)); lo >= hi {
+			continue
+		}
+		for hi-lo > words16 {
+			mid := int(uint(lo+hi) >> 1)
+			if large[mid] < x {
+				lo = mid + 1
+			} else {
+				hi = mid + 1
+			}
+		}
+
+		window, _ := archsimd.LoadUint16x32Part(large[lo:hi])
+		// Lanes past the window hold padding, so mask them out before testing.
+		valid := uint32(1)<<uint(hi-lo) - 1
+		if hi-lo == words16 {
+			valid = ^uint32(0)
+		}
+		if window.Equal(archsimd.BroadcastUint16x32(x)).ToBits()&valid != 0 {
+			dst[n] = x
+			n++
+		}
 	}
 	return n
 }
 
-// SelectBit returns the position of the rank-th set bit of bm, counting from
-// zero, or -1 when bm holds fewer bits than that.
-func SelectBit(bm []uint64, rank int) int {
-	for i, w := range bm {
-		c := bits.OnesCount64(w)
-		if rank < c {
-			return i*64 + selectInWord(w, rank)
-		}
-		rank -= c
+func fillWords(dst []uint64, v uint64) {
+	vec := archsimd.BroadcastUint64x8(v)
+	i := 0
+	for ; i+words64 <= len(dst); i += words64 {
+		vec.Store(dst[i:])
 	}
-	return -1
+	for ; i < len(dst); i++ {
+		dst[i] = v
+	}
 }
 
-// selectInWord returns the position of the rank-th set bit within one word.
-func selectInWord(w uint64, rank int) int {
-	for ; rank > 0; rank-- {
-		w &= w - 1
+func flipWords(dst []uint64) {
+	ones := archsimd.BroadcastUint64x8(^uint64(0))
+	i := 0
+	for ; i+words64 <= len(dst); i += words64 {
+		archsimd.LoadUint64x8(dst[i:]).Xor(ones).Store(dst[i:])
 	}
-	return bits.TrailingZeros64(w)
+	for ; i < len(dst); i++ {
+		dst[i] = ^dst[i]
+	}
+}
+
+func anyNonZero(words []uint64) bool {
+	zero := archsimd.BroadcastUint64x8(0)
+	i := 0
+	for ; i+words64 <= len(words); i += words64 {
+		if archsimd.LoadUint64x8(words[i:]).NotEqual(zero).ToBits() != 0 {
+			return true
+		}
+	}
+	for ; i < len(words); i++ {
+		if words[i] != 0 {
+			return true
+		}
+	}
+	return false
 }

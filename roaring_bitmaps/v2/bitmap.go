@@ -1,5 +1,3 @@
-//go:build goexperiment.simd && amd64
-
 // Package roaringv2 extends the two-container Roaring of v1 with run containers:
 // a chunk made of long stretches of consecutive values is stored as a list of
 // intervals instead of an array or a bitmap.

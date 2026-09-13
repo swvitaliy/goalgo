@@ -1,5 +1,3 @@
-//go:build goexperiment.simd && amd64
-
 package roaringv3
 
 import (

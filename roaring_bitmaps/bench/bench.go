@@ -1,5 +1,3 @@
-//go:build goexperiment.simd && amd64
-
 // Package bench drives v1, v2 and v3 through the same workloads so the three
 // container models can be compared directly.
 //

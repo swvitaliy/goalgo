@@ -1,5 +1,3 @@
-//go:build goexperiment.simd && amd64
-
 package bench
 
 import (
@@ -7,13 +5,23 @@ import (
 	"strconv"
 	"testing"
 
+	"goalgo/roaring_bitmaps/internal/simdops"
 	roaringv3 "goalgo/roaring_bitmaps/v3"
 )
 
 // caseName labels a benchmark case as key=value pairs, which is the shape
-// benchstat -col and benchdraw need to slice the results by dimension.
+// benchstat -col and benchdraw need to slice the results by dimension. The
+// simd tag records which simdops build ran, so a vector and a scalar pass can be
+// concatenated into one file and compared.
 func caseName(version, data string) string {
-	return "version=" + version + "/data=" + data
+	return "version=" + version + "/data=" + data + "/simd=" + simdTag()
+}
+
+func simdTag() string {
+	if simdops.Vectorized {
+		return "on"
+	}
+	return "off"
 }
 
 // pair holds two bitmaps of the same version and dataset, ready for a binary
@@ -154,7 +162,7 @@ func eachCodec(b *testing.B, fn func(b *testing.B, c codec, bm *roaringv3.Bitmap
 		bm := roaringv3.New(ds.values...)
 		bm.RunOptimize()
 		for _, c := range codecs() {
-			b.Run("codec="+c.name+"/data="+ds.name, func(b *testing.B) {
+			b.Run("codec="+c.name+"/data="+ds.name+"/simd="+simdTag(), func(b *testing.B) {
 				fn(b, c, bm, c.encode(bm))
 			})
 		}

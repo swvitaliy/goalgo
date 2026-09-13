@@ -1,5 +1,3 @@
-//go:build goexperiment.simd && amd64
-
 // Package roaringv3 adds the parts a Roaring bitmap needs to leave the process:
 // serialisation in the portable format shared with the C and Java
 // implementations, and Rank/Select for positional queries.
