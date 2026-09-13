@@ -25,9 +25,9 @@ func andContainers(a, b *container) *container {
 		return andRunBitmap(b, a).normalize()
 
 	case a.kind == kindArray && b.kind == kindArray:
-		out := newArrayContainer(min(a.card, b.card))
+		out := newArrayContainer(int(min(a.card, b.card)))
 		out.arr = out.arr[:min(a.card, b.card)]
-		out.card = simdops.IntersectArrays(out.arr, a.arr, b.arr)
+		out.card = int32(simdops.IntersectArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
 		return out.normalize()
 
@@ -38,7 +38,7 @@ func andContainers(a, b *container) *container {
 
 	default:
 		out := newBitmapContainer()
-		out.card = simdops.AndTo(out.bm, a.bm, b.bm)
+		out.card = int32(simdops.AndTo(out.bm[:], a.bm[:], b.bm[:]))
 		return out.normalize()
 	}
 }
@@ -59,9 +59,9 @@ func orContainers(a, b *container) *container {
 		return orRunBitmap(b, a).normalize()
 
 	case a.kind == kindArray && b.kind == kindArray:
-		out := newArrayContainer(a.card + b.card)
+		out := newArrayContainer(int(a.card + b.card))
 		out.arr = out.arr[:a.card+b.card]
-		out.card = simdops.UnionArrays(out.arr, a.arr, b.arr)
+		out.card = int32(simdops.UnionArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
 		return out.normalize()
 
@@ -72,7 +72,7 @@ func orContainers(a, b *container) *container {
 
 	default:
 		out := newBitmapContainer()
-		out.card = simdops.OrTo(out.bm, a.bm, b.bm)
+		out.card = int32(simdops.OrTo(out.bm[:], a.bm[:], b.bm[:]))
 		return out.normalize()
 	}
 }
@@ -89,20 +89,20 @@ func andNotContainers(a, b *container) *container {
 
 	case a.kind == kindRun && b.kind == kindBitmap:
 		out := &container{kind: kindBitmap, bm: runsToBitmap(a.runs)}
-		out.card = simdops.AndNotTo(out.bm, out.bm, b.bm)
+		out.card = int32(simdops.AndNotTo(out.bm[:], out.bm[:], b.bm[:]))
 		return out.normalize()
 	case a.kind == kindBitmap && b.kind == kindRun:
 		out := a.clone()
 		for _, iv := range b.runs {
-			simdops.ClearRange(out.bm, int(iv.start), int(iv.last)+1)
+			simdops.ClearRange(out.bm[:], int(iv.start), int(iv.last)+1)
 		}
-		out.card = simdops.Popcount(out.bm)
+		out.card = int32(simdops.Popcount(out.bm[:]))
 		return out.normalize()
 
 	case a.kind == kindArray && b.kind == kindArray:
-		out := newArrayContainer(a.card)
+		out := newArrayContainer(int(a.card))
 		out.arr = out.arr[:a.card]
-		out.card = simdops.DifferenceArrays(out.arr, a.arr, b.arr)
+		out.card = int32(simdops.DifferenceArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
 		return out.normalize()
 
@@ -120,7 +120,7 @@ func andNotContainers(a, b *container) *container {
 
 	default:
 		out := newBitmapContainer()
-		out.card = simdops.AndNotTo(out.bm, a.bm, b.bm)
+		out.card = int32(simdops.AndNotTo(out.bm[:], a.bm[:], b.bm[:]))
 		return out.normalize()
 	}
 }
@@ -141,9 +141,9 @@ func xorContainers(a, b *container) *container {
 		return xorRunBitmap(b, a).normalize()
 
 	case a.kind == kindArray && b.kind == kindArray:
-		out := newArrayContainer(a.card + b.card)
+		out := newArrayContainer(int(a.card + b.card))
 		out.arr = out.arr[:a.card+b.card]
-		out.card = simdops.XorArrays(out.arr, a.arr, b.arr)
+		out.card = int32(simdops.XorArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
 		return out.normalize()
 
@@ -154,7 +154,7 @@ func xorContainers(a, b *container) *container {
 
 	default:
 		out := newBitmapContainer()
-		out.card = simdops.XorTo(out.bm, a.bm, b.bm)
+		out.card = int32(simdops.XorTo(out.bm[:], a.bm[:], b.bm[:]))
 		return out.normalize()
 	}
 }
@@ -170,7 +170,7 @@ func intersects(a, b *container) bool {
 		return runsIntersectContainer(b.runs, a)
 
 	case a.kind == kindBitmap && b.kind == kindBitmap:
-		return simdops.Intersects(a.bm, b.bm)
+		return simdops.Intersects(a.bm[:], b.bm[:])
 
 	case a.kind == kindArray && b.kind == kindBitmap:
 		return anyContained(a.arr, b)
@@ -208,7 +208,7 @@ func runsIntersectContainer(runs []interval, c *container) bool {
 		return false
 	}
 	for _, iv := range runs {
-		if simdops.HasBitInRange(c.bm, int(iv.start), int(iv.last)+1) {
+		if simdops.HasBitInRange(c.bm[:], int(iv.start), int(iv.last)+1) {
 			return true
 		}
 	}
@@ -223,7 +223,7 @@ func andRunArray(r, arr *container) *container {
 // filterArrayByRuns keeps the values of an array container whose membership in
 // runs equals want.
 func filterArrayByRuns(arr *container, runs []interval, want bool) *container {
-	out := newArrayContainer(arr.card)
+	out := newArrayContainer(int(arr.card))
 	j := 0
 	for _, v := range arr.arr {
 		for j < len(runs) && runs[j].last < v {
@@ -234,7 +234,7 @@ func filterArrayByRuns(arr *container, runs []interval, want bool) *container {
 			out.arr = append(out.arr, v)
 		}
 	}
-	out.card = len(out.arr)
+	out.card = int32(len(out.arr))
 	return out
 }
 
@@ -243,27 +243,27 @@ func filterArrayByRuns(arr *container, runs []interval, want bool) *container {
 func andRunBitmap(r, bmc *container) *container {
 	out := newBitmapContainer()
 	for _, iv := range r.runs {
-		simdops.CopyRange(out.bm, bmc.bm, int(iv.start), int(iv.last)+1)
+		simdops.CopyRange(out.bm[:], bmc.bm[:], int(iv.start), int(iv.last)+1)
 	}
-	out.card = simdops.Popcount(out.bm)
+	out.card = int32(simdops.Popcount(out.bm[:]))
 	return out
 }
 
 func orRunBitmap(r, bmc *container) *container {
 	out := bmc.clone()
 	for _, iv := range r.runs {
-		simdops.SetRange(out.bm, int(iv.start), int(iv.last)+1)
+		simdops.SetRange(out.bm[:], int(iv.start), int(iv.last)+1)
 	}
-	out.card = simdops.Popcount(out.bm)
+	out.card = int32(simdops.Popcount(out.bm[:]))
 	return out
 }
 
 func xorRunBitmap(r, bmc *container) *container {
 	out := bmc.clone()
 	for _, iv := range r.runs {
-		simdops.FlipRange(out.bm, int(iv.start), int(iv.last)+1)
+		simdops.FlipRange(out.bm[:], int(iv.start), int(iv.last)+1)
 	}
-	out.card = simdops.Popcount(out.bm)
+	out.card = int32(simdops.Popcount(out.bm[:]))
 	return out
 }
 
@@ -279,13 +279,13 @@ func anyContained(values []uint16, bm *container) bool {
 // filterArray keeps the values of the array container arr whose membership in the
 // bitmap container bm equals want.
 func filterArray(arr, bm *container, want bool) *container {
-	out := newArrayContainer(arr.card)
+	out := newArrayContainer(int(arr.card))
 	for _, v := range arr.arr {
 		if (bm.bm[v/64]&(1<<(v%64)) != 0) == want {
 			out.arr = append(out.arr, v)
 		}
 	}
-	out.card = len(out.arr)
+	out.card = int32(len(out.arr))
 	return out
 }
 

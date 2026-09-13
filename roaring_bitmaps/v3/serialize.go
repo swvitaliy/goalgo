@@ -192,7 +192,7 @@ func (b *Bitmap) validate() error {
 func (c *container) serializedSize() int {
 	switch c.kind {
 	case kindArray:
-		return 2 * c.card
+		return 2 * int(c.card)
 	case kindRun:
 		return 2 + 4*len(c.runs)
 	default:
@@ -214,7 +214,7 @@ func (c *container) appendTo(buf []byte) []byte {
 			buf = binary.LittleEndian.AppendUint16(buf, iv.last-iv.start)
 		}
 	default:
-		for _, w := range c.bm {
+		for _, w := range c.bm[:] {
 			buf = binary.LittleEndian.AppendUint64(buf, w)
 		}
 	}
@@ -247,7 +247,7 @@ func readContainer(r *reader, card int, isRun bool) (*container, error) {
 			}
 		}
 		c := newRunContainer(runs)
-		if c.card != card {
+		if int(c.card) != card {
 			return nil, fmt.Errorf("run cardinality %d does not match header %d", c.card, card)
 		}
 		return c, nil
@@ -258,11 +258,11 @@ func readContainer(r *reader, card int, isRun bool) (*container, error) {
 			return nil, err
 		}
 		c := newBitmapContainer()
-		for i := range c.bm {
+		for i := range c.bm[:] {
 			c.bm[i] = binary.LittleEndian.Uint64(words[8*i:])
 		}
-		c.card = simdops.Popcount(c.bm)
-		if c.card != card {
+		c.card = int32(simdops.Popcount(c.bm[:]))
+		if int(c.card) != card {
 			return nil, fmt.Errorf("bitmap cardinality %d does not match header %d", c.card, card)
 		}
 		return c, nil
@@ -280,7 +280,7 @@ func readContainer(r *reader, card int, isRun bool) (*container, error) {
 			}
 			c.arr[i] = v
 		}
-		c.card = card
+		c.card = int32(card)
 		return c, nil
 	}
 }

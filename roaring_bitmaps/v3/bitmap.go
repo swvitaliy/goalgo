@@ -92,7 +92,7 @@ func (b *Bitmap) Contains(v uint32) bool {
 func (b *Bitmap) Cardinality() int {
 	n := 0
 	for _, c := range b.conts {
-		n += c.card
+		n += int(c.card)
 	}
 	return n
 }
@@ -239,9 +239,9 @@ func (b *Bitmap) AndCardinality(other *Bitmap) int {
 			j++
 		default:
 			if a, o := b.conts[i], other.conts[j]; a.kind == kindBitmap && o.kind == kindBitmap {
-				n += simdops.AndCardinality(a.bm, o.bm)
+				n += simdops.AndCardinality(a.bm[:], o.bm[:])
 			} else if c := andContainers(a, o); c != nil {
-				n += c.card
+				n += int(c.card)
 			}
 			i++
 			j++

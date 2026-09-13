@@ -30,17 +30,6 @@ type Bitmap interface {
 	AndCardinality(other Bitmap) int
 }
 
-// runOptimizer is implemented by the versions that have run containers.
-type runOptimizer interface {
-	RunOptimize() bool
-}
-
-// serializer is implemented by the version that can leave the process.
-type serializer interface {
-	ToBytes() []byte
-	SerializedSize() int
-}
-
 type v1Bitmap struct{ *roaringv1.Bitmap }
 
 func (b v1Bitmap) And(other Bitmap) Bitmap {
@@ -88,11 +77,25 @@ type version struct {
 	new  func(values ...uint32) Bitmap
 }
 
+// versions lists the implementations under comparison, each built the way it is
+// meant to be used. v2 and v3 exist for their run containers, so their
+// constructors include RunOptimize: the difference between v1 and v2 in any chart
+// is exactly what that encoding buys, or costs.
 func versions() []version {
 	return []version{
-		{name: "v1", new: func(values ...uint32) Bitmap { return v1Bitmap{roaringv1.New(values...)} }},
-		{name: "v2", new: func(values ...uint32) Bitmap { return v2Bitmap{roaringv2.New(values...)} }},
-		{name: "v3", new: func(values ...uint32) Bitmap { return v3Bitmap{roaringv3.New(values...)} }},
+		{name: "v1", new: func(values ...uint32) Bitmap {
+			return v1Bitmap{roaringv1.New(values...)}
+		}},
+		{name: "v2", new: func(values ...uint32) Bitmap {
+			b := roaringv2.New(values...)
+			b.RunOptimize()
+			return v2Bitmap{b}
+		}},
+		{name: "v3", new: func(values ...uint32) Bitmap {
+			b := roaringv3.New(values...)
+			b.RunOptimize()
+			return v3Bitmap{b}
+		}},
 	}
 }
 
@@ -112,17 +115,18 @@ func datasetSize() int {
 	return 200_000
 }
 
-// datasets returns the four shapes that tell the container models apart: a dense
-// block where bitmaps win, a wide scatter where arrays win, long runs where run
-// containers win, and a skewed distribution closer to real data.
+// datasets returns the three shapes that tell the container models apart.
+//
+//   - sparse: random values across 2^31. Every chunk holds a handful of values, so
+//     everything is a tiny array container and per-container overhead dominates.
+//   - runs: stretches of 512 consecutive values separated by random gaps. In v1
+//     these fill bitmap containers; in v2 and v3 they collapse into a few
+//     intervals each. This is the shape run containers were built for.
+//   - zipf: a skewed distribution with a crowded low end and a sparse tail, so one
+//     bitmap mixes bitmap, array and run containers the way real data does.
 func datasets(offset uint32) []dataset {
 	n := datasetSize()
 	rng := rand.New(rand.NewPCG(uint64(offset)+1, 0x5eed))
-
-	dense := make([]uint32, n)
-	for i := range dense {
-		dense[i] = offset + uint32(i)
-	}
 
 	sparse := make([]uint32, n)
 	for i := range sparse {
@@ -144,7 +148,6 @@ func datasets(offset uint32) []dataset {
 	}
 
 	return []dataset{
-		{name: "dense", values: dense},
 		{name: "sparse", values: sparse},
 		{name: "runs", values: runs},
 		{name: "zipf", values: zipf},

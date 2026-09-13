@@ -17,7 +17,7 @@ func (b *Bitmap) Rank(v uint32) int {
 			break
 		}
 		if k < key {
-			n += b.conts[i].card
+			n += int(b.conts[i].card)
 			continue
 		}
 		n += b.conts[i].rank(lo(v))
@@ -33,10 +33,10 @@ func (b *Bitmap) Select(i int) (uint32, bool) {
 		return 0, false
 	}
 	for idx, c := range b.conts {
-		if i < c.card {
+		if i < int(c.card) {
 			return uint32(b.keys[idx])<<16 | uint32(c.selectAt(i)), true
 		}
-		i -= c.card
+		i -= int(c.card)
 	}
 	return 0, false
 }
@@ -51,14 +51,14 @@ func (b *Bitmap) Maximum() (uint32, bool) {
 	}
 	last := len(b.conts) - 1
 	c := b.conts[last]
-	return uint32(b.keys[last])<<16 | uint32(c.selectAt(c.card-1)), true
+	return uint32(b.keys[last])<<16 | uint32(c.selectAt(int(c.card)-1)), true
 }
 
 // rank returns how many values of the container are less than or equal to v.
 func (c *container) rank(v uint16) int {
 	switch c.kind {
 	case kindBitmap:
-		return simdops.PopcountPrefix(c.bm, int(v)+1)
+		return simdops.PopcountPrefix(c.bm[:], int(v)+1)
 
 	case kindRun:
 		n := 0
@@ -89,7 +89,7 @@ func (c *container) rank(v uint16) int {
 func (c *container) selectAt(i int) uint16 {
 	switch c.kind {
 	case kindBitmap:
-		return uint16(simdops.SelectBit(c.bm, i))
+		return uint16(simdops.SelectBit(c.bm[:], i))
 
 	case kindRun:
 		for _, iv := range c.runs {

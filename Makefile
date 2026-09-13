@@ -45,7 +45,12 @@ roaring_test:
 
 .PHONY: roaring_bench
 roaring_bench:
-	$(GO_SIMD) test -bench=. -benchmem ./roaring_bitmaps/... | tee ./roaring_bitmaps/bench_results.txt
+	$(GO_SIMD) test -run='^$$' -bench=. -benchmem -benchtime=200ms -count=10 ./roaring_bitmaps/bench | tee ./roaring_bitmaps/bench_results_count10.txt
+	benchstat -format=csv ./roaring_bitmaps/bench_results_count10.txt > ./roaring_bitmaps/bench_results.csv
+
+.PHONY: roaring_plots
+roaring_plots:
+	./roaring_bitmaps/plot.sh
 
 .PHONY: roaring_fuzz
 roaring_fuzz:

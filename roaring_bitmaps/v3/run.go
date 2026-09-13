@@ -237,10 +237,10 @@ func runsToArray(dst []uint16, runs []interval) int {
 	return n
 }
 
-func runsToBitmap(runs []interval) []uint64 {
-	bm := make([]uint64, simdops.BitmapWords)
+func runsToBitmap(runs []interval) *bitmapWords {
+	bm := new(bitmapWords)
 	for _, iv := range runs {
-		simdops.SetRange(bm, int(iv.start), int(iv.last)+1)
+		simdops.SetRange(bm[:], int(iv.start), int(iv.last)+1)
 	}
 	return bm
 }

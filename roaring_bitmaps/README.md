@@ -21,7 +21,8 @@ is an older launcher that rejects `GOEXPERIMENT` before it switches toolchains:
 
 ```
 make roaring_test    # go test -race
-make roaring_bench   # writes bench_results.txt
+make roaring_bench   # 10 runs -> bench_results_count10.txt + bench_results.csv
+make roaring_plots   # plots/*.svg via benchdraw
 make roaring_fuzz
 ```
 
@@ -48,19 +49,41 @@ cover only the pure bitwise loops and drop to `archsimd` everywhere else.
 
 ## What the benchmarks show
 
-From `bench_results.txt` (200k values per dataset):
+`bench/` builds each version the way it is meant to be used — v2 and v3 with
+`RunOptimize` applied — and runs all three over the same three datasets: `sparse`
+(random values across 2^31, every chunk a tiny array), `runs` (stretches of 512
+consecutive values, the shape run containers exist for) and `zipf` (a skewed
+distribution that mixes container kinds). Serialisation has no counterpart in
+v1/v2, so it is compared against the alternative one would ship without it: a
+dump of the sorted `uint32` values, rebuilt on the other side.
 
-- Run containers are the whole story on run-heavy and dense data. `And` on the
-  dense dataset goes from 17.6us (v1) to 0.44us (v2 after `RunOptimize`), and on
-  the runs dataset from 35.5us to 2.8us. `Xor` shows the same shape.
-- On sparse data run containers cost slightly more than they save: `RunOptimize`
-  finds nothing to collapse, and v2/v3 run a few percent behind v1 through the
-  extra dispatch.
-- Serialised size is where the encoding shows up most: the dense dataset drops
-  from 0.157 to 0.0003 bytes per value after `RunOptimize`, the runs dataset from
-  0.53 to 0.008, while sparse and zipf are unchanged at 3.3 and 2.1.
-- v3 tracks v2 on set operations, as expected — serialisation does not touch those
-  paths. Its own numbers to read are `ToBytes` and `FromBytes`.
+From `bench_results.csv` (medians of 10 runs, 200k values per dataset):
+
+- **Run containers are what v2 buys, and only on data that has runs.** On `runs`
+  `And` drops from 25.8us (v1) to 1.5us (v2), `AndNot` from 14.4us to 1.7us,
+  `Or` from 14.7us to 2.5us. `AndCardinality` does not move (1.36us vs 1.25us):
+  v1 already fuses AND and popcount in one SIMD pass without writing a result, so
+  there was nothing left to save.
+- **They also cost something.** `Contains` on `runs` goes from 5.7ns to 16.9ns —
+  a binary search over intervals instead of one bit test. Point lookups pay for
+  what set operations gain.
+- **On `sparse` v2 and v3 are slower than v1, by ~1.4x on `And`.** Nothing there
+  is run-shaped; what shows is the container struct. Carrying a third encoding
+  costs one slice header, which puts v2's container in the 64-byte size class
+  against v1's 48, and a sparse operation allocates ~32k of them. Packing the
+  struct (`card int32`, bitmap as an array pointer) took this gap down from 1.85x;
+  the remainder is that size class plus a longer type switch.
+- **On `zipf` the three are within noise of each other.**
+- **v3 against a raw dump:** on `runs` the stream is 0.008 bytes per value
+  against 4, and both directions are two to three orders of magnitude faster
+  (`ToBytes` 0.6us vs 218us, `FromBytes` 1.8us vs 1054us). On `sparse` there is
+  little to compress (3.3 vs 4 bytes per value) but decoding is still 2.6x faster
+  because the format lands directly in containers instead of re-inserting values.
+
+`plot.sh` renders one chart per operation and dataset into `plots/` (the datasets
+differ by orders of magnitude, so a shared axis would hide the fast cases). It
+needs `benchdraw` built from source: the published module has a broken
+dependency, and the fork used here also moves the legend below the plot.
 
 ## Correctness
 

@@ -20,14 +20,23 @@ const (
 	kindBitmap
 )
 
+// bitmapWords is the fixed shape of a bitmap container: a container always covers
+// the whole 65536-value key space, so a pointer to the array carries the same
+// information as a slice header in a third of the space.
+type bitmapWords = [simdops.BitmapWords]uint64
+
 // container holds the low 16 bits of every value sharing one high-16-bit key.
-// Both representations live in one struct rather than behind an interface so
-// that operations dispatch on a field test instead of an indirect call.
+// Both representations live in one struct rather than behind an interface so that
+// operations dispatch on a field test instead of an indirect call.
+//
+// The field order and widths are deliberate. Sparse data produces tens of
+// thousands of these per operation, so the struct is kept inside a small size
+// class: card is int32 because a container never holds more than 65536 values.
 type container struct {
+	arr  []uint16     // kindArray, sorted and duplicate-free
+	bm   *bitmapWords // kindBitmap
+	card int32
 	kind kind
-	card int
-	arr  []uint16 // kindArray, sorted and duplicate-free
-	bm   []uint64 // kindBitmap, simdops.BitmapWords words
 }
 
 func newArrayContainer(capacity int) *container {
@@ -35,7 +44,7 @@ func newArrayContainer(capacity int) *container {
 }
 
 func newBitmapContainer() *container {
-	return &container{kind: kindBitmap, bm: make([]uint64, simdops.BitmapWords)}
+	return &container{kind: kindBitmap, bm: new(bitmapWords)}
 }
 
 func (c *container) clone() *container {
@@ -43,7 +52,8 @@ func (c *container) clone() *container {
 	if c.kind == kindArray {
 		out.arr = slices.Clone(c.arr)
 	} else {
-		out.bm = slices.Clone(c.bm)
+		out.bm = new(bitmapWords)
+		*out.bm = *c.bm
 	}
 	return out
 }
@@ -125,7 +135,7 @@ func (c *container) flipBit(v uint16) bool {
 }
 
 func (c *container) convertToBitmap() {
-	bm := make([]uint64, simdops.BitmapWords)
+	bm := new(bitmapWords)
 	for _, v := range c.arr {
 		bm[v/64] |= 1 << (v % 64)
 	}
@@ -134,7 +144,7 @@ func (c *container) convertToBitmap() {
 
 func (c *container) convertToArray() {
 	arr := make([]uint16, c.card)
-	simdops.BitmapToArray(arr, c.bm)
+	simdops.BitmapToArray(arr, c.bm[:])
 	c.kind, c.arr, c.bm = kindArray, arr, nil
 }
 
@@ -162,7 +172,7 @@ func (c *container) appendValues(dst []uint32, base uint32) []uint32 {
 	}
 
 	buf := make([]uint16, c.card)
-	simdops.BitmapToArray(buf, c.bm)
+	simdops.BitmapToArray(buf, c.bm[:])
 	for _, v := range buf {
 		dst = append(dst, base|uint32(v))
 	}
@@ -172,9 +182,9 @@ func (c *container) appendValues(dst []uint32, base uint32) []uint32 {
 func andContainers(a, b *container) *container {
 	switch {
 	case a.kind == kindArray && b.kind == kindArray:
-		out := newArrayContainer(min(a.card, b.card))
+		out := newArrayContainer(int(min(a.card, b.card)))
 		out.arr = out.arr[:min(a.card, b.card)]
-		out.card = simdops.IntersectArrays(out.arr, a.arr, b.arr)
+		out.card = int32(simdops.IntersectArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
 		return out.normalize()
 
@@ -186,7 +196,7 @@ func andContainers(a, b *container) *container {
 
 	default:
 		out := newBitmapContainer()
-		out.card = simdops.AndTo(out.bm, a.bm, b.bm)
+		out.card = int32(simdops.AndTo(out.bm[:], a.bm[:], b.bm[:]))
 		return out.normalize()
 	}
 }
@@ -194,9 +204,9 @@ func andContainers(a, b *container) *container {
 func orContainers(a, b *container) *container {
 	switch {
 	case a.kind == kindArray && b.kind == kindArray:
-		out := newArrayContainer(a.card + b.card)
+		out := newArrayContainer(int(a.card + b.card))
 		out.arr = out.arr[:a.card+b.card]
-		out.card = simdops.UnionArrays(out.arr, a.arr, b.arr)
+		out.card = int32(simdops.UnionArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
 		return out.normalize()
 
@@ -208,7 +218,7 @@ func orContainers(a, b *container) *container {
 
 	default:
 		out := newBitmapContainer()
-		out.card = simdops.OrTo(out.bm, a.bm, b.bm)
+		out.card = int32(simdops.OrTo(out.bm[:], a.bm[:], b.bm[:]))
 		return out.normalize()
 	}
 }
@@ -216,9 +226,9 @@ func orContainers(a, b *container) *container {
 func andNotContainers(a, b *container) *container {
 	switch {
 	case a.kind == kindArray && b.kind == kindArray:
-		out := newArrayContainer(a.card)
+		out := newArrayContainer(int(a.card))
 		out.arr = out.arr[:a.card]
-		out.card = simdops.DifferenceArrays(out.arr, a.arr, b.arr)
+		out.card = int32(simdops.DifferenceArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
 		return out.normalize()
 
@@ -236,7 +246,7 @@ func andNotContainers(a, b *container) *container {
 
 	default:
 		out := newBitmapContainer()
-		out.card = simdops.AndNotTo(out.bm, a.bm, b.bm)
+		out.card = int32(simdops.AndNotTo(out.bm[:], a.bm[:], b.bm[:]))
 		return out.normalize()
 	}
 }
@@ -244,9 +254,9 @@ func andNotContainers(a, b *container) *container {
 func xorContainers(a, b *container) *container {
 	switch {
 	case a.kind == kindArray && b.kind == kindArray:
-		out := newArrayContainer(a.card + b.card)
+		out := newArrayContainer(int(a.card + b.card))
 		out.arr = out.arr[:a.card+b.card]
-		out.card = simdops.XorArrays(out.arr, a.arr, b.arr)
+		out.card = int32(simdops.XorArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
 		return out.normalize()
 
@@ -258,7 +268,7 @@ func xorContainers(a, b *container) *container {
 
 	default:
 		out := newBitmapContainer()
-		out.card = simdops.XorTo(out.bm, a.bm, b.bm)
+		out.card = int32(simdops.XorTo(out.bm[:], a.bm[:], b.bm[:]))
 		return out.normalize()
 	}
 }
@@ -266,7 +276,7 @@ func xorContainers(a, b *container) *container {
 func intersects(a, b *container) bool {
 	switch {
 	case a.kind == kindBitmap && b.kind == kindBitmap:
-		return simdops.Intersects(a.bm, b.bm)
+		return simdops.Intersects(a.bm[:], b.bm[:])
 
 	case a.kind == kindArray && b.kind == kindBitmap:
 		return anyContained(a.arr, b)
@@ -300,13 +310,13 @@ func anyContained(values []uint16, bm *container) bool {
 // filterArray keeps the values of the array container arr whose membership in the
 // bitmap container bm equals want, producing an array container.
 func filterArray(arr, bm *container, want bool) *container {
-	out := newArrayContainer(arr.card)
+	out := newArrayContainer(int(arr.card))
 	for _, v := range arr.arr {
 		if (bm.bm[v/64]&(1<<(v%64)) != 0) == want {
 			out.arr = append(out.arr, v)
 		}
 	}
-	out.card = len(out.arr)
+	out.card = int32(len(out.arr))
 	return out
 }
 

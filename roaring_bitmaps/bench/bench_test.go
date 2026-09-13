@@ -3,11 +3,18 @@
 package bench
 
 import (
+	"encoding/binary"
 	"strconv"
 	"testing"
 
 	roaringv3 "goalgo/roaring_bitmaps/v3"
 )
+
+// caseName labels a benchmark case as key=value pairs, which is the shape
+// benchstat -col and benchdraw need to slice the results by dimension.
+func caseName(version, data string) string {
+	return "version=" + version + "/data=" + data
+}
 
 // pair holds two bitmaps of the same version and dataset, ready for a binary
 // operation. Building them is not part of what the set-operation benchmarks
@@ -17,64 +24,44 @@ type pair struct {
 	b Bitmap
 }
 
-func buildPair(v version, left, right dataset, optimize bool) pair {
-	p := pair{a: v.new(left.values...), b: v.new(right.values...)}
-	if optimize {
-		if o, ok := p.a.(runOptimizer); ok {
-			o.RunOptimize()
-		}
-		if o, ok := p.b.(runOptimizer); ok {
-			o.RunOptimize()
-		}
-	}
-	return p
+func buildPair(v version, left, right dataset) pair {
+	return pair{a: v.new(left.values...), b: v.new(right.values...)}
 }
 
-// eachCase runs fn for every version, dataset and run-encoding setting. v1 has no
-// run containers, so it is only visited once per dataset.
-func eachCase(b *testing.B, fn func(b *testing.B, v version, left, right dataset, optimize bool)) {
+// eachCase runs fn once per version and dataset.
+func eachCase(b *testing.B, fn func(b *testing.B, v version, left, right dataset)) {
 	left := datasets(0)
 	right := datasets(1 << 12)
 
 	for _, v := range versions() {
 		for i, ds := range left {
-			for _, optimize := range []bool{false, true} {
-				name := v.name + "/" + ds.name
-				if optimize {
-					if v.name == "v1" {
-						continue
-					}
-					name += "/runopt"
-				}
-				b.Run(name, func(b *testing.B) {
-					fn(b, v, ds, right[i], optimize)
-				})
-			}
+			b.Run(caseName(v.name, ds.name), func(b *testing.B) {
+				fn(b, v, ds, right[i])
+			})
 		}
 	}
 }
 
+// BenchmarkBuild measures the constructor as each version is meant to be used,
+// so for v2 and v3 it includes the RunOptimize pass.
 func BenchmarkBuild(b *testing.B) {
-	eachCase(b, func(b *testing.B, v version, left, _ dataset, optimize bool) {
+	eachCase(b, func(b *testing.B, v version, left, _ dataset) {
 		b.ReportAllocs()
 		for b.Loop() {
-			bm := v.new(left.values...)
-			if optimize {
-				bm.(runOptimizer).RunOptimize()
-			}
+			_ = v.new(left.values...)
 		}
 	})
 }
 
 func BenchmarkContains(b *testing.B) {
-	eachCase(b, func(b *testing.B, v version, left, _ dataset, optimize bool) {
-		p := buildPair(v, left, left, optimize)
+	eachCase(b, func(b *testing.B, v version, left, _ dataset) {
+		bm := v.new(left.values...)
 		values := left.values
 
 		b.ResetTimer()
 		i, hits := 0, 0
 		for b.Loop() {
-			if p.a.Contains(values[i]) {
+			if bm.Contains(values[i]) {
 				hits++
 			}
 			if i++; i == len(values) {
@@ -108,8 +95,8 @@ func BenchmarkAndCardinality(b *testing.B) {
 }
 
 func benchmarkBinary(b *testing.B, op func(pair)) {
-	eachCase(b, func(b *testing.B, v version, left, right dataset, optimize bool) {
-		p := buildPair(v, left, right, optimize)
+	eachCase(b, func(b *testing.B, v version, left, right dataset) {
+		p := buildPair(v, left, right)
 
 		b.ReportAllocs()
 		b.ResetTimer()
@@ -119,70 +106,91 @@ func benchmarkBinary(b *testing.B, op func(pair)) {
 	})
 }
 
-// BenchmarkSerializedSize does no timing work worth reading; it reports the bytes
-// each encoding needs per value, which is the other half of the v1/v2/v3
-// comparison.
-func BenchmarkSerializedSize(b *testing.B) {
+// Serialisation exists only in v3, so there is no version to compare it with.
+// Its point is made against the alternative one would ship without it: a dump of
+// the sorted uint32 values, rebuilt into a bitmap on the other side. Cases are
+// tagged codec=raw and codec=v3.
+
+type codec struct {
+	name   string
+	encode func(bm *roaringv3.Bitmap) []byte
+	decode func(data []byte) (*roaringv3.Bitmap, error)
+}
+
+func codecs() []codec {
+	return []codec{
+		{
+			name: "raw",
+			encode: func(bm *roaringv3.Bitmap) []byte {
+				values := bm.ToArray()
+				out := make([]byte, 0, 4*len(values))
+				for _, v := range values {
+					out = binary.LittleEndian.AppendUint32(out, v)
+				}
+				return out
+			},
+			decode: func(data []byte) (*roaringv3.Bitmap, error) {
+				values := make([]uint32, len(data)/4)
+				for i := range values {
+					values[i] = binary.LittleEndian.Uint32(data[4*i:])
+				}
+				// Reach the same in-memory state FromBytes produces from a
+				// run-optimised stream, so the two decoders end at the same place.
+				bm := roaringv3.New(values...)
+				bm.RunOptimize()
+				return bm, nil
+			},
+		},
+		{
+			name:   "v3",
+			encode: (*roaringv3.Bitmap).ToBytes,
+			decode: roaringv3.FromBytes,
+		},
+	}
+}
+
+func eachCodec(b *testing.B, fn func(b *testing.B, c codec, bm *roaringv3.Bitmap, data []byte)) {
 	for _, ds := range datasets(0) {
-		for _, optimize := range []bool{false, true} {
-			name := "v3/" + ds.name
-			if optimize {
-				name += "/runopt"
-			}
-			b.Run(name, func(b *testing.B) {
-				bm := roaringv3.New(ds.values...)
-				if optimize {
-					bm.RunOptimize()
-				}
-				for b.Loop() {
-					_ = bm.SerializedSize()
-				}
-				// Reported after the loop so the timing harness does not clear it.
-				b.ReportMetric(float64(bm.SerializedSize())/float64(bm.Cardinality()), "bytes/value")
+		bm := roaringv3.New(ds.values...)
+		bm.RunOptimize()
+		for _, c := range codecs() {
+			b.Run("codec="+c.name+"/data="+ds.name, func(b *testing.B) {
+				fn(b, c, bm, c.encode(bm))
 			})
 		}
 	}
 }
 
-func BenchmarkToBytes(b *testing.B) {
-	benchmarkSerialization(b, func(b *testing.B, bm *roaringv3.Bitmap, _ []byte) {
+// BenchmarkSerializedSize does no timing work worth reading; it reports the bytes
+// each codec needs per value, which is the other half of the comparison.
+func BenchmarkSerializedSize(b *testing.B) {
+	eachCodec(b, func(b *testing.B, _ codec, bm *roaringv3.Bitmap, data []byte) {
 		for b.Loop() {
-			_ = bm.ToBytes()
+			_ = len(data)
+		}
+		// Reported after the loop so the timing harness does not clear it.
+		b.ReportMetric(float64(len(data))/float64(bm.Cardinality()), "bytes/value")
+	})
+}
+
+func BenchmarkToBytes(b *testing.B) {
+	eachCodec(b, func(b *testing.B, c codec, bm *roaringv3.Bitmap, _ []byte) {
+		b.ReportAllocs()
+		for b.Loop() {
+			_ = c.encode(bm)
 		}
 	})
 }
 
 func BenchmarkFromBytes(b *testing.B) {
-	benchmarkSerialization(b, func(b *testing.B, _ *roaringv3.Bitmap, data []byte) {
+	eachCodec(b, func(b *testing.B, c codec, _ *roaringv3.Bitmap, data []byte) {
+		b.ReportAllocs()
 		for b.Loop() {
-			if _, err := roaringv3.FromBytes(data); err != nil {
+			if _, err := c.decode(data); err != nil {
 				b.Fatal(err)
 			}
 		}
 	})
-}
-
-func benchmarkSerialization(b *testing.B, fn func(b *testing.B, bm *roaringv3.Bitmap, data []byte)) {
-	for _, ds := range datasets(0) {
-		for _, optimize := range []bool{false, true} {
-			name := "v3/" + ds.name
-			if optimize {
-				name += "/runopt"
-			}
-			b.Run(name, func(b *testing.B) {
-				bm := roaringv3.New(ds.values...)
-				if optimize {
-					bm.RunOptimize()
-				}
-				data := bm.ToBytes()
-
-				b.SetBytes(int64(len(data)))
-				b.ReportAllocs()
-				b.ResetTimer()
-				fn(b, bm, data)
-			})
-		}
-	}
 }
 
 // TestVersionsAgree guards the comparison itself: a benchmark of three
@@ -199,7 +207,7 @@ func TestVersionsAgree(t *testing.T) {
 
 			var want []string
 			for _, v := range versions() {
-				p := buildPair(v, ds, right[i], v.name != "v1")
+				p := buildPair(v, ds, right[i])
 				got := []string{
 					summarize(p.a.And(p.b)),
 					summarize(p.a.Or(p.b)),
@@ -214,6 +222,31 @@ func TestVersionsAgree(t *testing.T) {
 					if got[j] != want[j] {
 						t.Fatalf("%s disagrees with v1 on operation %d: %s vs %s", v.name, j, got[j], want[j])
 					}
+				}
+			}
+		})
+	}
+}
+
+// TestCodecsAgree checks that both codecs round-trip to the same set.
+func TestCodecsAgree(t *testing.T) {
+	t.Parallel()
+
+	for _, ds := range datasets(0) {
+		t.Run(ds.name, func(t *testing.T) {
+			t.Parallel()
+
+			bm := roaringv3.New(ds.values...)
+			bm.RunOptimize()
+			want := summarize(v3Bitmap{bm})
+
+			for _, c := range codecs() {
+				got, err := c.decode(c.encode(bm))
+				if err != nil {
+					t.Fatalf("%s: %v", c.name, err)
+				}
+				if s := summarize(v3Bitmap{got}); s != want {
+					t.Fatalf("%s round-trip changed the set: %s vs %s", c.name, s, want)
 				}
 			}
 		})

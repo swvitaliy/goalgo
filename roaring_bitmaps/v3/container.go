@@ -24,14 +24,25 @@ const (
 	kindRun
 )
 
+// bitmapWords is the fixed shape of a bitmap container: a container always covers
+// the whole 65536-value key space, so a pointer to the array carries the same
+// information as a slice header in a third of the space.
+type bitmapWords = [simdops.BitmapWords]uint64
+
 // container holds the low 16 bits of every value sharing one high-16-bit key, in
 // whichever of the three encodings is cheapest for its contents.
+//
+// The field order and widths are deliberate. Sparse data produces tens of
+// thousands of these per operation, so the struct is kept inside a small size
+// class: card is int32 because a container never holds more than 65536 values,
+// and the bitmap is a pointer rather than a slice. Carrying the third encoding
+// costs one extra slice header over the two-encoding container of v1.
 type container struct {
+	arr  []uint16     // kindArray, sorted and duplicate-free
+	runs []interval   // kindRun, sorted, disjoint and non-adjacent
+	bm   *bitmapWords // kindBitmap
+	card int32
 	kind kind
-	card int
-	arr  []uint16   // kindArray, sorted and duplicate-free
-	bm   []uint64   // kindBitmap, simdops.BitmapWords words
-	runs []interval // kindRun, sorted, disjoint and non-adjacent
 }
 
 func newArrayContainer(capacity int) *container {
@@ -39,11 +50,11 @@ func newArrayContainer(capacity int) *container {
 }
 
 func newBitmapContainer() *container {
-	return &container{kind: kindBitmap, bm: make([]uint64, simdops.BitmapWords)}
+	return &container{kind: kindBitmap, bm: new(bitmapWords)}
 }
 
 func newRunContainer(runs []interval) *container {
-	return &container{kind: kindRun, card: runsCardinality(runs), runs: runs}
+	return &container{kind: kindRun, card: int32(runsCardinality(runs)), runs: runs}
 }
 
 func (c *container) clone() *container {
@@ -52,7 +63,8 @@ func (c *container) clone() *container {
 	case kindArray:
 		out.arr = slices.Clone(c.arr)
 	case kindBitmap:
-		out.bm = slices.Clone(c.bm)
+		out.bm = new(bitmapWords)
+		*out.bm = *c.bm
 	case kindRun:
 		out.runs = slices.Clone(c.runs)
 	}
@@ -156,7 +168,7 @@ func (c *container) clearBit(v uint16) bool {
 func (c *container) convertToBitmap() {
 	switch c.kind {
 	case kindArray:
-		bm := make([]uint64, simdops.BitmapWords)
+		bm := new(bitmapWords)
 		for _, v := range c.arr {
 			bm[v/64] |= 1 << (v % 64)
 		}
@@ -171,7 +183,7 @@ func (c *container) convertToArray() {
 	arr := make([]uint16, c.card)
 	switch c.kind {
 	case kindBitmap:
-		simdops.BitmapToArray(arr, c.bm)
+		simdops.BitmapToArray(arr, c.bm[:])
 		c.bm = nil
 	case kindRun:
 		runsToArray(arr, c.runs)
@@ -192,7 +204,7 @@ func (c *container) runOptimize() {
 	if c.kind == kindArray {
 		nruns = countRunsArray(c.arr)
 	} else {
-		nruns = countRunsBitmap(c.bm)
+		nruns = countRunsBitmap(c.bm[:])
 	}
 	if runsBytes(nruns) >= c.currentBytes() {
 		return
@@ -202,7 +214,7 @@ func (c *container) runOptimize() {
 		c.runs = arrayToRuns(c.arr)
 		c.arr = nil
 	} else {
-		c.runs = bitmapToRuns(c.bm)
+		c.runs = bitmapToRuns(c.bm[:])
 		c.bm = nil
 	}
 	c.kind = kindRun
@@ -211,7 +223,7 @@ func (c *container) runOptimize() {
 func (c *container) currentBytes() int {
 	switch c.kind {
 	case kindArray:
-		return 2 * c.card
+		return 2 * int(c.card)
 	case kindBitmap:
 		return bitmapBytes
 	default:
@@ -232,7 +244,7 @@ func (c *container) normalize() *container {
 
 	switch c.kind {
 	case kindRun:
-		if runsBytes(len(c.runs)) > min(2*c.card, bitmapBytes) {
+		if runsBytes(len(c.runs)) > min(2*int(c.card), bitmapBytes) {
 			if c.card <= arrayMax {
 				c.convertToArray()
 			} else {
@@ -266,7 +278,7 @@ func (c *container) appendValues(dst []uint32, base uint32) []uint32 {
 		}
 	default:
 		buf := make([]uint16, c.card)
-		simdops.BitmapToArray(buf, c.bm)
+		simdops.BitmapToArray(buf, c.bm[:])
 		for _, v := range buf {
 			dst = append(dst, base|uint32(v))
 		}
