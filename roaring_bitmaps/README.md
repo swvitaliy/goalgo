@@ -10,6 +10,59 @@ portable serialisation format, and positional queries.
 | `roaring_bitmaps` (this directory) | the bitmap: array, bitmap and run containers, `RunOptimize`, portable-format serialisation, `Rank`/`Select` |
 | `bench` | the workloads, each run with and without `RunOptimize` |
 
+## Usage
+
+```go
+import roaring "goalgo/roaring_bitmaps"
+
+a := roaring.New(1, 2, 3, 100_000, 100_001)
+b := roaring.New(2, 3, 4, 100_001, 1<<20)
+
+union := a.Or(b)  // {1 2 3 4 100000 100001 1048576}
+inter := a.And(b) // {2 3 100001}
+a.AndNot(b)       // values of a not in b
+a.Xor(b)          // symmetric difference
+
+a.AndCardinality(b) // 3, without building the intersection
+a.Intersects(b)     // true, stops at the first shared value
+a.Contains(100_001) // true
+
+// Run encoding is never chosen on its own. Once a bitmap holds runs of
+// consecutive values, ask for it explicitly; set operations between two
+// run containers then stay in interval arithmetic.
+a.RunOptimize()
+
+data := a.ToBytes()              // portable Roaring format
+c, err := roaring.FromBytes(data) // c.ToArray() == a.ToArray()
+
+a.Rank(100_000) // 4: how many values are <= 100000
+a.Select(3)     // 100000, true: the 4th smallest value
+```
+
+`Or`, `And`, `AndNot` and `Xor` return a new bitmap and leave both operands
+untouched. The zero value of `Bitmap` is an empty set ready for use; a `Bitmap`
+is not safe for concurrent modification.
+
+## How a set operation finds its work
+
+A value's high 16 bits pick a chunk, its low 16 bits a position inside that
+chunk's container. A bitmap keeps its chunk keys in a sorted `[]uint16` with the
+containers in a parallel slice, so a binary operation never searches: it walks
+both key lists with two indices, like a merge join, pairing equal keys and
+handling one-sided ones according to the operation (`Or` clones them, `And`
+skips them). Empty results drop out together with their key.
+
+Each pair of containers is dispatched on its two encodings. Array against array
+goes through `simdops.IntersectArrays` or a merge; bitmap against bitmap through
+the fused `AndTo`/`OrTo` loops; run against run stays in interval arithmetic; the
+mixed pairs walk the cheaper structure — array values probed against runs or
+bits, bitmaps edited range by range. The result is then normalised to the
+cheapest encoding for its cardinality: an array up to 4096 values, a bitmap
+above that, runs only if it was already runs and still the smallest.
+
+Point operations — `Add`, `Remove`, `Contains` — find their chunk with one
+binary search over the keys.
+
 ## Building
 
 `simdops` has two implementations of its hot primitives, chosen by build tag:
@@ -122,8 +175,10 @@ From `bench_results.csv` (medians of 10 runs, 200k values per dataset):
 
 ## Correctness
 
-Every version is checked against a `map[uint32]struct{}` reference model, in table
+The bitmap is checked against a `map[uint32]struct{}` reference model, in table
 tests and in fuzz targets covering set operations, run encoding, serialisation
-round-trips and parsing of arbitrary bytes. `bench` additionally asserts that all
-three versions produce identical results on every dataset before any timing is
-reported.
+round-trips, Rank/Select and parsing of arbitrary bytes. The same suite runs on
+the vector and the scalar `simdops` build. `bench` additionally asserts, before
+any timing is reported, that the bitmap answers the same with and without
+`RunOptimize`, that both codecs round-trip to the same values, and that the
+array baseline and the bitmap agree on every Rank and Select it measures.
