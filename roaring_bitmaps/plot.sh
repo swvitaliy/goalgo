@@ -26,27 +26,14 @@ draw() {
 
 echo "plots from $input:"
 
-# Version comparison, on the vectorised build.
 for op in Build Contains And Or AndNot Xor AndCardinality; do
 	for data in sparse runs zipf; do
-		draw "${op,,}_${data}" "Benchmark$op/data=$data/simd=on" version ns/op "$op, $data"
+		draw "${op,,}_${data}" "Benchmark$op/data=$data" version ns/op "$op, $data"
 	done
 done
 
 for data in sparse runs zipf; do
-	draw "size_${data}" "BenchmarkSerializedSize/data=$data/simd=on" codec bytes/value "Serialised size, $data"
-	draw "tobytes_${data}" "BenchmarkToBytes/data=$data/simd=on" codec ns/op "ToBytes, $data"
-	draw "frombytes_${data}" "BenchmarkFromBytes/data=$data/simd=on" codec ns/op "FromBytes, $data"
-done
-
-# What vectorisation buys: the same version and data, primitives on the x axis.
-# v1 is the interesting one — its bitmap containers are where the SIMD loops run;
-# v2 on runs is included to show that interval arithmetic gains nothing.
-for op in And Or AndNot Xor Contains; do
-	for data in sparse runs zipf; do
-		draw "simd_${op,,}_${data}" "Benchmark$op/version=v1/data=$data" simd ns/op "$op, $data, v1: scalar vs AVX-512"
-	done
-done
-for op in And Or; do
-	draw "simd_${op,,}_runs_v2" "Benchmark$op/version=v2/data=runs" simd ns/op "$op, runs, v2: scalar vs AVX-512"
+	draw "size_${data}" "BenchmarkSerializedSize/data=$data" codec bytes/value "Serialised size, $data"
+	draw "tobytes_${data}" "BenchmarkToBytes/data=$data" codec ns/op "ToBytes, $data"
+	draw "frombytes_${data}" "BenchmarkFromBytes/data=$data" codec ns/op "FromBytes, $data"
 done

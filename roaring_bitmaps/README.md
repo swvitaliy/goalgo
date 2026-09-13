@@ -30,9 +30,7 @@ make roaring_fuzz
 ```
 
 For the vector build the CPU must have AVX-512 F/BW/VL, VPOPCNTDQ and VBMI2;
-`simdops` panics at init otherwise. The scalar build has no such requirement and
-is also what the benchmarks use as the baseline for measuring what the
-vectorisation buys.
+`simdops` panics at init otherwise. The scalar build has no such requirement.
 
 ## Reproducing the benchmarks
 
@@ -41,11 +39,9 @@ make roaring_bench   # 10 runs -> bench_results_count10.txt + bench_results.csv
 make roaring_plots   # plots/*.svg via benchdraw
 ```
 
-`roaring_bench` runs every case ten times at 200ms each, twice — once on the
-vector build and once on the scalar one — and concatenates both into a single
-file; cases carry a `simd=on|off` tag telling them apart. The raw output then
-goes through `benchstat -format=csv`, so the CSV carries medians with 95%
-confidence intervals. The whole thing takes about eight minutes. Set `ROARING_N` to change the values per dataset
+`roaring_bench` runs every case ten times at 200ms each on the vector build
+(about four minutes) and feeds the raw output through `benchstat -format=csv`,
+so the CSV carries medians with 95% confidence intervals. Set `ROARING_N` to change the values per dataset
 from the default 200k.
 
 Both tools are installed with `go install`:
@@ -61,7 +57,7 @@ itself) and bumping the `go` directive so module pruning skips the rest. The
 copy used here is also patched to pad the plot area, drop the legend and label
 the time axis in ns/us/ms rather than raw nanoseconds.
 
-Case names have the form `version=v2/data=runs/simd=on` (`codec=raw/...` for
+Case names have the form `version=v2/data=runs` (`codec=raw/data=runs` for
 serialisation), which is what lets both `benchstat -col` and `benchdraw` slice
 a single run by dimension.
 
@@ -111,12 +107,6 @@ From `bench_results.csv` (medians of 10 runs, 200k values per dataset):
   struct (`card int32`, bitmap as an array pointer) took this gap down from 1.85x;
   the remainder is that size class plus a longer type switch.
 - **On `zipf` the three are within noise of each other.**
-- **Vectorisation is worth 1.4–2x on bitmap containers, nothing elsewhere.** The
-  scalar build (`simd=off`) is the baseline: on `runs` v1's `And` goes from
-  41.6us to 26.0us with AVX-512, `Or`/`AndNot`/`Xor` gain 1.4x, and `And` on
-  `zipf` gains 2x. About half of a bitmap operation is allocating and zeroing
-  the 8KiB result containers, which no vector loop touches. `sparse` and run
-  containers show no difference at all — there is no vector path on them.
 - **v3 against a raw dump:** on `runs` the stream is 0.008 bytes per value
   against 4, and both directions are two to three orders of magnitude faster
   (`ToBytes` 0.6us vs 234us, `FromBytes` 1.9us vs 1171us). On `sparse` there is

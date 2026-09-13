@@ -1,5 +1,7 @@
 package roaringv3
 
+import "slices"
+
 import "goalgo/roaring_bitmaps/internal/simdops"
 
 // The binary operations dispatch on the encodings of both operands. Run operands
@@ -180,12 +182,7 @@ func intersects(a, b *container) bool {
 		if small.card > large.card {
 			small, large = large, small
 		}
-		for _, v := range small.arr {
-			if large.contains(v) {
-				return true
-			}
-		}
-		return false
+		return slices.ContainsFunc(small.arr, large.contains)
 	}
 }
 

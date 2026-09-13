@@ -43,12 +43,9 @@ GO_SIMD := GOROOT=$(GO_SIMD_ROOT) GOTOOLCHAIN=local GOEXPERIMENT=simd $(GO_SIMD_
 roaring_test:
 	$(GO_SIMD) test -race ./roaring_bitmaps/...
 
-# Two passes over the same benchmarks: one with the AVX-512 primitives, one with
-# the plain-Go ones. Cases carry a simd=on|off tag, so both land in one file.
 .PHONY: roaring_bench
 roaring_bench:
 	$(GO_SIMD) test -run='^$$' -bench=. -benchmem -benchtime=200ms -count=10 ./roaring_bitmaps/bench | tee ./roaring_bitmaps/bench_results_count10.txt
-	go test -run='^$$' -bench=. -benchmem -benchtime=200ms -count=10 ./roaring_bitmaps/bench | tee -a ./roaring_bitmaps/bench_results_count10.txt
 	benchstat -format=csv ./roaring_bitmaps/bench_results_count10.txt > ./roaring_bitmaps/bench_results.csv
 
 .PHONY: roaring_plots
