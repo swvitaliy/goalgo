@@ -52,6 +52,35 @@ func BenchmarkBuild(b *testing.B) {
 	})
 }
 
+// BenchmarkMemory does no timing work worth reading; it reports the heap bytes
+// the bitmap occupies per value, which is what run containers save. The set
+// operations report their own allocation per call through -benchmem.
+//
+// zipf is measured at twice the usual size: its crowded head is where the
+// container kinds mix, and doubling the draw makes that head dense enough to
+// show how the footprint moves as chunks cross from arrays into bitmaps.
+func BenchmarkMemory(b *testing.B) {
+	sets := datasets(0)
+	for _, ds := range datasetsOfSize(2*datasetSize(), 0) {
+		if ds.name == "zipf" {
+			sets[2] = ds
+		}
+	}
+
+	for _, v := range variants() {
+		for _, ds := range sets {
+			b.Run(caseName(v.name, ds.name), func(b *testing.B) {
+				bm := v.new(ds.values...)
+				for b.Loop() {
+					_ = bm.SizeInBytes()
+				}
+				// Reported after the loop so the timing harness does not clear it.
+				b.ReportMetric(float64(bm.SizeInBytes())/float64(bm.Cardinality()), "bytes/value")
+			})
+		}
+	}
+}
+
 func BenchmarkContains(b *testing.B) {
 	eachCase(b, func(b *testing.B, v variant, left, _ dataset) {
 		bm := v.new(left.values...)

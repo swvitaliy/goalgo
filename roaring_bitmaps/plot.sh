@@ -35,6 +35,17 @@ for op in Build Contains And Or AndNot Xor AndCardinality; do
 	done
 done
 
+# Memory: the bitmap's footprint per value, and what each set operation
+# allocates per call.
+for data in sparse runs zipf; do
+	draw "mem_${data}" "BenchmarkMemory/data=$data" runopt bytes/value "Memory, $data"
+done
+for op in Build And Or AndNot Xor; do
+	for data in sparse runs zipf; do
+		draw "alloc_${op,,}_${data}" "Benchmark$op/data=$data" runopt B/op "$op allocation, $data"
+	done
+done
+
 for data in sparse runs zipf; do
 	draw "size_${data}" "BenchmarkSerializedSize/data=$data" codec bytes/value "Serialised size, $data"
 	draw "tobytes_${data}" "BenchmarkToBytes/data=$data" codec ns/op "ToBytes, $data"

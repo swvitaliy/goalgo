@@ -21,6 +21,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"unsafe"
 
 	"goalgo/roaring_bitmaps/internal/simdops"
 )
@@ -303,6 +304,26 @@ func (b *Bitmap) Stats() (arrays, bitmaps, runs int) {
 		}
 	}
 	return arrays, bitmaps, runs
+}
+
+// SizeInBytes reports the heap memory the bitmap occupies: the key and
+// container slices, every container struct with its payload, and the
+// Rank/Select prefix cache once one has been built. Slice capacities count
+// rather than lengths, since capacity is what was allocated.
+func (b *Bitmap) SizeInBytes() int {
+	n := int(unsafe.Sizeof(*b)) +
+		cap(b.keys)*int(unsafe.Sizeof(uint16(0))) +
+		cap(b.conts)*int(unsafe.Sizeof((*container)(nil))) +
+		cap(b.prefix)*int(unsafe.Sizeof(int(0)))
+	for _, c := range b.conts {
+		n += int(unsafe.Sizeof(*c)) +
+			cap(c.arr)*int(unsafe.Sizeof(uint16(0))) +
+			cap(c.runs)*int(unsafe.Sizeof(interval{}))
+		if c.bm != nil {
+			n += bitmapBytes
+		}
+	}
+	return n
 }
 
 func (b *Bitmap) insertAt(i int, k uint16, c *container) {

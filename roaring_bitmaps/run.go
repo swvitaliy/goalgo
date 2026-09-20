@@ -205,13 +205,15 @@ func runsIntersect(a, b []interval) bool {
 	return false
 }
 
-// arrayToRuns collapses a sorted array into runs.
+// arrayToRuns collapses a sorted array into runs. The result is sized exactly:
+// a run container keeps this slice, and capacity for one interval per value
+// would cost twice what the array did.
 func arrayToRuns(arr []uint16) []interval {
 	if len(arr) == 0 {
 		return nil
 	}
 
-	out := make([]interval, 0, len(arr))
+	out := make([]interval, 0, countRunsArray(arr))
 	cur := interval{start: arr[0], last: arr[0]}
 	for _, v := range arr[1:] {
 		if int(v) == int(cur.last)+1 {

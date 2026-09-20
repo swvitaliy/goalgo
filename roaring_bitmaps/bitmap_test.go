@@ -321,6 +321,55 @@ func TestRunOptimize(t *testing.T) {
 	}
 }
 
+func TestSizeInBytes(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		values      []uint32
+		runOptimize bool
+	}
+
+	// A Bitmap header is 72 bytes and a container 64. The first key lands in
+	// an 8-byte size class (four uint16), the first container pointer in an
+	// 8-byte one, a fresh array container holds four values, a run container
+	// one interval of 4 bytes, a bitmap container 8192 bytes.
+	const (
+		header    = 72
+		keys      = 8
+		pointer   = 8
+		container = 64
+		array     = 4 * 2
+		run       = 4
+		bitmap    = 8192
+	)
+
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "empty", args: args{values: nil}, want: header},
+		{name: "one array container", args: args{values: []uint32{1, 2, 3}}, want: header + keys + pointer + container + array},
+		{name: "one bitmap container", args: args{values: sequence(0, 5000)}, want: header + keys + pointer + container + bitmap},
+		{name: "one run container from a bitmap", args: args{values: sequence(0, 5000), runOptimize: true}, want: header + keys + pointer + container + run},
+		{name: "one run container from an array", args: args{values: sequence(0, 100), runOptimize: true}, want: header + keys + pointer + container + run},
+		{name: "two chunks", args: args{values: []uint32{0, 1 << 16}}, want: header + keys + 2*(pointer+container+array)},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			b := New(tt.args.values...)
+			if tt.args.runOptimize {
+				b.RunOptimize()
+			}
+
+			require.Equal(t, tt.want, b.SizeInBytes())
+		})
+	}
+}
+
 func TestRunContainerAddRemove(t *testing.T) {
 	t.Parallel()
 

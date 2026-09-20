@@ -1,729 +1,786 @@
-# go test -run='^$' -bench=. -benchmem -benchtime=200ms -count=10 ./roaring_bitmaps/bench
-# ROARING_N=200000 (default), amd64 AVX-512, GOEXPERIMENT=simd, packed containers
-
 goos: linux
 goarch: amd64
 pkg: goalgo/roaring_bitmaps/bench
 cpu: AMD Ryzen AI 9 HX PRO 370 w/ Radeon 890M       
-BenchmarkBuild/runopt=off/data=sparse-24         	       5	  44191994 ns/op	 4450144 B/op	   94644 allocs/op
-BenchmarkBuild/runopt=off/data=sparse-24         	       5	  44462626 ns/op	 4449089 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=off/data=sparse-24         	       5	  41090553 ns/op	 4449083 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=off/data=sparse-24         	       5	  45552012 ns/op	 4449102 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=off/data=sparse-24         	       5	  44431245 ns/op	 4449096 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=off/data=sparse-24         	       5	  46467297 ns/op	 4449083 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=off/data=sparse-24         	       5	  46862671 ns/op	 4449076 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=off/data=sparse-24         	       5	  46214192 ns/op	 4449108 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=off/data=sparse-24         	       5	  48187795 ns/op	 4449076 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=off/data=sparse-24         	       5	  47340180 ns/op	 4449080 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=off/data=runs-24           	     255	    992642 ns/op	  529441 B/op	     201 allocs/op
-BenchmarkBuild/runopt=off/data=runs-24           	     235	   1034107 ns/op	  529440 B/op	     201 allocs/op
-BenchmarkBuild/runopt=off/data=runs-24           	     234	   1004182 ns/op	  529441 B/op	     201 allocs/op
-BenchmarkBuild/runopt=off/data=runs-24           	     232	   1062216 ns/op	  529441 B/op	     201 allocs/op
-BenchmarkBuild/runopt=off/data=runs-24           	     244	   1030611 ns/op	  529440 B/op	     201 allocs/op
-BenchmarkBuild/runopt=off/data=runs-24           	     254	    969550 ns/op	  529442 B/op	     201 allocs/op
-BenchmarkBuild/runopt=off/data=runs-24           	     244	    984371 ns/op	  529440 B/op	     201 allocs/op
-BenchmarkBuild/runopt=off/data=runs-24           	     235	    967130 ns/op	  529442 B/op	     201 allocs/op
-BenchmarkBuild/runopt=off/data=runs-24           	     259	   1011137 ns/op	  529441 B/op	     201 allocs/op
-BenchmarkBuild/runopt=off/data=runs-24           	     212	   1120287 ns/op	  529442 B/op	     201 allocs/op
-BenchmarkBuild/runopt=off/data=zipf-24           	      12	  21328936 ns/op	 1475730 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=off/data=zipf-24           	      13	  17926346 ns/op	 1475729 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=off/data=zipf-24           	      12	  18480042 ns/op	 1475749 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=off/data=zipf-24           	      12	  19532553 ns/op	 1475729 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=off/data=zipf-24           	      13	  18106611 ns/op	 1475729 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=off/data=zipf-24           	      10	  21266388 ns/op	 1475729 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=off/data=zipf-24           	      12	  18497455 ns/op	 1475728 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=off/data=zipf-24           	      13	  17765810 ns/op	 1475731 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=off/data=zipf-24           	      13	  18764681 ns/op	 1475729 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=off/data=zipf-24           	      13	  17489869 ns/op	 1475729 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=on/data=sparse-24          	       4	  50483689 ns/op	 4449108 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=on/data=sparse-24          	       5	  46249851 ns/op	 4449089 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=on/data=sparse-24          	       5	  44510696 ns/op	 4449076 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=on/data=sparse-24          	       6	  43700216 ns/op	 4449077 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=on/data=sparse-24          	       5	  41840646 ns/op	 4449080 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=on/data=sparse-24          	       5	  45584891 ns/op	 4449080 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=on/data=sparse-24          	       5	  46390224 ns/op	 4449080 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=on/data=sparse-24          	       4	  53611725 ns/op	 4449104 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=on/data=sparse-24          	       5	  49203725 ns/op	 4449102 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=on/data=sparse-24          	       5	  46786710 ns/op	 4449099 B/op	   94643 allocs/op
-BenchmarkBuild/runopt=on/data=runs-24            	     252	    952185 ns/op	  530865 B/op	     213 allocs/op
-BenchmarkBuild/runopt=on/data=runs-24            	     253	    911984 ns/op	  530866 B/op	     213 allocs/op
-BenchmarkBuild/runopt=on/data=runs-24            	     246	   1002017 ns/op	  530865 B/op	     213 allocs/op
-BenchmarkBuild/runopt=on/data=runs-24            	     249	   1038942 ns/op	  530865 B/op	     213 allocs/op
-BenchmarkBuild/runopt=on/data=runs-24            	     234	    954768 ns/op	  530865 B/op	     213 allocs/op
-BenchmarkBuild/runopt=on/data=runs-24            	     204	   1152881 ns/op	  530865 B/op	     213 allocs/op
-BenchmarkBuild/runopt=on/data=runs-24            	     240	   1019212 ns/op	  530864 B/op	     213 allocs/op
-BenchmarkBuild/runopt=on/data=runs-24            	     236	   1023183 ns/op	  530864 B/op	     213 allocs/op
-BenchmarkBuild/runopt=on/data=runs-24            	     210	   1028767 ns/op	  530864 B/op	     213 allocs/op
-BenchmarkBuild/runopt=on/data=runs-24            	     242	    939229 ns/op	  530867 B/op	     213 allocs/op
-BenchmarkBuild/runopt=on/data=zipf-24            	      13	  18324680 ns/op	 1475729 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=on/data=zipf-24            	      13	  17985568 ns/op	 1475754 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=on/data=zipf-24            	      13	  18391388 ns/op	 1475755 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=on/data=zipf-24            	      13	  18208682 ns/op	 1475738 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=on/data=zipf-24            	      12	  18414118 ns/op	 1475758 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=on/data=zipf-24            	      12	  18024744 ns/op	 1475738 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=on/data=zipf-24            	      12	  20228028 ns/op	 1475730 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=on/data=zipf-24            	      12	  19091141 ns/op	 1475730 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=on/data=zipf-24            	      13	  18131776 ns/op	 1475731 B/op	   16354 allocs/op
-BenchmarkBuild/runopt=on/data=zipf-24            	      13	  18558183 ns/op	 1475731 B/op	   16354 allocs/op
-BenchmarkContains/runopt=off/data=sparse-24      	 2495630	        94.35 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=sparse-24      	 2336847	        97.18 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=sparse-24      	 2380045	        96.18 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=sparse-24      	 2194329	       102.1 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=sparse-24      	 2327662	        98.66 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=sparse-24      	 2520346	       108.8 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=sparse-24      	 2476717	       104.3 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=sparse-24      	 2239243	       102.2 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=sparse-24      	 2261314	       100.7 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=sparse-24      	 2511646	        96.47 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=runs-24        	43360315	         5.725 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=runs-24        	40853028	         5.888 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=runs-24        	44181140	         5.784 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=runs-24        	43494940	         5.840 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=runs-24        	42517308	         6.003 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=runs-24        	39194756	         5.937 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=runs-24        	41137336	         5.765 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=runs-24        	41244198	         5.756 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=runs-24        	40819651	         5.614 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=runs-24        	42219811	         5.764 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=zipf-24        	 3033225	        80.15 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=zipf-24        	 2633916	        85.15 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=zipf-24        	 2608790	        88.96 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=zipf-24        	 2859544	        81.57 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=zipf-24        	 2610079	        83.71 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=zipf-24        	 2928160	        81.20 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=zipf-24        	 2941756	        92.33 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=zipf-24        	 2766454	        85.51 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=zipf-24        	 2553652	        90.85 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=off/data=zipf-24        	 2910987	        83.78 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=sparse-24       	 2428654	       105.0 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=sparse-24       	 2499408	        97.04 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=sparse-24       	 2551825	        96.12 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=sparse-24       	 2431176	       100.4 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=sparse-24       	 2394558	       102.0 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=sparse-24       	 2161875	       103.7 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=sparse-24       	 2620040	        92.31 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=sparse-24       	 2555790	        95.90 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=sparse-24       	 2480428	       101.3 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=sparse-24       	 2536051	        96.01 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=runs-24         	15257991	        16.40 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=runs-24         	15230451	        17.03 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=runs-24         	14732046	        16.32 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=runs-24         	15275241	        16.17 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=runs-24         	13795203	        16.76 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=runs-24         	15278730	        16.80 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=runs-24         	13670540	        16.26 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=runs-24         	14247835	        16.52 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=runs-24         	15104617	        16.47 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=runs-24         	14335640	        16.58 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=zipf-24         	 2864037	        83.74 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=zipf-24         	 2995470	        82.94 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=zipf-24         	 2951799	        82.98 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=zipf-24         	 2909274	        82.38 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=zipf-24         	 2920874	        83.44 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=zipf-24         	 2951608	        83.03 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=zipf-24         	 2876952	        82.80 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=zipf-24         	 2821743	        83.78 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=zipf-24         	 2957598	        80.83 ns/op	       0 B/op	       0 allocs/op
-BenchmarkContains/runopt=on/data=zipf-24         	 2905850	        82.00 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAnd/runopt=off/data=sparse-24           	      46	   4804542 ns/op	 2468197 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=off/data=sparse-24           	      56	   4072975 ns/op	 2468082 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=off/data=sparse-24           	      61	   4180076 ns/op	 2468082 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=off/data=sparse-24           	      51	   4617342 ns/op	 2468083 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=off/data=sparse-24           	      44	   5013660 ns/op	 2468082 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=off/data=sparse-24           	      55	   4603169 ns/op	 2468083 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=off/data=sparse-24           	      54	   4378681 ns/op	 2468082 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=off/data=sparse-24           	      38	   6323073 ns/op	 2468082 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=off/data=sparse-24           	      52	   4577011 ns/op	 2468183 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=off/data=sparse-24           	      39	   5316889 ns/op	 2468084 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=off/data=runs-24             	    9684	     24517 ns/op	  144000 B/op	      39 allocs/op
-BenchmarkAnd/runopt=off/data=runs-24             	   10000	     24055 ns/op	  144000 B/op	      39 allocs/op
-BenchmarkAnd/runopt=off/data=runs-24             	   10309	     23001 ns/op	  144000 B/op	      39 allocs/op
-BenchmarkAnd/runopt=off/data=runs-24             	    9565	     23405 ns/op	  144000 B/op	      39 allocs/op
-BenchmarkAnd/runopt=off/data=runs-24             	   10000	     21031 ns/op	  144000 B/op	      39 allocs/op
-BenchmarkAnd/runopt=off/data=runs-24             	   10000	     24169 ns/op	  144000 B/op	      39 allocs/op
-BenchmarkAnd/runopt=off/data=runs-24             	    9946	     23794 ns/op	  144000 B/op	      39 allocs/op
-BenchmarkAnd/runopt=off/data=runs-24             	   10000	     23774 ns/op	  144000 B/op	      39 allocs/op
-BenchmarkAnd/runopt=off/data=runs-24             	    9456	     24489 ns/op	  144000 B/op	      39 allocs/op
-BenchmarkAnd/runopt=off/data=runs-24             	    8860	     24609 ns/op	  144000 B/op	      39 allocs/op
-BenchmarkAnd/runopt=off/data=zipf-24             	     289	    767525 ns/op	  621337 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=off/data=zipf-24             	     318	    775497 ns/op	  621337 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=off/data=zipf-24             	     283	    835292 ns/op	  621337 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=off/data=zipf-24             	     271	    778880 ns/op	  621337 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=off/data=zipf-24             	     357	    723895 ns/op	  621337 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=off/data=zipf-24             	     308	    738337 ns/op	  621338 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=off/data=zipf-24             	     301	    750878 ns/op	  621338 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=off/data=zipf-24             	     342	    666118 ns/op	  621337 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=off/data=zipf-24             	     349	    704446 ns/op	  621339 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=off/data=zipf-24             	     325	    697876 ns/op	  621337 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=on/data=sparse-24            	      55	   4431792 ns/op	 2468177 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=on/data=sparse-24            	      58	   3930456 ns/op	 2468083 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=on/data=sparse-24            	      66	   3682991 ns/op	 2468082 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=on/data=sparse-24            	      64	   4168504 ns/op	 2468084 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=on/data=sparse-24            	      56	   3931461 ns/op	 2468082 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=on/data=sparse-24            	      60	   4113710 ns/op	 2468081 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=on/data=sparse-24            	      60	   3701535 ns/op	 2468083 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=on/data=sparse-24            	      40	   5094227 ns/op	 2468083 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=on/data=sparse-24            	      46	   4916525 ns/op	 2468084 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=on/data=sparse-24            	      45	   5401081 ns/op	 2468082 B/op	   65239 allocs/op
-BenchmarkAnd/runopt=on/data=runs-24              	  134385	      1585 ns/op	    2528 B/op	      33 allocs/op
-BenchmarkAnd/runopt=on/data=runs-24              	  139915	      1445 ns/op	    2528 B/op	      33 allocs/op
-BenchmarkAnd/runopt=on/data=runs-24              	  199657	      1479 ns/op	    2528 B/op	      33 allocs/op
-BenchmarkAnd/runopt=on/data=runs-24              	  170918	      1588 ns/op	    2528 B/op	      33 allocs/op
-BenchmarkAnd/runopt=on/data=runs-24              	  145383	      1507 ns/op	    2528 B/op	      33 allocs/op
-BenchmarkAnd/runopt=on/data=runs-24              	  161992	      1422 ns/op	    2528 B/op	      33 allocs/op
-BenchmarkAnd/runopt=on/data=runs-24              	  141681	      1608 ns/op	    2528 B/op	      33 allocs/op
-BenchmarkAnd/runopt=on/data=runs-24              	  153099	      1548 ns/op	    2528 B/op	      33 allocs/op
-BenchmarkAnd/runopt=on/data=runs-24              	  164816	      1583 ns/op	    2528 B/op	      33 allocs/op
-BenchmarkAnd/runopt=on/data=runs-24              	  140980	      1449 ns/op	    2528 B/op	      33 allocs/op
-BenchmarkAnd/runopt=on/data=zipf-24              	     321	    697482 ns/op	  621338 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=on/data=zipf-24              	     340	    711168 ns/op	  621338 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=on/data=zipf-24              	     334	    775663 ns/op	  621338 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=on/data=zipf-24              	     302	    748067 ns/op	  621337 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=on/data=zipf-24              	     325	    710787 ns/op	  621339 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=on/data=zipf-24              	     349	    705863 ns/op	  621337 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=on/data=zipf-24              	     326	    687361 ns/op	  621338 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=on/data=zipf-24              	     373	    661938 ns/op	  621339 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=on/data=zipf-24              	     328	    741302 ns/op	  621338 B/op	    6543 allocs/op
-BenchmarkAnd/runopt=on/data=zipf-24              	     331	    682784 ns/op	  621339 B/op	    6543 allocs/op
-BenchmarkOr/runopt=off/data=sparse-24            	      45	   5357323 ns/op	 4563170 B/op	   65580 allocs/op
-BenchmarkOr/runopt=off/data=sparse-24            	      48	   5175196 ns/op	 4563173 B/op	   65580 allocs/op
-BenchmarkOr/runopt=off/data=sparse-24            	      44	   5373199 ns/op	 4563173 B/op	   65580 allocs/op
-BenchmarkOr/runopt=off/data=sparse-24            	      37	   6096807 ns/op	 4563174 B/op	   65580 allocs/op
-BenchmarkOr/runopt=off/data=sparse-24            	      33	   6779755 ns/op	 4563170 B/op	   65580 allocs/op
-BenchmarkOr/runopt=off/data=sparse-24            	      48	   5220361 ns/op	 4563172 B/op	   65580 allocs/op
-BenchmarkOr/runopt=off/data=sparse-24            	      40	   5344545 ns/op	 4563172 B/op	   65580 allocs/op
-BenchmarkOr/runopt=off/data=sparse-24            	      56	   4391081 ns/op	 4563175 B/op	   65580 allocs/op
-BenchmarkOr/runopt=off/data=sparse-24            	      33	   6982649 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkOr/runopt=off/data=sparse-24            	      36	   6468997 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkOr/runopt=off/data=runs-24              	   16608	     14385 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkOr/runopt=off/data=runs-24              	   16964	     14584 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkOr/runopt=off/data=runs-24              	   16484	     13812 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkOr/runopt=off/data=runs-24              	   16695	     13954 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkOr/runopt=off/data=runs-24              	   16863	     14375 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkOr/runopt=off/data=runs-24              	   16976	     14043 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkOr/runopt=off/data=runs-24              	   16342	     14493 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkOr/runopt=off/data=runs-24              	   17293	     13702 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkOr/runopt=off/data=runs-24              	   16687	     14150 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkOr/runopt=off/data=runs-24              	   15884	     14495 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkOr/runopt=off/data=zipf-24              	     121	   1949273 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkOr/runopt=off/data=zipf-24              	     120	   1999986 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkOr/runopt=off/data=zipf-24              	     100	   2042721 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkOr/runopt=off/data=zipf-24              	     139	   1732802 ns/op	 1212385 B/op	    7245 allocs/op
-BenchmarkOr/runopt=off/data=zipf-24              	     100	   2221559 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkOr/runopt=off/data=zipf-24              	     128	   1819093 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkOr/runopt=off/data=zipf-24              	     134	   1836346 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkOr/runopt=off/data=zipf-24              	     121	   1958423 ns/op	 1212386 B/op	    7245 allocs/op
-BenchmarkOr/runopt=off/data=zipf-24              	     129	   1823008 ns/op	 1212387 B/op	    7245 allocs/op
-BenchmarkOr/runopt=off/data=zipf-24              	     141	   1700070 ns/op	 1212390 B/op	    7245 allocs/op
-BenchmarkOr/runopt=on/data=sparse-24             	      42	   5587695 ns/op	 4563175 B/op	   65580 allocs/op
-BenchmarkOr/runopt=on/data=sparse-24             	      37	   6275678 ns/op	 4563315 B/op	   65580 allocs/op
-BenchmarkOr/runopt=on/data=sparse-24             	      34	   6233708 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkOr/runopt=on/data=sparse-24             	      51	   4395034 ns/op	 4563172 B/op	   65580 allocs/op
-BenchmarkOr/runopt=on/data=sparse-24             	      50	   4662400 ns/op	 4563172 B/op	   65580 allocs/op
-BenchmarkOr/runopt=on/data=sparse-24             	      57	   4212558 ns/op	 4563177 B/op	   65580 allocs/op
-BenchmarkOr/runopt=on/data=sparse-24             	      46	   4862180 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkOr/runopt=on/data=sparse-24             	      43	   5292254 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkOr/runopt=on/data=sparse-24             	      38	   5958734 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkOr/runopt=on/data=sparse-24             	      40	   6208319 ns/op	 4563170 B/op	   65580 allocs/op
-BenchmarkOr/runopt=on/data=runs-24               	  104119	      2460 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkOr/runopt=on/data=runs-24               	  102912	      2220 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkOr/runopt=on/data=runs-24               	  106873	      2209 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkOr/runopt=on/data=runs-24               	   97645	      2539 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkOr/runopt=on/data=runs-24               	  102693	      2458 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkOr/runopt=on/data=runs-24               	   92469	      2393 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkOr/runopt=on/data=runs-24               	   86893	      2448 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkOr/runopt=on/data=runs-24               	   97646	      2574 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkOr/runopt=on/data=runs-24               	  101499	      2256 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkOr/runopt=on/data=runs-24               	  102487	      2294 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkOr/runopt=on/data=zipf-24               	     127	   1862875 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkOr/runopt=on/data=zipf-24               	     135	   1896586 ns/op	 1212389 B/op	    7245 allocs/op
-BenchmarkOr/runopt=on/data=zipf-24               	     100	   2364693 ns/op	 1212385 B/op	    7245 allocs/op
-BenchmarkOr/runopt=on/data=zipf-24               	      93	   2157691 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkOr/runopt=on/data=zipf-24               	     100	   2254743 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkOr/runopt=on/data=zipf-24               	     120	   1973711 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkOr/runopt=on/data=zipf-24               	     124	   1872911 ns/op	 1212385 B/op	    7245 allocs/op
-BenchmarkOr/runopt=on/data=zipf-24               	     133	   1840299 ns/op	 1212386 B/op	    7245 allocs/op
-BenchmarkOr/runopt=on/data=zipf-24               	     135	   1850658 ns/op	 1212386 B/op	    7245 allocs/op
-BenchmarkOr/runopt=on/data=zipf-24               	     100	   2196640 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkAndNot/runopt=off/data=sparse-24        	      37	   6099669 ns/op	 4115941 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=off/data=sparse-24        	      36	   6054131 ns/op	 4115940 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=off/data=sparse-24        	      33	   6171773 ns/op	 4115938 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=off/data=sparse-24        	      36	   6550684 ns/op	 4115942 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=off/data=sparse-24        	      36	   6258668 ns/op	 4115937 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=off/data=sparse-24        	      33	   7304896 ns/op	 4115938 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=off/data=sparse-24        	      30	   7644577 ns/op	 4115937 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=off/data=sparse-24        	      40	   7277130 ns/op	 4115938 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=off/data=sparse-24        	      33	   6473298 ns/op	 4115938 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=off/data=sparse-24        	      28	   7492443 ns/op	 4115939 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=off/data=runs-24          	   16934	     14198 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=off/data=runs-24          	   16274	     14328 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=off/data=runs-24          	   18592	     13199 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=off/data=runs-24          	   16412	     14366 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=off/data=runs-24          	   16498	     14732 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=off/data=runs-24          	   16347	     14886 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=off/data=runs-24          	   16509	     14443 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=off/data=runs-24          	   16348	     14581 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=off/data=runs-24          	   16182	     14528 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=off/data=runs-24          	   15783	     14860 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=off/data=zipf-24          	     138	   1798326 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=off/data=zipf-24          	     120	   1913740 ns/op	  777353 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=off/data=zipf-24          	     132	   1866570 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=off/data=zipf-24          	     100	   2009982 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=off/data=zipf-24          	     147	   1576921 ns/op	  777354 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=off/data=zipf-24          	     148	   1602259 ns/op	  777354 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=off/data=zipf-24          	     146	   1616741 ns/op	  777353 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=off/data=zipf-24          	     134	   1773636 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=off/data=zipf-24          	     141	   1636362 ns/op	  777354 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=off/data=zipf-24          	     145	   1632755 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=on/data=sparse-24         	      28	   7167203 ns/op	 4115942 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=on/data=sparse-24         	      36	   5852817 ns/op	 4115937 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=on/data=sparse-24         	      44	   5716038 ns/op	 4115938 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=on/data=sparse-24         	      39	   5726825 ns/op	 4115940 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=on/data=sparse-24         	      37	   6819421 ns/op	 4115939 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=on/data=sparse-24         	      37	   6554439 ns/op	 4115939 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=on/data=sparse-24         	      42	   5827397 ns/op	 4115939 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=on/data=sparse-24         	      38	   5794441 ns/op	 4115947 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=on/data=sparse-24         	      36	   6309410 ns/op	 4115938 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=on/data=sparse-24         	      34	   6445247 ns/op	 4115939 B/op	   65424 allocs/op
-BenchmarkAndNot/runopt=on/data=runs-24           	  122167	      1718 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=on/data=runs-24           	  144171	      1885 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=on/data=runs-24           	  107170	      1904 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=on/data=runs-24           	  138447	      2077 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=on/data=runs-24           	  120034	      1833 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=on/data=runs-24           	  117807	      1831 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=on/data=runs-24           	  119128	      1922 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=on/data=runs-24           	  130863	      1914 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=on/data=runs-24           	  122595	      1862 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=on/data=runs-24           	  135727	      1957 ns/op	    3952 B/op	      33 allocs/op
-BenchmarkAndNot/runopt=on/data=zipf-24           	     100	   2119934 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=on/data=zipf-24           	     124	   1928417 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=on/data=zipf-24           	     100	   2296507 ns/op	  777353 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=on/data=zipf-24           	     100	   2156929 ns/op	  777353 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=on/data=zipf-24           	     139	   1795964 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=on/data=zipf-24           	     132	   1823566 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=on/data=zipf-24           	     100	   2091928 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=on/data=zipf-24           	     122	   1920401 ns/op	  777353 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=on/data=zipf-24           	     141	   1731032 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkAndNot/runopt=on/data=zipf-24           	     127	   1876343 ns/op	  777352 B/op	    6901 allocs/op
-BenchmarkXor/runopt=off/data=sparse-24           	      36	   6792154 ns/op	 4563174 B/op	   65580 allocs/op
-BenchmarkXor/runopt=off/data=sparse-24           	      33	   6486979 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkXor/runopt=off/data=sparse-24           	      31	   7339882 ns/op	 4563174 B/op	   65580 allocs/op
-BenchmarkXor/runopt=off/data=sparse-24           	      34	   6233611 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkXor/runopt=off/data=sparse-24           	      34	   6491260 ns/op	 4563170 B/op	   65580 allocs/op
-BenchmarkXor/runopt=off/data=sparse-24           	      25	   8004414 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkXor/runopt=off/data=sparse-24           	      33	   9535132 ns/op	 4563180 B/op	   65580 allocs/op
-BenchmarkXor/runopt=off/data=sparse-24           	      26	   8824354 ns/op	 4563175 B/op	   65580 allocs/op
-BenchmarkXor/runopt=off/data=sparse-24           	      31	   6601552 ns/op	 4563170 B/op	   65580 allocs/op
-BenchmarkXor/runopt=off/data=sparse-24           	      44	   5278257 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkXor/runopt=off/data=runs-24             	   15860	     14802 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkXor/runopt=off/data=runs-24             	   17089	     14283 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkXor/runopt=off/data=runs-24             	   15663	     15038 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkXor/runopt=off/data=runs-24             	   16454	     14244 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkXor/runopt=off/data=runs-24             	   16320	     14799 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkXor/runopt=off/data=runs-24             	   16093	     15032 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkXor/runopt=off/data=runs-24             	   15882	     15301 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkXor/runopt=off/data=runs-24             	   17059	     14348 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkXor/runopt=off/data=runs-24             	   17793	     13896 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkXor/runopt=off/data=runs-24             	   16587	     14868 ns/op	   99456 B/op	      33 allocs/op
-BenchmarkXor/runopt=off/data=zipf-24             	     121	   1914458 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=off/data=zipf-24             	     140	   1687478 ns/op	 1212385 B/op	    7245 allocs/op
-BenchmarkXor/runopt=off/data=zipf-24             	     142	   1662112 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=off/data=zipf-24             	     134	   1847498 ns/op	 1212387 B/op	    7245 allocs/op
-BenchmarkXor/runopt=off/data=zipf-24             	     133	   1781511 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=off/data=zipf-24             	     123	   1873481 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=off/data=zipf-24             	     142	   1656163 ns/op	 1212386 B/op	    7245 allocs/op
-BenchmarkXor/runopt=off/data=zipf-24             	     139	   1861256 ns/op	 1212387 B/op	    7245 allocs/op
-BenchmarkXor/runopt=off/data=zipf-24             	     130	   1808140 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=off/data=zipf-24             	     133	   1814639 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=on/data=sparse-24            	      52	   4818032 ns/op	 4563177 B/op	   65580 allocs/op
-BenchmarkXor/runopt=on/data=sparse-24            	      34	   6570316 ns/op	 4563173 B/op	   65580 allocs/op
-BenchmarkXor/runopt=on/data=sparse-24            	      42	   6185560 ns/op	 4563172 B/op	   65580 allocs/op
-BenchmarkXor/runopt=on/data=sparse-24            	      44	   5451178 ns/op	 4563172 B/op	   65580 allocs/op
-BenchmarkXor/runopt=on/data=sparse-24            	      30	   7494665 ns/op	 4563172 B/op	   65580 allocs/op
-BenchmarkXor/runopt=on/data=sparse-24            	      33	   6978854 ns/op	 4563170 B/op	   65580 allocs/op
-BenchmarkXor/runopt=on/data=sparse-24            	      26	   8543053 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkXor/runopt=on/data=sparse-24            	      31	   8656871 ns/op	 4563173 B/op	   65580 allocs/op
-BenchmarkXor/runopt=on/data=sparse-24            	      34	   7308705 ns/op	 4563171 B/op	   65580 allocs/op
-BenchmarkXor/runopt=on/data=sparse-24            	      28	   8943172 ns/op	 4563174 B/op	   65580 allocs/op
-BenchmarkXor/runopt=on/data=runs-24              	   40006	      5757 ns/op	    9552 B/op	      57 allocs/op
-BenchmarkXor/runopt=on/data=runs-24              	   50836	      4771 ns/op	    9552 B/op	      57 allocs/op
-BenchmarkXor/runopt=on/data=runs-24              	   52843	      5397 ns/op	    9552 B/op	      57 allocs/op
-BenchmarkXor/runopt=on/data=runs-24              	   49329	      5369 ns/op	    9552 B/op	      57 allocs/op
-BenchmarkXor/runopt=on/data=runs-24              	   34377	      6234 ns/op	    9552 B/op	      57 allocs/op
-BenchmarkXor/runopt=on/data=runs-24              	   43410	      5448 ns/op	    9552 B/op	      57 allocs/op
-BenchmarkXor/runopt=on/data=runs-24              	   42643	      5485 ns/op	    9552 B/op	      57 allocs/op
-BenchmarkXor/runopt=on/data=runs-24              	   43752	      5138 ns/op	    9552 B/op	      57 allocs/op
-BenchmarkXor/runopt=on/data=runs-24              	   44115	      5635 ns/op	    9552 B/op	      57 allocs/op
-BenchmarkXor/runopt=on/data=runs-24              	   56818	      5233 ns/op	    9552 B/op	      57 allocs/op
-BenchmarkXor/runopt=on/data=zipf-24              	     126	   1943639 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=on/data=zipf-24              	     133	   1776439 ns/op	 1212387 B/op	    7245 allocs/op
-BenchmarkXor/runopt=on/data=zipf-24              	     122	   1887022 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=on/data=zipf-24              	     146	   1780953 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=on/data=zipf-24              	     134	   1809450 ns/op	 1212385 B/op	    7245 allocs/op
-BenchmarkXor/runopt=on/data=zipf-24              	     121	   1965842 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=on/data=zipf-24              	     138	   1712301 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=on/data=zipf-24              	     117	   2178951 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=on/data=zipf-24              	     123	   1974720 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkXor/runopt=on/data=zipf-24              	     133	   1835016 ns/op	 1212384 B/op	    7245 allocs/op
-BenchmarkAndCardinality/runopt=off/data=sparse-24         	      38	   6036923 ns/op	 2467373 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=off/data=sparse-24         	      60	   4022893 ns/op	 2467369 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=off/data=sparse-24         	      49	   4642385 ns/op	 2467370 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=off/data=sparse-24         	      25	   8281464 ns/op	 2467370 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=off/data=sparse-24         	      40	   5794290 ns/op	 2467370 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=off/data=sparse-24         	      39	   6573794 ns/op	 2467369 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=off/data=sparse-24         	      32	   6542877 ns/op	 2467371 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=off/data=sparse-24         	      51	   4856070 ns/op	 2467375 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=off/data=sparse-24         	      52	   4382268 ns/op	 2467374 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=off/data=sparse-24         	      39	   6693342 ns/op	 2467370 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=off/data=runs-24           	  160923	      1502 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAndCardinality/runopt=off/data=runs-24           	  165032	      1472 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAndCardinality/runopt=off/data=runs-24           	  159013	      1479 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAndCardinality/runopt=off/data=runs-24           	  170546	      1424 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAndCardinality/runopt=off/data=runs-24           	  174824	      1388 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAndCardinality/runopt=off/data=runs-24           	  176916	      1364 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAndCardinality/runopt=off/data=runs-24           	  162004	      1394 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAndCardinality/runopt=off/data=runs-24           	  168595	      1409 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAndCardinality/runopt=off/data=runs-24           	  166279	      1434 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAndCardinality/runopt=off/data=runs-24           	  169843	      1376 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAndCardinality/runopt=off/data=zipf-24           	     276	    789575 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=off/data=zipf-24           	     244	    906607 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=off/data=zipf-24           	     303	    713173 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=off/data=zipf-24           	     328	    682198 ns/op	  609889 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=off/data=zipf-24           	     313	    739274 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=off/data=zipf-24           	     304	    756528 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=off/data=zipf-24           	     294	    838920 ns/op	  609889 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=off/data=zipf-24           	     322	    744557 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=off/data=zipf-24           	     285	    789105 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=off/data=zipf-24           	     320	    835019 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=on/data=sparse-24          	      43	   5548115 ns/op	 2467369 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=on/data=sparse-24          	      39	   6172012 ns/op	 2467368 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=on/data=sparse-24          	      45	   5573299 ns/op	 2467370 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=on/data=sparse-24          	      66	   4072165 ns/op	 2467374 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=on/data=sparse-24          	      52	   5760081 ns/op	 2467369 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=on/data=sparse-24          	      48	   4736554 ns/op	 2467374 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=on/data=sparse-24          	      57	   4581879 ns/op	 2467371 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=on/data=sparse-24          	      48	   4673486 ns/op	 2467371 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=on/data=sparse-24          	      57	   4576147 ns/op	 2467371 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=on/data=sparse-24          	      44	   6161095 ns/op	 2467369 B/op	   65228 allocs/op
-BenchmarkAndCardinality/runopt=on/data=runs-24            	  180333	      1301 ns/op	    2144 B/op	      24 allocs/op
-BenchmarkAndCardinality/runopt=on/data=runs-24            	  164041	      1283 ns/op	    2144 B/op	      24 allocs/op
-BenchmarkAndCardinality/runopt=on/data=runs-24            	  202782	      1266 ns/op	    2144 B/op	      24 allocs/op
-BenchmarkAndCardinality/runopt=on/data=runs-24            	  196057	      1325 ns/op	    2144 B/op	      24 allocs/op
-BenchmarkAndCardinality/runopt=on/data=runs-24            	  229012	      1302 ns/op	    2144 B/op	      24 allocs/op
-BenchmarkAndCardinality/runopt=on/data=runs-24            	  171853	      1257 ns/op	    2144 B/op	      24 allocs/op
-BenchmarkAndCardinality/runopt=on/data=runs-24            	  175362	      1300 ns/op	    2144 B/op	      24 allocs/op
-BenchmarkAndCardinality/runopt=on/data=runs-24            	  225494	      1326 ns/op	    2144 B/op	      24 allocs/op
-BenchmarkAndCardinality/runopt=on/data=runs-24            	  185872	      1389 ns/op	    2144 B/op	      24 allocs/op
-BenchmarkAndCardinality/runopt=on/data=runs-24            	  144193	      1487 ns/op	    2144 B/op	      24 allocs/op
-BenchmarkAndCardinality/runopt=on/data=zipf-24            	     290	    785513 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=on/data=zipf-24            	     364	    677846 ns/op	  609890 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=on/data=zipf-24            	     356	    747487 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=on/data=zipf-24            	     278	    839422 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=on/data=zipf-24            	     296	    766712 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=on/data=zipf-24            	     296	    749411 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=on/data=zipf-24            	     283	    790646 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=on/data=zipf-24            	     326	    719851 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=on/data=zipf-24            	     321	    742776 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkAndCardinality/runopt=on/data=zipf-24            	     252	    821219 ns/op	  609888 B/op	    6524 allocs/op
-BenchmarkSerializedSize/codec=raw/data=sparse-24          	692033366	         0.3508 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=sparse-24          	708942188	         0.3504 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=sparse-24          	607849971	         0.3599 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=sparse-24          	714838628	         0.3346 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=sparse-24          	708650445	         0.3534 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=sparse-24          	623959173	         0.3544 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=sparse-24          	655949436	         0.3650 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=sparse-24          	718837711	         0.3399 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=sparse-24          	714906490	         0.3569 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=sparse-24          	622647931	         0.3629 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=sparse-24      	554460482	         0.4083 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=sparse-24      	674171298	         0.3581 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=sparse-24      	712788814	         0.3553 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=sparse-24      	640144057	         0.3476 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=sparse-24      	647578864	         0.3667 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=sparse-24      	715381077	         0.3645 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=sparse-24      	742745833	         0.3370 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=sparse-24      	688419616	         0.3516 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=sparse-24      	607265491	         0.3682 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=sparse-24      	656821729	         0.3750 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=runs-24            	657164271	         0.3321 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=runs-24            	660954259	         0.3572 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=runs-24            	587408098	         0.3512 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=runs-24            	718308734	         0.3598 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=runs-24            	686172981	         0.3529 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=runs-24            	536133774	         0.3866 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=runs-24            	707303366	         0.3665 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=runs-24            	587355382	         0.3636 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=runs-24            	689453288	         0.3728 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=runs-24            	652951226	         0.3596 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=runs-24        	634951273	         0.3495 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=runs-24        	669771073	         0.3546 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=runs-24        	687452163	         0.3631 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=runs-24        	622905512	         0.3455 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=runs-24        	696852254	         0.3419 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=runs-24        	597897626	         0.3609 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=runs-24        	654809252	         0.3508 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=runs-24        	630571376	         0.3488 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=runs-24        	662060344	         0.3412 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=runs-24        	678596889	         0.3714 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=zipf-24            	605291442	         0.4006 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=zipf-24            	594453643	         0.3704 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=zipf-24            	633053775	         0.3695 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=zipf-24            	654741781	         0.3446 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=zipf-24            	781273040	         0.3321 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=zipf-24            	694570074	         0.3575 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=zipf-24            	610943167	         0.3365 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=zipf-24            	717020228	         0.3296 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=zipf-24            	778175193	         0.3788 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=raw/data=zipf-24            	713643944	         0.3432 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=zipf-24        	672736296	         0.3544 ns/op	         2.138 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=zipf-24        	708247126	         0.3512 ns/op	         2.138 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=zipf-24        	687680875	         0.3394 ns/op	         2.138 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=zipf-24        	540148785	         0.3841 ns/op	         2.138 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=zipf-24        	748307352	         0.3459 ns/op	         2.138 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=zipf-24        	635376693	         0.3599 ns/op	         2.138 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=zipf-24        	680821551	         0.3577 ns/op	         2.138 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=zipf-24        	681202756	         0.3417 ns/op	         2.138 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=zipf-24        	647118422	         0.3565 ns/op	         2.138 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSerializedSize/codec=roaring/data=zipf-24        	707084979	         0.3574 ns/op	         2.138 bytes/value	       0 B/op	       0 allocs/op
-BenchmarkToBytes/codec=raw/data=sparse-24                 	    1772	    134544 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=sparse-24                 	    1338	    168216 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=sparse-24                 	    1388	    161260 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=sparse-24                 	    1365	    167684 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=sparse-24                 	    1507	    162735 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=sparse-24                 	    1341	    172530 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=sparse-24                 	    1183	    172362 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=sparse-24                 	    1378	    171553 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=sparse-24                 	    1364	    170073 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=sparse-24                 	    1436	    150608 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=sparse-24             	     326	    653618 ns/op	  663552 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=sparse-24             	     400	    601143 ns/op	  663552 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=sparse-24             	     372	    610067 ns/op	  663552 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=sparse-24             	     453	    549554 ns/op	  663553 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=sparse-24             	     423	    610993 ns/op	  663552 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=sparse-24             	     376	    617246 ns/op	  663552 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=sparse-24             	     402	    570058 ns/op	  663552 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=sparse-24             	     382	    662430 ns/op	  663552 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=sparse-24             	     364	    679933 ns/op	  663552 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=sparse-24             	     432	    634820 ns/op	  663552 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=runs-24                   	    2270	    103705 ns/op	  745475 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=runs-24                   	    2248	    104588 ns/op	  745475 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=runs-24                   	    2262	    103567 ns/op	  745474 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=runs-24                   	    2042	    108833 ns/op	  745475 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=runs-24                   	    2529	    102724 ns/op	  745476 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=runs-24                   	    2240	     99687 ns/op	  745476 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=runs-24                   	    2240	     99152 ns/op	  745477 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=runs-24                   	    2156	    105537 ns/op	  745475 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=runs-24                   	    2305	    104475 ns/op	  745476 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=runs-24                   	    2038	    106802 ns/op	  745476 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=runs-24               	  380521	       566.3 ns/op	    1536 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=runs-24               	  435814	       595.2 ns/op	    1536 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=runs-24               	  434056	       568.7 ns/op	    1536 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=runs-24               	  484812	       585.1 ns/op	    1536 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=runs-24               	  391725	       557.6 ns/op	    1536 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=runs-24               	  464404	       558.1 ns/op	    1536 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=runs-24               	  389565	       604.3 ns/op	    1536 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=runs-24               	  410589	       573.0 ns/op	    1536 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=runs-24               	  385532	       558.1 ns/op	    1536 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=runs-24               	  491592	       539.3 ns/op	    1536 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=zipf-24                   	    1791	    114545 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=zipf-24                   	    2067	    107801 ns/op	  802817 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=zipf-24                   	    2084	    114709 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=zipf-24                   	    1935	    109477 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=zipf-24                   	    2469	    113052 ns/op	  802817 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=zipf-24                   	    2241	    117701 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=zipf-24                   	    2070	    114115 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=zipf-24                   	    2072	    113475 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=zipf-24                   	    2067	    120360 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=raw/data=zipf-24                   	    1964	    119171 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=zipf-24               	    1720	    130082 ns/op	  434176 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=zipf-24               	    1618	    140848 ns/op	  434176 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=zipf-24               	    1789	    133531 ns/op	  434176 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=zipf-24               	    1450	    138295 ns/op	  434176 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=zipf-24               	    2254	    125270 ns/op	  434177 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=zipf-24               	    1681	    132410 ns/op	  434176 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=zipf-24               	    2187	    132471 ns/op	  434176 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=zipf-24               	    1675	    131225 ns/op	  434176 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=zipf-24               	    1464	    141586 ns/op	  434176 B/op	       1 allocs/op
-BenchmarkToBytes/codec=roaring/data=zipf-24               	    1678	    131221 ns/op	  434176 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=sparse-24               	     741	    301964 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=sparse-24               	     836	    243616 ns/op	  802817 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=sparse-24               	     994	    269300 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=sparse-24               	     955	    285838 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=sparse-24               	     738	    306097 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=sparse-24               	     824	    300160 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=sparse-24               	     818	    299040 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=sparse-24               	     789	    259936 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=sparse-24               	     813	    305170 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=sparse-24               	     794	    299158 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=roaring/data=sparse-24           	     134	   1778893 ns/op	 3163435 B/op	   65384 allocs/op
-BenchmarkFromBytes/codec=roaring/data=sparse-24           	     132	   1822675 ns/op	 3163435 B/op	   65384 allocs/op
-BenchmarkFromBytes/codec=roaring/data=sparse-24           	     133	   1778890 ns/op	 3163434 B/op	   65384 allocs/op
-BenchmarkFromBytes/codec=roaring/data=sparse-24           	     128	   1844736 ns/op	 3163435 B/op	   65384 allocs/op
-BenchmarkFromBytes/codec=roaring/data=sparse-24           	     141	   1709158 ns/op	 3163434 B/op	   65384 allocs/op
-BenchmarkFromBytes/codec=roaring/data=sparse-24           	     132	   1807705 ns/op	 3163434 B/op	   65384 allocs/op
-BenchmarkFromBytes/codec=roaring/data=sparse-24           	     134	   1724723 ns/op	 3163436 B/op	   65384 allocs/op
-BenchmarkFromBytes/codec=roaring/data=sparse-24           	     128	   1808995 ns/op	 3163434 B/op	   65384 allocs/op
-BenchmarkFromBytes/codec=roaring/data=sparse-24           	     128	   1816752 ns/op	 3163436 B/op	   65384 allocs/op
-BenchmarkFromBytes/codec=roaring/data=sparse-24           	     147	   1631990 ns/op	 3163437 B/op	   65384 allocs/op
-BenchmarkFromBytes/codec=raw/data=runs-24                 	    1010	    227242 ns/op	  745472 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=runs-24                 	    1086	    214734 ns/op	  745472 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=runs-24                 	    1077	    222154 ns/op	  745472 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=runs-24                 	    1341	    216136 ns/op	  745472 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=runs-24                 	    1021	    200212 ns/op	  745474 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=runs-24                 	    1107	    242134 ns/op	  745472 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=runs-24                 	    1062	    248781 ns/op	  745473 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=runs-24                 	     979	    218539 ns/op	  745473 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=runs-24                 	    1004	    237280 ns/op	  745472 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=runs-24                 	    1012	    239164 ns/op	  745472 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=roaring/data=runs-24             	  126633	      1899 ns/op	    2488 B/op	      28 allocs/op
-BenchmarkFromBytes/codec=roaring/data=runs-24             	  118774	      1911 ns/op	    2488 B/op	      28 allocs/op
-BenchmarkFromBytes/codec=roaring/data=runs-24             	  121957	      1846 ns/op	    2488 B/op	      28 allocs/op
-BenchmarkFromBytes/codec=roaring/data=runs-24             	  152608	      1822 ns/op	    2488 B/op	      28 allocs/op
-BenchmarkFromBytes/codec=roaring/data=runs-24             	  135106	      1846 ns/op	    2488 B/op	      28 allocs/op
-BenchmarkFromBytes/codec=roaring/data=runs-24             	  125959	      2071 ns/op	    2488 B/op	      28 allocs/op
-BenchmarkFromBytes/codec=roaring/data=runs-24             	  137547	      1808 ns/op	    2488 B/op	      28 allocs/op
-BenchmarkFromBytes/codec=roaring/data=runs-24             	  117477	      1853 ns/op	    2488 B/op	      28 allocs/op
-BenchmarkFromBytes/codec=roaring/data=runs-24             	  137708	      1818 ns/op	    2488 B/op	      28 allocs/op
-BenchmarkFromBytes/codec=roaring/data=runs-24             	  118695	      1857 ns/op	    2488 B/op	      28 allocs/op
-BenchmarkFromBytes/codec=raw/data=zipf-24                 	     866	    266219 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=zipf-24                 	     882	    243909 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=zipf-24                 	     871	    256404 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=zipf-24                 	     957	    239884 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=zipf-24                 	     877	    271457 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=zipf-24                 	     939	    266312 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=zipf-24                 	     866	    262821 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=zipf-24                 	     936	    258452 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=zipf-24                 	     864	    270961 ns/op	  802816 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=raw/data=zipf-24                 	     894	    237774 ns/op	  802817 B/op	       1 allocs/op
-BenchmarkFromBytes/codec=roaring/data=zipf-24             	     667	    448748 ns/op	  710019 B/op	    6876 allocs/op
-BenchmarkFromBytes/codec=roaring/data=zipf-24             	     470	    490981 ns/op	  710018 B/op	    6876 allocs/op
-BenchmarkFromBytes/codec=roaring/data=zipf-24             	     522	    443175 ns/op	  710019 B/op	    6876 allocs/op
-BenchmarkFromBytes/codec=roaring/data=zipf-24             	     612	    445378 ns/op	  710020 B/op	    6876 allocs/op
-BenchmarkFromBytes/codec=roaring/data=zipf-24             	     427	    511696 ns/op	  710019 B/op	    6876 allocs/op
-BenchmarkFromBytes/codec=roaring/data=zipf-24             	     456	    500344 ns/op	  710018 B/op	    6876 allocs/op
-BenchmarkFromBytes/codec=roaring/data=zipf-24             	     544	    445363 ns/op	  710019 B/op	    6876 allocs/op
-BenchmarkFromBytes/codec=roaring/data=zipf-24             	     535	    478496 ns/op	  710020 B/op	    6876 allocs/op
-BenchmarkFromBytes/codec=roaring/data=zipf-24             	     510	    471954 ns/op	  710019 B/op	    6876 allocs/op
-BenchmarkFromBytes/codec=roaring/data=zipf-24             	     603	    441627 ns/op	  710020 B/op	    6876 allocs/op
-BenchmarkRank/method=array/data=sparse-24                 	 3240439	        74.20 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=sparse-24                 	 3276579	        73.94 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=sparse-24                 	 3001617	        76.48 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=sparse-24                 	 3101187	        75.12 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=sparse-24                 	 2814636	        78.28 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=sparse-24                 	 3257677	        73.46 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=sparse-24                 	 3201314	        74.58 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=sparse-24                 	 3195123	        74.80 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=sparse-24                 	 3178386	        77.16 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=sparse-24                 	 3209845	        74.29 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=sparse-24               	 2518198	        99.77 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=sparse-24               	 2534478	        97.36 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=sparse-24               	 2337513	       106.4 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=sparse-24               	 2310907	       107.5 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=sparse-24               	 2404818	       104.5 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=sparse-24               	 2415300	       101.9 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=sparse-24               	 2400802	       100.4 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=sparse-24               	 2394350	       100.7 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=sparse-24               	 2561013	        97.01 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=sparse-24               	 2175314	       103.8 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=runs-24                   	 8129419	        29.99 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=runs-24                   	 7531934	        30.47 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=runs-24                   	 7955520	        29.56 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=runs-24                   	 7952812	        30.36 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=runs-24                   	 6672823	        31.00 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=runs-24                   	 8128639	        30.07 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=runs-24                   	 8227964	        29.48 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=runs-24                   	 8151786	        29.70 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=runs-24                   	 8128683	        29.65 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=runs-24                   	 7986661	        29.77 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=runs-24                 	17742320	        13.41 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=runs-24                 	18651232	        13.32 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=runs-24                 	18087440	        13.60 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=runs-24                 	18585463	        12.98 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=runs-24                 	18878994	        13.17 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=runs-24                 	18884262	        13.25 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=runs-24                 	17352751	        13.48 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=runs-24                 	17108031	        13.86 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=runs-24                 	18385364	        13.22 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=runs-24                 	15954728	        13.70 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=zipf-24                   	 3094996	        76.74 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=zipf-24                   	 3214864	        75.65 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=zipf-24                   	 3220543	        74.87 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=zipf-24                   	 3208135	        74.52 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=zipf-24                   	 3248562	        73.91 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=zipf-24                   	 3204649	        75.12 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=zipf-24                   	 2930074	        77.48 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=zipf-24                   	 2969224	        78.40 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=zipf-24                   	 3142743	        80.04 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=array/data=zipf-24                   	 3144757	        79.18 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=zipf-24                 	 2498306	        89.51 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=zipf-24                 	 2816515	        84.89 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=zipf-24                 	 2678782	        85.86 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=zipf-24                 	 2678035	        86.25 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=zipf-24                 	 2660840	        88.47 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=zipf-24                 	 2684734	        90.50 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=zipf-24                 	 2783868	        86.12 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=zipf-24                 	 2525892	        89.29 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=zipf-24                 	 2797270	        83.24 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkRank/method=roaring/data=zipf-24                 	 2874243	        81.79 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=sparse-24               	157980843	         1.500 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=sparse-24               	159271584	         1.480 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=sparse-24               	150842102	         1.544 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=sparse-24               	161925136	         1.444 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=sparse-24               	158374941	         1.487 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=sparse-24               	173630083	         1.486 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=sparse-24               	178379644	         1.369 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=sparse-24               	170881389	         1.450 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=sparse-24               	164886560	         1.431 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=sparse-24               	171770786	         1.411 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=sparse-24             	 3310113	        71.64 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=sparse-24             	 3355602	        70.19 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=sparse-24             	 3097233	        75.93 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=sparse-24             	 3295300	        71.50 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=sparse-24             	 3138652	        74.81 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=sparse-24             	 2979194	        75.03 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=sparse-24             	 3188641	        73.09 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=sparse-24             	 3343090	        71.97 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=sparse-24             	 3310737	        71.96 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=sparse-24             	 3327658	        71.51 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=runs-24                 	160973032	         1.504 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=runs-24                 	168024118	         1.475 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=runs-24                 	148829208	         1.572 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=runs-24                 	164439415	         1.445 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=runs-24                 	143492762	         1.595 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=runs-24                 	162703226	         1.477 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=runs-24                 	170776390	         1.425 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=runs-24                 	164120102	         1.465 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=runs-24                 	162700099	         1.472 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=runs-24                 	147750673	         1.591 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=runs-24               	17162917	        13.57 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=runs-24               	17951827	        14.81 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=runs-24               	15128378	        14.43 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=runs-24               	17203160	        14.91 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=runs-24               	17671107	        14.04 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=runs-24               	17971476	        14.28 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=runs-24               	15195757	        13.85 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=runs-24               	16994511	        14.95 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=runs-24               	16586776	        13.96 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=runs-24               	16551890	        14.03 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=zipf-24                 	149488926	         1.568 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=zipf-24                 	170162648	         1.401 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=zipf-24                 	170582485	         1.435 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=zipf-24                 	149781340	         1.530 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=zipf-24                 	157483297	         1.479 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=zipf-24                 	156487876	         1.487 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=zipf-24                 	163835097	         1.530 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=zipf-24                 	176012484	         1.483 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=zipf-24                 	141973350	         1.618 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=array/data=zipf-24                 	164876577	         1.457 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=zipf-24               	14986400	        15.80 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=zipf-24               	15768439	        17.32 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=zipf-24               	13215108	        17.39 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=zipf-24               	14611286	        16.96 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=zipf-24               	15417201	        16.03 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=zipf-24               	15826267	        15.23 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=zipf-24               	14551137	        16.54 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=zipf-24               	13924491	        15.90 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=zipf-24               	15503671	        17.52 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
-BenchmarkSelect/method=roaring/data=zipf-24               	15540039	        16.76 ns/op	         0.1378 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkBuild/runopt=off/data=sparse-24         	       5	  44330011 ns/op	 4451348 B/op	   94646 allocs/op
+BenchmarkBuild/runopt=off/data=sparse-24         	       6	  43552761 ns/op	 4450017 B/op	   94644 allocs/op
+BenchmarkBuild/runopt=off/data=sparse-24         	       5	  41460719 ns/op	 4449121 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=off/data=sparse-24         	       5	  41758213 ns/op	 4449080 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=off/data=sparse-24         	       5	  41757219 ns/op	 4449080 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=off/data=sparse-24         	       5	  40740010 ns/op	 4449083 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=off/data=sparse-24         	       6	  39678987 ns/op	 4449096 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=off/data=sparse-24         	       5	  40997619 ns/op	 4449124 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=off/data=sparse-24         	       6	  40082105 ns/op	 4449101 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=off/data=sparse-24         	       6	  38946123 ns/op	 4449096 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=off/data=runs-24           	     290	    815610 ns/op	  529443 B/op	     201 allocs/op
+BenchmarkBuild/runopt=off/data=runs-24           	     283	    841422 ns/op	  529441 B/op	     201 allocs/op
+BenchmarkBuild/runopt=off/data=runs-24           	     268	    849953 ns/op	  529444 B/op	     201 allocs/op
+BenchmarkBuild/runopt=off/data=runs-24           	     279	    838697 ns/op	  529443 B/op	     201 allocs/op
+BenchmarkBuild/runopt=off/data=runs-24           	     296	    800176 ns/op	  529441 B/op	     201 allocs/op
+BenchmarkBuild/runopt=off/data=runs-24           	     286	    831002 ns/op	  529442 B/op	     201 allocs/op
+BenchmarkBuild/runopt=off/data=runs-24           	     289	    814542 ns/op	  529441 B/op	     201 allocs/op
+BenchmarkBuild/runopt=off/data=runs-24           	     298	    835121 ns/op	  529442 B/op	     201 allocs/op
+BenchmarkBuild/runopt=off/data=runs-24           	     280	    826994 ns/op	  529444 B/op	     201 allocs/op
+BenchmarkBuild/runopt=off/data=runs-24           	     296	    826769 ns/op	  529441 B/op	     201 allocs/op
+BenchmarkBuild/runopt=off/data=zipf-24           	      38	   6202719 ns/op	 1281370 B/op	    3045 allocs/op
+BenchmarkBuild/runopt=off/data=zipf-24           	      34	   6303001 ns/op	 1281373 B/op	    3045 allocs/op
+BenchmarkBuild/runopt=off/data=zipf-24           	      36	   6219032 ns/op	 1281373 B/op	    3045 allocs/op
+BenchmarkBuild/runopt=off/data=zipf-24           	      38	   6196876 ns/op	 1281369 B/op	    3045 allocs/op
+BenchmarkBuild/runopt=off/data=zipf-24           	      38	   6322656 ns/op	 1281373 B/op	    3045 allocs/op
+BenchmarkBuild/runopt=off/data=zipf-24           	      37	   6216741 ns/op	 1281372 B/op	    3045 allocs/op
+BenchmarkBuild/runopt=off/data=zipf-24           	      38	   6254692 ns/op	 1281375 B/op	    3045 allocs/op
+BenchmarkBuild/runopt=off/data=zipf-24           	      38	   6291541 ns/op	 1281369 B/op	    3045 allocs/op
+BenchmarkBuild/runopt=off/data=zipf-24           	      37	   6315398 ns/op	 1281369 B/op	    3045 allocs/op
+BenchmarkBuild/runopt=off/data=zipf-24           	      39	   6197941 ns/op	 1281370 B/op	    3045 allocs/op
+BenchmarkBuild/runopt=on/data=sparse-24          	       5	  41593807 ns/op	 4449076 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=on/data=sparse-24          	       6	  39943874 ns/op	 4449101 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=on/data=sparse-24          	       5	  40393123 ns/op	 4449076 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=on/data=sparse-24          	       5	  46219913 ns/op	 4449102 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=on/data=sparse-24          	       5	  47594230 ns/op	 4449083 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=on/data=sparse-24          	       5	  50133627 ns/op	 4449083 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=on/data=sparse-24          	       4	  58340399 ns/op	 4449080 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=on/data=sparse-24          	       5	  46820934 ns/op	 4449086 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=on/data=sparse-24          	       5	  45982754 ns/op	 4449105 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=on/data=sparse-24          	       5	  47470468 ns/op	 4449080 B/op	   94643 allocs/op
+BenchmarkBuild/runopt=on/data=runs-24            	     266	    896878 ns/op	  530866 B/op	     213 allocs/op
+BenchmarkBuild/runopt=on/data=runs-24            	     264	    938240 ns/op	  530867 B/op	     213 allocs/op
+BenchmarkBuild/runopt=on/data=runs-24            	     216	   1130578 ns/op	  530864 B/op	     213 allocs/op
+BenchmarkBuild/runopt=on/data=runs-24            	     231	    938367 ns/op	  530864 B/op	     213 allocs/op
+BenchmarkBuild/runopt=on/data=runs-24            	     280	    890466 ns/op	  530865 B/op	     213 allocs/op
+BenchmarkBuild/runopt=on/data=runs-24            	     246	    926346 ns/op	  530866 B/op	     213 allocs/op
+BenchmarkBuild/runopt=on/data=runs-24            	     255	    898747 ns/op	  530866 B/op	     213 allocs/op
+BenchmarkBuild/runopt=on/data=runs-24            	     252	    958213 ns/op	  530868 B/op	     213 allocs/op
+BenchmarkBuild/runopt=on/data=runs-24            	     237	    975762 ns/op	  530865 B/op	     213 allocs/op
+BenchmarkBuild/runopt=on/data=runs-24            	     267	    944202 ns/op	  530866 B/op	     213 allocs/op
+BenchmarkBuild/runopt=on/data=zipf-24            	      34	   6731097 ns/op	 1306689 B/op	    3405 allocs/op
+BenchmarkBuild/runopt=on/data=zipf-24            	      34	   6669092 ns/op	 1306686 B/op	    3405 allocs/op
+BenchmarkBuild/runopt=on/data=zipf-24            	      36	   6924382 ns/op	 1306683 B/op	    3405 allocs/op
+BenchmarkBuild/runopt=on/data=zipf-24            	      36	   6593411 ns/op	 1306688 B/op	    3405 allocs/op
+BenchmarkBuild/runopt=on/data=zipf-24            	      36	   6647302 ns/op	 1306682 B/op	    3405 allocs/op
+BenchmarkBuild/runopt=on/data=zipf-24            	      36	   7033262 ns/op	 1306684 B/op	    3405 allocs/op
+BenchmarkBuild/runopt=on/data=zipf-24            	      36	   6639267 ns/op	 1306685 B/op	    3405 allocs/op
+BenchmarkBuild/runopt=on/data=zipf-24            	      33	   6633668 ns/op	 1306686 B/op	    3405 allocs/op
+BenchmarkBuild/runopt=on/data=zipf-24            	      33	   6886417 ns/op	 1306690 B/op	    3405 allocs/op
+BenchmarkBuild/runopt=on/data=zipf-24            	      28	   7165534 ns/op	 1306686 B/op	    3405 allocs/op
+BenchmarkMemory/runopt=off/data=sparse-24        	    4497	     53371 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=sparse-24        	    4716	     54996 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=sparse-24        	    4304	     53913 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=sparse-24        	    4425	     54785 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=sparse-24        	    3850	     53472 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=sparse-24        	    3940	     52596 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=sparse-24        	    4386	     54686 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=sparse-24        	    4587	     51939 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=sparse-24        	    4833	     53811 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=sparse-24        	    4240	     51866 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=runs-24          	23405620	        10.67 ns/op	         0.5378 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=runs-24          	22322092	        10.39 ns/op	         0.5378 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=runs-24          	23457717	        10.98 ns/op	         0.5378 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=runs-24          	21864669	        10.80 ns/op	         0.5378 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=runs-24          	21909246	        10.57 ns/op	         0.5378 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=runs-24          	21453120	        10.99 ns/op	         0.5378 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=runs-24          	23218034	        10.38 ns/op	         0.5378 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=runs-24          	22318350	        10.47 ns/op	         0.5378 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=runs-24          	23325375	        10.35 ns/op	         0.5378 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=runs-24          	23357990	        10.33 ns/op	         0.5378 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=zipf-24          	  741890	       325.3 ns/op	         2.094 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=zipf-24          	  730299	       330.3 ns/op	         2.094 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=zipf-24          	  729438	       331.8 ns/op	         2.094 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=zipf-24          	  723720	       326.8 ns/op	         2.094 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=zipf-24          	  730432	       327.8 ns/op	         2.094 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=zipf-24          	  726657	       326.2 ns/op	         2.094 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=zipf-24          	  727564	       327.7 ns/op	         2.094 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=zipf-24          	  723662	       326.6 ns/op	         2.094 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=zipf-24          	  693854	       331.8 ns/op	         2.094 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=off/data=zipf-24          	  731775	       337.8 ns/op	         2.094 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=sparse-24         	    4449	     54665 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=sparse-24         	    4287	     54091 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=sparse-24         	    4771	     54988 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=sparse-24         	    4783	     52335 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=sparse-24         	    4464	     51883 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=sparse-24         	    4795	     52742 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=sparse-24         	    4485	     53204 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=sparse-24         	    4812	     52346 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=sparse-24         	    4478	     53305 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=sparse-24         	    4653	     54002 ns/op	        15.00 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=runs-24           	23150720	        10.33 ns/op	         0.01276 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=runs-24           	23226926	        10.40 ns/op	         0.01276 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=runs-24           	23390239	        10.40 ns/op	         0.01276 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=runs-24           	23310870	        10.30 ns/op	         0.01276 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=runs-24           	22574498	        10.32 ns/op	         0.01276 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=runs-24           	22017806	        10.36 ns/op	         0.01276 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=runs-24           	23281510	        10.27 ns/op	         0.01276 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=runs-24           	22798324	        10.35 ns/op	         0.01276 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=runs-24           	23288731	        10.36 ns/op	         0.01276 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=runs-24           	23538184	        10.23 ns/op	         0.01276 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=zipf-24           	  739933	       324.0 ns/op	         0.2007 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=zipf-24           	  732482	       324.2 ns/op	         0.2007 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=zipf-24           	  742597	       324.7 ns/op	         0.2007 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=zipf-24           	  739429	       326.7 ns/op	         0.2007 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=zipf-24           	  739072	       326.4 ns/op	         0.2007 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=zipf-24           	  733335	       325.7 ns/op	         0.2007 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=zipf-24           	  731155	       325.5 ns/op	         0.2007 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=zipf-24           	  736593	       324.5 ns/op	         0.2007 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=zipf-24           	  735604	       324.9 ns/op	         0.2007 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkMemory/runopt=on/data=zipf-24           	  732120	       325.0 ns/op	         0.2007 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=sparse-24      	 2634954	        91.93 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=sparse-24      	 2582278	        92.60 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=sparse-24      	 2619540	        92.11 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=sparse-24      	 2618107	        91.45 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=sparse-24      	 2588679	        92.77 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=sparse-24      	 2595410	        92.86 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=sparse-24      	 2583555	        92.36 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=sparse-24      	 2598608	        92.04 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=sparse-24      	 2581124	        92.33 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=sparse-24      	 2585433	        93.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=runs-24        	44051682	         5.696 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=runs-24        	43587117	         5.566 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=runs-24        	42874782	         5.517 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=runs-24        	43546862	         5.597 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=runs-24        	41541658	         5.744 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=runs-24        	41760075	         5.755 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=runs-24        	41681233	         5.885 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=runs-24        	42647166	         5.887 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=runs-24        	42046006	         5.759 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=runs-24        	37796370	         5.890 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=zipf-24        	 6465430	        37.29 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=zipf-24        	 6453139	        36.86 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=zipf-24        	 6703226	        35.72 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=zipf-24        	 6691465	        35.85 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=zipf-24        	 6547208	        36.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=zipf-24        	 6717507	        35.67 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=zipf-24        	 6571819	        36.92 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=zipf-24        	 6613803	        36.69 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=zipf-24        	 6494042	        36.77 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=off/data=zipf-24        	 6485704	        36.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=sparse-24       	 2584819	        92.39 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=sparse-24       	 2631556	        91.52 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=sparse-24       	 2626202	        91.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=sparse-24       	 2603756	        92.54 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=sparse-24       	 2623198	        91.31 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=sparse-24       	 2553676	        95.88 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=sparse-24       	 2131410	       106.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=sparse-24       	 2586988	       105.8 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=sparse-24       	 2578393	        92.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=sparse-24       	 2584795	        92.49 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=runs-24         	14794734	        15.76 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=runs-24         	15070623	        15.92 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=runs-24         	15138186	        16.23 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=runs-24         	15451447	        15.76 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=runs-24         	15471486	        15.65 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=runs-24         	15532933	        16.33 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=runs-24         	15682670	        15.80 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=runs-24         	14851153	        15.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=runs-24         	15702902	        15.55 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=runs-24         	15382213	        15.75 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=zipf-24         	11047003	        21.85 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=zipf-24         	11250645	        21.59 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=zipf-24         	11187969	        21.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=zipf-24         	11224477	        21.36 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=zipf-24         	10739922	        21.59 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=zipf-24         	11126091	        21.70 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=zipf-24         	11353650	        21.28 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=zipf-24         	11358096	        21.66 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=zipf-24         	10324232	        21.44 ns/op	       0 B/op	       0 allocs/op
+BenchmarkContains/runopt=on/data=zipf-24         	11365705	        21.36 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAnd/runopt=off/data=sparse-24           	      69	   3283818 ns/op	 2468081 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=off/data=sparse-24           	      64	   3523873 ns/op	 2468084 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=off/data=sparse-24           	      74	   3204974 ns/op	 2468084 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=off/data=sparse-24           	      62	   3766968 ns/op	 2468083 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=off/data=sparse-24           	      67	   3339724 ns/op	 2468085 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=off/data=sparse-24           	      69	   3259022 ns/op	 2468084 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=off/data=sparse-24           	      73	   3200863 ns/op	 2468086 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=off/data=sparse-24           	      73	   3237916 ns/op	 2468083 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=off/data=sparse-24           	      73	   3179112 ns/op	 2468083 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=off/data=sparse-24           	      73	   3213085 ns/op	 2468084 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=off/data=runs-24             	   10000	     21043 ns/op	  144000 B/op	      39 allocs/op
+BenchmarkAnd/runopt=off/data=runs-24             	   10356	     22714 ns/op	  144000 B/op	      39 allocs/op
+BenchmarkAnd/runopt=off/data=runs-24             	   10000	     20481 ns/op	  144000 B/op	      39 allocs/op
+BenchmarkAnd/runopt=off/data=runs-24             	   12396	     19501 ns/op	  144000 B/op	      39 allocs/op
+BenchmarkAnd/runopt=off/data=runs-24             	    9858	     22588 ns/op	  144000 B/op	      39 allocs/op
+BenchmarkAnd/runopt=off/data=runs-24             	   11576	     21203 ns/op	  144000 B/op	      39 allocs/op
+BenchmarkAnd/runopt=off/data=runs-24             	   12462	     20109 ns/op	  144000 B/op	      39 allocs/op
+BenchmarkAnd/runopt=off/data=runs-24             	   10000	     21228 ns/op	  144000 B/op	      39 allocs/op
+BenchmarkAnd/runopt=off/data=runs-24             	   12654	     19094 ns/op	  144000 B/op	      39 allocs/op
+BenchmarkAnd/runopt=off/data=runs-24             	   12280	     18406 ns/op	  144000 B/op	      39 allocs/op
+BenchmarkAnd/runopt=off/data=zipf-24             	     879	    229788 ns/op	  376352 B/op	     664 allocs/op
+BenchmarkAnd/runopt=off/data=zipf-24             	     966	    241905 ns/op	  376352 B/op	     664 allocs/op
+BenchmarkAnd/runopt=off/data=zipf-24             	    1191	    199410 ns/op	  376353 B/op	     664 allocs/op
+BenchmarkAnd/runopt=off/data=zipf-24             	    1219	    194927 ns/op	  376352 B/op	     664 allocs/op
+BenchmarkAnd/runopt=off/data=zipf-24             	    1197	    218313 ns/op	  376352 B/op	     664 allocs/op
+BenchmarkAnd/runopt=off/data=zipf-24             	    1198	    195931 ns/op	  376353 B/op	     664 allocs/op
+BenchmarkAnd/runopt=off/data=zipf-24             	    1134	    197105 ns/op	  376352 B/op	     664 allocs/op
+BenchmarkAnd/runopt=off/data=zipf-24             	    1204	    197818 ns/op	  376352 B/op	     664 allocs/op
+BenchmarkAnd/runopt=off/data=zipf-24             	     991	    239752 ns/op	  376352 B/op	     664 allocs/op
+BenchmarkAnd/runopt=off/data=zipf-24             	     902	    239112 ns/op	  376352 B/op	     664 allocs/op
+BenchmarkAnd/runopt=on/data=sparse-24            	      69	   3430238 ns/op	 2468083 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=on/data=sparse-24            	      56	   3704084 ns/op	 2468085 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=on/data=sparse-24            	      51	   4502187 ns/op	 2468082 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=on/data=sparse-24            	      33	   7729540 ns/op	 2468082 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=on/data=sparse-24            	      40	   7000561 ns/op	 2468086 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=on/data=sparse-24            	      42	   5768515 ns/op	 2468216 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=on/data=sparse-24            	      42	   5921540 ns/op	 2468081 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=on/data=sparse-24            	      44	   4634555 ns/op	 2468083 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=on/data=sparse-24            	      40	   5193821 ns/op	 2468081 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=on/data=sparse-24            	      48	   4502954 ns/op	 2468083 B/op	   65239 allocs/op
+BenchmarkAnd/runopt=on/data=runs-24              	  170766	      1269 ns/op	    2528 B/op	      33 allocs/op
+BenchmarkAnd/runopt=on/data=runs-24              	  187761	      1242 ns/op	    2528 B/op	      33 allocs/op
+BenchmarkAnd/runopt=on/data=runs-24              	  204075	      1232 ns/op	    2528 B/op	      33 allocs/op
+BenchmarkAnd/runopt=on/data=runs-24              	  200734	      1228 ns/op	    2528 B/op	      33 allocs/op
+BenchmarkAnd/runopt=on/data=runs-24              	  203876	      1219 ns/op	    2528 B/op	      33 allocs/op
+BenchmarkAnd/runopt=on/data=runs-24              	  197000	      1391 ns/op	    2528 B/op	      33 allocs/op
+BenchmarkAnd/runopt=on/data=runs-24              	  145480	      1440 ns/op	    2528 B/op	      33 allocs/op
+BenchmarkAnd/runopt=on/data=runs-24              	  190502	      1244 ns/op	    2528 B/op	      33 allocs/op
+BenchmarkAnd/runopt=on/data=runs-24              	  196938	      1309 ns/op	    2528 B/op	      33 allocs/op
+BenchmarkAnd/runopt=on/data=runs-24              	  162331	      1296 ns/op	    2528 B/op	      33 allocs/op
+BenchmarkAnd/runopt=on/data=zipf-24              	   11053	     24530 ns/op	   45640 B/op	     661 allocs/op
+BenchmarkAnd/runopt=on/data=zipf-24              	    8554	     26838 ns/op	   45640 B/op	     661 allocs/op
+BenchmarkAnd/runopt=on/data=zipf-24              	    8659	     24337 ns/op	   45640 B/op	     661 allocs/op
+BenchmarkAnd/runopt=on/data=zipf-24              	   11656	     20870 ns/op	   45640 B/op	     661 allocs/op
+BenchmarkAnd/runopt=on/data=zipf-24              	   10630	     22331 ns/op	   45640 B/op	     661 allocs/op
+BenchmarkAnd/runopt=on/data=zipf-24              	   10129	     23537 ns/op	   45640 B/op	     661 allocs/op
+BenchmarkAnd/runopt=on/data=zipf-24              	   10534	     22713 ns/op	   45640 B/op	     661 allocs/op
+BenchmarkAnd/runopt=on/data=zipf-24              	   10981	     21656 ns/op	   45640 B/op	     661 allocs/op
+BenchmarkAnd/runopt=on/data=zipf-24              	    9948	     22704 ns/op	   45640 B/op	     661 allocs/op
+BenchmarkAnd/runopt=on/data=zipf-24              	    9895	     25485 ns/op	   45640 B/op	     661 allocs/op
+BenchmarkOr/runopt=off/data=sparse-24            	      54	   4407912 ns/op	 4563176 B/op	   65580 allocs/op
+BenchmarkOr/runopt=off/data=sparse-24            	      43	   4814771 ns/op	 4563173 B/op	   65580 allocs/op
+BenchmarkOr/runopt=off/data=sparse-24            	      61	   4061262 ns/op	 4563171 B/op	   65580 allocs/op
+BenchmarkOr/runopt=off/data=sparse-24            	      58	   3886712 ns/op	 4563177 B/op	   65580 allocs/op
+BenchmarkOr/runopt=off/data=sparse-24            	      45	   5440431 ns/op	 4563169 B/op	   65580 allocs/op
+BenchmarkOr/runopt=off/data=sparse-24            	      54	   3740136 ns/op	 4563171 B/op	   65580 allocs/op
+BenchmarkOr/runopt=off/data=sparse-24            	      58	   4298279 ns/op	 4563171 B/op	   65580 allocs/op
+BenchmarkOr/runopt=off/data=sparse-24            	      44	   5072282 ns/op	 4563173 B/op	   65580 allocs/op
+BenchmarkOr/runopt=off/data=sparse-24            	      58	   4118426 ns/op	 4563171 B/op	   65580 allocs/op
+BenchmarkOr/runopt=off/data=sparse-24            	      43	   4723594 ns/op	 4563170 B/op	   65580 allocs/op
+BenchmarkOr/runopt=off/data=runs-24              	   18172	     12815 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkOr/runopt=off/data=runs-24              	   22713	      9650 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkOr/runopt=off/data=runs-24              	   21171	     11549 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkOr/runopt=off/data=runs-24              	   25861	      9766 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkOr/runopt=off/data=runs-24              	   18208	     13017 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkOr/runopt=off/data=runs-24              	   22748	     11830 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkOr/runopt=off/data=runs-24              	   17780	     12840 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkOr/runopt=off/data=runs-24              	   20665	     11913 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkOr/runopt=off/data=runs-24              	   19350	     11837 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkOr/runopt=off/data=runs-24              	   22974	     12292 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkOr/runopt=off/data=zipf-24              	     523	    476868 ns/op	  906985 B/op	     849 allocs/op
+BenchmarkOr/runopt=off/data=zipf-24              	     534	    413875 ns/op	  906985 B/op	     849 allocs/op
+BenchmarkOr/runopt=off/data=zipf-24              	     656	    374699 ns/op	  906986 B/op	     849 allocs/op
+BenchmarkOr/runopt=off/data=zipf-24              	     625	    438366 ns/op	  906986 B/op	     849 allocs/op
+BenchmarkOr/runopt=off/data=zipf-24              	     576	    408865 ns/op	  906986 B/op	     849 allocs/op
+BenchmarkOr/runopt=off/data=zipf-24              	     616	    374865 ns/op	  906987 B/op	     849 allocs/op
+BenchmarkOr/runopt=off/data=zipf-24              	     598	    375846 ns/op	  906987 B/op	     849 allocs/op
+BenchmarkOr/runopt=off/data=zipf-24              	     637	    379726 ns/op	  906987 B/op	     849 allocs/op
+BenchmarkOr/runopt=off/data=zipf-24              	     595	    459550 ns/op	  906986 B/op	     849 allocs/op
+BenchmarkOr/runopt=off/data=zipf-24              	     476	    481728 ns/op	  906986 B/op	     849 allocs/op
+BenchmarkOr/runopt=on/data=sparse-24             	      38	   6194479 ns/op	 4563171 B/op	   65580 allocs/op
+BenchmarkOr/runopt=on/data=sparse-24             	      62	   3756900 ns/op	 4563174 B/op	   65580 allocs/op
+BenchmarkOr/runopt=on/data=sparse-24             	      61	   3829027 ns/op	 4563175 B/op	   65580 allocs/op
+BenchmarkOr/runopt=on/data=sparse-24             	      60	   3899491 ns/op	 4563173 B/op	   65580 allocs/op
+BenchmarkOr/runopt=on/data=sparse-24             	      56	   4282586 ns/op	 4563170 B/op	   65580 allocs/op
+BenchmarkOr/runopt=on/data=sparse-24             	      57	   4107398 ns/op	 4563173 B/op	   65580 allocs/op
+BenchmarkOr/runopt=on/data=sparse-24             	      58	   4324741 ns/op	 4563267 B/op	   65580 allocs/op
+BenchmarkOr/runopt=on/data=sparse-24             	      52	   4442708 ns/op	 4563176 B/op	   65580 allocs/op
+BenchmarkOr/runopt=on/data=sparse-24             	      56	   4086887 ns/op	 4563172 B/op	   65580 allocs/op
+BenchmarkOr/runopt=on/data=sparse-24             	      57	   3939184 ns/op	 4563173 B/op	   65580 allocs/op
+BenchmarkOr/runopt=on/data=runs-24               	  125875	      1840 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkOr/runopt=on/data=runs-24               	  131043	      1849 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkOr/runopt=on/data=runs-24               	  137766	      1947 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkOr/runopt=on/data=runs-24               	  122743	      1963 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkOr/runopt=on/data=runs-24               	  128470	      1786 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkOr/runopt=on/data=runs-24               	  126949	      1894 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkOr/runopt=on/data=runs-24               	  117735	      2092 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkOr/runopt=on/data=runs-24               	  126746	      2004 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkOr/runopt=on/data=runs-24               	  114852	      2119 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkOr/runopt=on/data=runs-24               	  127975	      2333 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkOr/runopt=on/data=zipf-24               	    4341	     50821 ns/op	   87928 B/op	     838 allocs/op
+BenchmarkOr/runopt=on/data=zipf-24               	    4656	     48146 ns/op	   87928 B/op	     838 allocs/op
+BenchmarkOr/runopt=on/data=zipf-24               	    5072	     44313 ns/op	   87928 B/op	     838 allocs/op
+BenchmarkOr/runopt=on/data=zipf-24               	    5107	     49049 ns/op	   87928 B/op	     838 allocs/op
+BenchmarkOr/runopt=on/data=zipf-24               	    4618	     51276 ns/op	   87928 B/op	     838 allocs/op
+BenchmarkOr/runopt=on/data=zipf-24               	    4291	     49931 ns/op	   87928 B/op	     838 allocs/op
+BenchmarkOr/runopt=on/data=zipf-24               	    5317	     45489 ns/op	   87928 B/op	     838 allocs/op
+BenchmarkOr/runopt=on/data=zipf-24               	    4686	     44830 ns/op	   87928 B/op	     838 allocs/op
+BenchmarkOr/runopt=on/data=zipf-24               	    4750	     43059 ns/op	   87928 B/op	     838 allocs/op
+BenchmarkOr/runopt=on/data=zipf-24               	    4507	     45012 ns/op	   87928 B/op	     838 allocs/op
+BenchmarkAndNot/runopt=off/data=sparse-24        	      62	   4047628 ns/op	 4115940 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=off/data=sparse-24        	      55	   4278508 ns/op	 4115940 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=off/data=sparse-24        	      52	   3906064 ns/op	 4115948 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=off/data=sparse-24        	      37	   5546429 ns/op	 4115939 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=off/data=sparse-24        	      54	   4829794 ns/op	 4115938 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=off/data=sparse-24        	      52	   4529714 ns/op	 4115940 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=off/data=sparse-24        	      55	   4308734 ns/op	 4115940 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=off/data=sparse-24        	      37	   5454531 ns/op	 4115939 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=off/data=sparse-24        	      67	   3497034 ns/op	 4115940 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=off/data=sparse-24        	      38	   6024447 ns/op	 4115940 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=off/data=runs-24          	   19072	     11451 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=off/data=runs-24          	   22682	     10146 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=off/data=runs-24          	   22108	     11120 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=off/data=runs-24          	   21531	     11764 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=off/data=runs-24          	   20994	     11633 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=off/data=runs-24          	   17238	     13758 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=off/data=runs-24          	   18439	     13041 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=off/data=runs-24          	   22843	     11057 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=off/data=runs-24          	   19684	     11949 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=off/data=runs-24          	   18939	     13311 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=off/data=zipf-24          	     672	    314767 ns/op	  433640 B/op	     745 allocs/op
+BenchmarkAndNot/runopt=off/data=zipf-24          	     759	    301633 ns/op	  433641 B/op	     745 allocs/op
+BenchmarkAndNot/runopt=off/data=zipf-24          	     876	    273242 ns/op	  433641 B/op	     745 allocs/op
+BenchmarkAndNot/runopt=off/data=zipf-24          	     843	    284768 ns/op	  433640 B/op	     745 allocs/op
+BenchmarkAndNot/runopt=off/data=zipf-24          	     650	    364341 ns/op	  433641 B/op	     745 allocs/op
+BenchmarkAndNot/runopt=off/data=zipf-24          	     835	    291593 ns/op	  433641 B/op	     745 allocs/op
+BenchmarkAndNot/runopt=off/data=zipf-24          	     858	    257962 ns/op	  433642 B/op	     745 allocs/op
+BenchmarkAndNot/runopt=off/data=zipf-24          	     890	    267640 ns/op	  433641 B/op	     745 allocs/op
+BenchmarkAndNot/runopt=off/data=zipf-24          	     932	    247752 ns/op	  433641 B/op	     745 allocs/op
+BenchmarkAndNot/runopt=off/data=zipf-24          	     918	    258809 ns/op	  433641 B/op	     745 allocs/op
+BenchmarkAndNot/runopt=on/data=sparse-24         	      67	   3530364 ns/op	 4115940 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=on/data=sparse-24         	      54	   4327669 ns/op	 4115939 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=on/data=sparse-24         	      58	   4000661 ns/op	 4115939 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=on/data=sparse-24         	      61	   4098869 ns/op	 4115940 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=on/data=sparse-24         	      51	   4259235 ns/op	 4115941 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=on/data=sparse-24         	      66	   3541567 ns/op	 4115941 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=on/data=sparse-24         	      63	   3779578 ns/op	 4115940 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=on/data=sparse-24         	      66	   3677352 ns/op	 4115941 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=on/data=sparse-24         	      66	   3562070 ns/op	 4115943 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=on/data=sparse-24         	      58	   3531029 ns/op	 4115938 B/op	   65424 allocs/op
+BenchmarkAndNot/runopt=on/data=runs-24           	  162612	      1536 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=on/data=runs-24           	  144174	      1630 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=on/data=runs-24           	  130956	      1776 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=on/data=runs-24           	  150006	      1534 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=on/data=runs-24           	  174427	      1792 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=on/data=runs-24           	  119952	      1917 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=on/data=runs-24           	  151896	      1515 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=on/data=runs-24           	  171008	      1577 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=on/data=runs-24           	  136552	      1864 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=on/data=runs-24           	  129603	      1565 ns/op	    3952 B/op	      33 allocs/op
+BenchmarkAndNot/runopt=on/data=zipf-24           	    6854	     35658 ns/op	   84576 B/op	     746 allocs/op
+BenchmarkAndNot/runopt=on/data=zipf-24           	    6654	     35121 ns/op	   84576 B/op	     746 allocs/op
+BenchmarkAndNot/runopt=on/data=zipf-24           	    6325	     31873 ns/op	   84576 B/op	     746 allocs/op
+BenchmarkAndNot/runopt=on/data=zipf-24           	    8703	     27444 ns/op	   84576 B/op	     746 allocs/op
+BenchmarkAndNot/runopt=on/data=zipf-24           	    8540	     27908 ns/op	   84576 B/op	     746 allocs/op
+BenchmarkAndNot/runopt=on/data=zipf-24           	    8871	     26869 ns/op	   84576 B/op	     746 allocs/op
+BenchmarkAndNot/runopt=on/data=zipf-24           	    7852	     27008 ns/op	   84576 B/op	     746 allocs/op
+BenchmarkAndNot/runopt=on/data=zipf-24           	    7155	     30119 ns/op	   84576 B/op	     746 allocs/op
+BenchmarkAndNot/runopt=on/data=zipf-24           	    8688	     27792 ns/op	   84576 B/op	     746 allocs/op
+BenchmarkAndNot/runopt=on/data=zipf-24           	    7656	     29487 ns/op	   84576 B/op	     746 allocs/op
+BenchmarkXor/runopt=off/data=sparse-24           	      46	   5099137 ns/op	 4563171 B/op	   65580 allocs/op
+BenchmarkXor/runopt=off/data=sparse-24           	      58	   3826935 ns/op	 4563177 B/op	   65580 allocs/op
+BenchmarkXor/runopt=off/data=sparse-24           	      58	   3714271 ns/op	 4563173 B/op	   65580 allocs/op
+BenchmarkXor/runopt=off/data=sparse-24           	      55	   3918377 ns/op	 4563171 B/op	   65580 allocs/op
+BenchmarkXor/runopt=off/data=sparse-24           	      57	   4152454 ns/op	 4563172 B/op	   65580 allocs/op
+BenchmarkXor/runopt=off/data=sparse-24           	      58	   3993241 ns/op	 4563174 B/op	   65580 allocs/op
+BenchmarkXor/runopt=off/data=sparse-24           	      63	   3740849 ns/op	 4563171 B/op	   65580 allocs/op
+BenchmarkXor/runopt=off/data=sparse-24           	      56	   5771630 ns/op	 4563172 B/op	   65580 allocs/op
+BenchmarkXor/runopt=off/data=sparse-24           	      57	   4640189 ns/op	 4563172 B/op	   65580 allocs/op
+BenchmarkXor/runopt=off/data=sparse-24           	      46	   4362801 ns/op	 4563176 B/op	   65580 allocs/op
+BenchmarkXor/runopt=off/data=runs-24             	   21580	     11875 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkXor/runopt=off/data=runs-24             	   19184	     11365 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkXor/runopt=off/data=runs-24             	   24228	     10487 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkXor/runopt=off/data=runs-24             	   21259	     10242 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkXor/runopt=off/data=runs-24             	   25012	     11262 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkXor/runopt=off/data=runs-24             	   17739	     13215 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkXor/runopt=off/data=runs-24             	   19070	     12126 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkXor/runopt=off/data=runs-24             	   17286	     13556 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkXor/runopt=off/data=runs-24             	   19309	     13725 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkXor/runopt=off/data=runs-24             	   16227	     13605 ns/op	   99456 B/op	      33 allocs/op
+BenchmarkXor/runopt=off/data=zipf-24             	     598	    432811 ns/op	  898795 B/op	     848 allocs/op
+BenchmarkXor/runopt=off/data=zipf-24             	     600	    387063 ns/op	  898793 B/op	     848 allocs/op
+BenchmarkXor/runopt=off/data=zipf-24             	     621	    391106 ns/op	  898794 B/op	     848 allocs/op
+BenchmarkXor/runopt=off/data=zipf-24             	     531	    401308 ns/op	  898795 B/op	     848 allocs/op
+BenchmarkXor/runopt=off/data=zipf-24             	     579	    432969 ns/op	  898794 B/op	     848 allocs/op
+BenchmarkXor/runopt=off/data=zipf-24             	     601	    405343 ns/op	  898794 B/op	     848 allocs/op
+BenchmarkXor/runopt=off/data=zipf-24             	     475	    455487 ns/op	  898794 B/op	     848 allocs/op
+BenchmarkXor/runopt=off/data=zipf-24             	     492	    436611 ns/op	  898796 B/op	     848 allocs/op
+BenchmarkXor/runopt=off/data=zipf-24             	     608	    388312 ns/op	  898795 B/op	     848 allocs/op
+BenchmarkXor/runopt=off/data=zipf-24             	     554	    419017 ns/op	  898793 B/op	     848 allocs/op
+BenchmarkXor/runopt=on/data=sparse-24            	      61	   4052044 ns/op	 4563172 B/op	   65580 allocs/op
+BenchmarkXor/runopt=on/data=sparse-24            	      44	   4703323 ns/op	 4563176 B/op	   65580 allocs/op
+BenchmarkXor/runopt=on/data=sparse-24            	      55	   4218300 ns/op	 4563172 B/op	   65580 allocs/op
+BenchmarkXor/runopt=on/data=sparse-24            	      62	   3763838 ns/op	 4563174 B/op	   65580 allocs/op
+BenchmarkXor/runopt=on/data=sparse-24            	      52	   4425082 ns/op	 4563170 B/op	   65580 allocs/op
+BenchmarkXor/runopt=on/data=sparse-24            	      48	   4455118 ns/op	 4563171 B/op	   65580 allocs/op
+BenchmarkXor/runopt=on/data=sparse-24            	      51	   4416837 ns/op	 4563170 B/op	   65580 allocs/op
+BenchmarkXor/runopt=on/data=sparse-24            	      61	   3892814 ns/op	 4563171 B/op	   65580 allocs/op
+BenchmarkXor/runopt=on/data=sparse-24            	      64	   3655546 ns/op	 4563173 B/op	   65580 allocs/op
+BenchmarkXor/runopt=on/data=sparse-24            	      63	   3753954 ns/op	 4563176 B/op	   65580 allocs/op
+BenchmarkXor/runopt=on/data=runs-24              	   61358	      3882 ns/op	    9552 B/op	      57 allocs/op
+BenchmarkXor/runopt=on/data=runs-24              	   62194	      3894 ns/op	    9552 B/op	      57 allocs/op
+BenchmarkXor/runopt=on/data=runs-24              	   45806	      4734 ns/op	    9552 B/op	      57 allocs/op
+BenchmarkXor/runopt=on/data=runs-24              	   59920	      4344 ns/op	    9552 B/op	      57 allocs/op
+BenchmarkXor/runopt=on/data=runs-24              	   59512	      4481 ns/op	    9552 B/op	      57 allocs/op
+BenchmarkXor/runopt=on/data=runs-24              	   47870	      4985 ns/op	    9552 B/op	      57 allocs/op
+BenchmarkXor/runopt=on/data=runs-24              	   49772	      4084 ns/op	    9552 B/op	      57 allocs/op
+BenchmarkXor/runopt=on/data=runs-24              	   60144	      4285 ns/op	    9552 B/op	      57 allocs/op
+BenchmarkXor/runopt=on/data=runs-24              	   55266	      3945 ns/op	    9552 B/op	      57 allocs/op
+BenchmarkXor/runopt=on/data=runs-24              	   60577	      4115 ns/op	    9552 B/op	      57 allocs/op
+BenchmarkXor/runopt=on/data=zipf-24              	    1616	    127453 ns/op	  186936 B/op	    1482 allocs/op
+BenchmarkXor/runopt=on/data=zipf-24              	    1803	    128171 ns/op	  186936 B/op	    1482 allocs/op
+BenchmarkXor/runopt=on/data=zipf-24              	    1623	    128311 ns/op	  186936 B/op	    1482 allocs/op
+BenchmarkXor/runopt=on/data=zipf-24              	    1656	    133022 ns/op	  186936 B/op	    1482 allocs/op
+BenchmarkXor/runopt=on/data=zipf-24              	    1837	    127167 ns/op	  186936 B/op	    1482 allocs/op
+BenchmarkXor/runopt=on/data=zipf-24              	    1645	    133971 ns/op	  186937 B/op	    1482 allocs/op
+BenchmarkXor/runopt=on/data=zipf-24              	    1636	    133876 ns/op	  186936 B/op	    1482 allocs/op
+BenchmarkXor/runopt=on/data=zipf-24              	    1767	    129160 ns/op	  186936 B/op	    1482 allocs/op
+BenchmarkXor/runopt=on/data=zipf-24              	    1700	    122869 ns/op	  186936 B/op	    1482 allocs/op
+BenchmarkXor/runopt=on/data=zipf-24              	    1855	    128830 ns/op	  186936 B/op	    1482 allocs/op
+BenchmarkAndCardinality/runopt=off/data=sparse-24         	      74	   3171314 ns/op	 2467369 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=off/data=sparse-24         	      62	   3297458 ns/op	 2467374 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=off/data=sparse-24         	      69	   3229865 ns/op	 2467374 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=off/data=sparse-24         	      70	   3331458 ns/op	 2467370 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=off/data=sparse-24         	      69	   3234434 ns/op	 2467373 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=off/data=sparse-24         	      63	   3614494 ns/op	 2467369 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=off/data=sparse-24         	      61	   3439356 ns/op	 2467370 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=off/data=sparse-24         	      62	   3780115 ns/op	 2467369 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=off/data=sparse-24         	      55	   4293501 ns/op	 2467371 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=off/data=sparse-24         	      61	   3484968 ns/op	 2467369 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=off/data=runs-24           	  184209	      1418 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAndCardinality/runopt=off/data=runs-24           	  172807	      1418 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAndCardinality/runopt=off/data=runs-24           	  186397	      1376 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAndCardinality/runopt=off/data=runs-24           	  180826	      1519 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAndCardinality/runopt=off/data=runs-24           	  165247	      1446 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAndCardinality/runopt=off/data=runs-24           	  154800	      1563 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAndCardinality/runopt=off/data=runs-24           	  181141	      1471 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAndCardinality/runopt=off/data=runs-24           	  155732	      1486 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAndCardinality/runopt=off/data=runs-24           	  170809	      1436 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAndCardinality/runopt=off/data=runs-24           	  168452	      1465 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAndCardinality/runopt=off/data=zipf-24           	    1064	    237054 ns/op	  327169 B/op	     634 allocs/op
+BenchmarkAndCardinality/runopt=off/data=zipf-24           	     994	    233673 ns/op	  327168 B/op	     634 allocs/op
+BenchmarkAndCardinality/runopt=off/data=zipf-24           	     999	    239267 ns/op	  327169 B/op	     634 allocs/op
+BenchmarkAndCardinality/runopt=off/data=zipf-24           	    1220	    200382 ns/op	  327169 B/op	     634 allocs/op
+BenchmarkAndCardinality/runopt=off/data=zipf-24           	    1167	    191801 ns/op	  327169 B/op	     634 allocs/op
+BenchmarkAndCardinality/runopt=off/data=zipf-24           	    1257	    187269 ns/op	  327168 B/op	     634 allocs/op
+BenchmarkAndCardinality/runopt=off/data=zipf-24           	    1172	    193304 ns/op	  327168 B/op	     634 allocs/op
+BenchmarkAndCardinality/runopt=off/data=zipf-24           	    1279	    187101 ns/op	  327169 B/op	     634 allocs/op
+BenchmarkAndCardinality/runopt=off/data=zipf-24           	    1184	    188875 ns/op	  327168 B/op	     634 allocs/op
+BenchmarkAndCardinality/runopt=off/data=zipf-24           	    1230	    190580 ns/op	  327169 B/op	     634 allocs/op
+BenchmarkAndCardinality/runopt=on/data=sparse-24          	      73	   3235297 ns/op	 2467369 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=on/data=sparse-24          	      66	   3393039 ns/op	 2467371 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=on/data=sparse-24          	      62	   3320682 ns/op	 2467374 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=on/data=sparse-24          	      60	   3829128 ns/op	 2467372 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=on/data=sparse-24          	      75	   3294590 ns/op	 2467372 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=on/data=sparse-24          	      70	   3487399 ns/op	 2467374 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=on/data=sparse-24          	      70	   3336718 ns/op	 2467375 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=on/data=sparse-24          	      64	   3766729 ns/op	 2467369 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=on/data=sparse-24          	      68	   3671739 ns/op	 2467368 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=on/data=sparse-24          	      61	   3743486 ns/op	 2467369 B/op	   65228 allocs/op
+BenchmarkAndCardinality/runopt=on/data=runs-24            	  204666	      1164 ns/op	    2144 B/op	      24 allocs/op
+BenchmarkAndCardinality/runopt=on/data=runs-24            	  174051	      1353 ns/op	    2144 B/op	      24 allocs/op
+BenchmarkAndCardinality/runopt=on/data=runs-24            	  194119	      1169 ns/op	    2144 B/op	      24 allocs/op
+BenchmarkAndCardinality/runopt=on/data=runs-24            	  170812	      1297 ns/op	    2144 B/op	      24 allocs/op
+BenchmarkAndCardinality/runopt=on/data=runs-24            	  166752	      1395 ns/op	    2144 B/op	      24 allocs/op
+BenchmarkAndCardinality/runopt=on/data=runs-24            	  173893	      1218 ns/op	    2144 B/op	      24 allocs/op
+BenchmarkAndCardinality/runopt=on/data=runs-24            	  206306	      1045 ns/op	    2144 B/op	      24 allocs/op
+BenchmarkAndCardinality/runopt=on/data=runs-24            	  237248	      1081 ns/op	    2144 B/op	      24 allocs/op
+BenchmarkAndCardinality/runopt=on/data=runs-24            	  217735	      1210 ns/op	    2144 B/op	      24 allocs/op
+BenchmarkAndCardinality/runopt=on/data=runs-24            	  211081	      1084 ns/op	    2144 B/op	      24 allocs/op
+BenchmarkAndCardinality/runopt=on/data=zipf-24            	   11671	     20388 ns/op	   42880 B/op	     646 allocs/op
+BenchmarkAndCardinality/runopt=on/data=zipf-24            	   10813	     22027 ns/op	   42880 B/op	     646 allocs/op
+BenchmarkAndCardinality/runopt=on/data=zipf-24            	   11130	     21370 ns/op	   42880 B/op	     646 allocs/op
+BenchmarkAndCardinality/runopt=on/data=zipf-24            	   11491	     21153 ns/op	   42880 B/op	     646 allocs/op
+BenchmarkAndCardinality/runopt=on/data=zipf-24            	   11312	     21038 ns/op	   42880 B/op	     646 allocs/op
+BenchmarkAndCardinality/runopt=on/data=zipf-24            	   10000	     23993 ns/op	   42880 B/op	     646 allocs/op
+BenchmarkAndCardinality/runopt=on/data=zipf-24            	   10474	     22512 ns/op	   42880 B/op	     646 allocs/op
+BenchmarkAndCardinality/runopt=on/data=zipf-24            	   10377	     23583 ns/op	   42880 B/op	     646 allocs/op
+BenchmarkAndCardinality/runopt=on/data=zipf-24            	   11046	     22927 ns/op	   42880 B/op	     646 allocs/op
+BenchmarkAndCardinality/runopt=on/data=zipf-24            	    9242	     25621 ns/op	   42880 B/op	     646 allocs/op
+BenchmarkSerializedSize/codec=raw/data=sparse-24          	541047054	         0.4358 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=sparse-24          	591505099	         0.4214 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=sparse-24          	521146936	         0.4200 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=sparse-24          	514329487	         0.4192 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=sparse-24          	502688218	         0.4244 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=sparse-24          	526389079	         0.4568 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=sparse-24          	579072283	         0.4073 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=sparse-24          	575919812	         0.4103 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=sparse-24          	479763964	         0.4277 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=sparse-24          	544781194	         0.4145 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=sparse-24      	586493365	         0.4352 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=sparse-24      	592693774	         0.4149 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=sparse-24      	588240888	         0.4101 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=sparse-24      	565239002	         0.5395 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=sparse-24      	575645240	         0.4207 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=sparse-24      	470349903	         0.4874 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=sparse-24      	567019802	         0.4309 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=sparse-24      	476929944	         0.4518 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=sparse-24      	586742020	         0.4076 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=sparse-24      	579063746	         0.4095 ns/op	         3.308 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=runs-24            	584606619	         0.4085 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=runs-24            	585707949	         0.4087 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=runs-24            	413771851	         0.5225 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=runs-24            	475611644	         0.5072 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=runs-24            	473312118	         0.5074 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=runs-24            	542187250	         0.4164 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=runs-24            	591067840	         0.4166 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=runs-24            	547029679	         0.4200 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=runs-24            	577145028	         0.4098 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=runs-24            	588922326	         0.4073 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=runs-24        	563859826	         0.4139 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=runs-24        	566205339	         0.4130 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=runs-24        	574141251	         0.4106 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=runs-24        	588368613	         0.4119 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=runs-24        	585900780	         0.4104 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=runs-24        	555522031	         0.4157 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=runs-24        	563540956	         0.4104 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=runs-24        	571833660	         0.4138 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=runs-24        	547275753	         0.4124 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=runs-24        	575463391	         0.4083 ns/op	         0.008026 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=zipf-24            	580800464	         0.4100 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=zipf-24            	591218250	         0.4091 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=zipf-24            	590291388	         0.4140 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=zipf-24            	562779943	         0.4122 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=zipf-24            	586646904	         0.4101 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=zipf-24            	571386696	         0.4134 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=zipf-24            	551384484	         0.4122 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=zipf-24            	576740529	         0.4130 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=zipf-24            	556037287	         0.4220 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=raw/data=zipf-24            	501925227	         0.4216 ns/op	         4.000 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=zipf-24        	585909234	         0.4077 ns/op	         0.1397 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=zipf-24        	458474668	         0.5090 ns/op	         0.1397 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=zipf-24        	594277640	         0.4230 ns/op	         0.1397 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=zipf-24        	472787037	         0.4289 ns/op	         0.1397 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=zipf-24        	468500248	         0.4717 ns/op	         0.1397 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=zipf-24        	586152956	         0.4062 ns/op	         0.1397 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=zipf-24        	510963226	         0.4189 ns/op	         0.1397 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=zipf-24        	475748708	         0.4461 ns/op	         0.1397 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=zipf-24        	555333884	         0.4124 ns/op	         0.1397 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSerializedSize/codec=roaring/data=zipf-24        	468060122	         0.4384 ns/op	         0.1397 bytes/value	       0 B/op	       0 allocs/op
+BenchmarkToBytes/codec=raw/data=sparse-24                 	    2119	    112538 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=sparse-24                 	    1509	    145786 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=sparse-24                 	    1627	    139681 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=sparse-24                 	    1580	    133102 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=sparse-24                 	    1480	    147378 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=sparse-24                 	    1785	    136715 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=sparse-24                 	    1590	    152496 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=sparse-24                 	    1581	    135589 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=sparse-24                 	    1442	    146853 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=sparse-24                 	    1442	    141902 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=sparse-24             	     424	    580293 ns/op	  663552 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=sparse-24             	     418	    533557 ns/op	  663552 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=sparse-24             	     451	    604908 ns/op	  663552 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=sparse-24             	     369	    619584 ns/op	  663552 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=sparse-24             	     446	    528506 ns/op	  663552 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=sparse-24             	     505	    519342 ns/op	  663552 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=sparse-24             	     396	    527373 ns/op	  663552 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=sparse-24             	     440	    637482 ns/op	  663552 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=sparse-24             	     390	    666447 ns/op	  663552 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=sparse-24             	     346	    660929 ns/op	  663552 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=runs-24                   	    2553	     87369 ns/op	  745475 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=runs-24                   	    3271	     70142 ns/op	  745478 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=runs-24                   	    3811	     90409 ns/op	  745476 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=runs-24                   	    2596	     92925 ns/op	  745475 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=runs-24                   	    2505	     87812 ns/op	  745477 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=runs-24                   	    2918	     87567 ns/op	  745476 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=runs-24                   	    2580	     84573 ns/op	  745476 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=runs-24                   	    2798	     84184 ns/op	  745477 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=runs-24                   	    3445	     68102 ns/op	  745479 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=runs-24                   	    3513	     68400 ns/op	  745479 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=runs-24               	  496357	       546.7 ns/op	    1536 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=runs-24               	  517980	       464.2 ns/op	    1536 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=runs-24               	  572210	       501.3 ns/op	    1536 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=runs-24               	  524952	       455.1 ns/op	    1536 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=runs-24               	  578806	       460.6 ns/op	    1536 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=runs-24               	  424444	       526.3 ns/op	    1536 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=runs-24               	  373941	       552.0 ns/op	    1536 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=runs-24               	  422469	       569.4 ns/op	    1536 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=runs-24               	  485037	       501.9 ns/op	    1536 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=runs-24               	  542450	       432.1 ns/op	    1536 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=zipf-24                   	    2514	     97430 ns/op	  794628 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=zipf-24                   	    2257	     95180 ns/op	  794627 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=zipf-24                   	    2287	    101898 ns/op	  794626 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=zipf-24                   	    2308	     88382 ns/op	  794628 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=zipf-24                   	    2311	     95084 ns/op	  794627 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=zipf-24                   	    2661	     77596 ns/op	  794629 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=zipf-24                   	    3244	     84551 ns/op	  794629 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=zipf-24                   	    2934	     79715 ns/op	  794630 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=zipf-24                   	    3224	     88936 ns/op	  794628 B/op	       1 allocs/op
+BenchmarkToBytes/codec=raw/data=zipf-24                   	    2115	    102867 ns/op	  794626 B/op	       1 allocs/op
+BenchmarkToBytes/codec=roaring/data=zipf-24               	   23062	      9889 ns/op	   28720 B/op	       2 allocs/op
+BenchmarkToBytes/codec=roaring/data=zipf-24               	   25057	      9479 ns/op	   28720 B/op	       2 allocs/op
+BenchmarkToBytes/codec=roaring/data=zipf-24               	   27536	      8594 ns/op	   28720 B/op	       2 allocs/op
+BenchmarkToBytes/codec=roaring/data=zipf-24               	   28785	      8098 ns/op	   28720 B/op	       2 allocs/op
+BenchmarkToBytes/codec=roaring/data=zipf-24               	   29265	      9279 ns/op	   28720 B/op	       2 allocs/op
+BenchmarkToBytes/codec=roaring/data=zipf-24               	   27514	      9653 ns/op	   28720 B/op	       2 allocs/op
+BenchmarkToBytes/codec=roaring/data=zipf-24               	   23604	     10035 ns/op	   28720 B/op	       2 allocs/op
+BenchmarkToBytes/codec=roaring/data=zipf-24               	   23730	     10061 ns/op	   28720 B/op	       2 allocs/op
+BenchmarkToBytes/codec=roaring/data=zipf-24               	   23083	     10206 ns/op	   28720 B/op	       2 allocs/op
+BenchmarkToBytes/codec=roaring/data=zipf-24               	   31459	      7456 ns/op	   28720 B/op	       2 allocs/op
+BenchmarkFromBytes/codec=raw/data=sparse-24               	    1292	    167533 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=sparse-24               	    1312	    167924 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=sparse-24               	    1399	    167502 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=sparse-24               	    1386	    164979 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=sparse-24               	    1424	    165397 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=sparse-24               	    1315	    187210 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=sparse-24               	    1432	    164725 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=sparse-24               	    1422	    163386 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=sparse-24               	    1204	    172293 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=sparse-24               	    1449	    168574 ns/op	  802816 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=roaring/data=sparse-24           	     168	   1377118 ns/op	 3163435 B/op	   65384 allocs/op
+BenchmarkFromBytes/codec=roaring/data=sparse-24           	     169	   1393835 ns/op	 3163438 B/op	   65384 allocs/op
+BenchmarkFromBytes/codec=roaring/data=sparse-24           	     177	   1358437 ns/op	 3163437 B/op	   65384 allocs/op
+BenchmarkFromBytes/codec=roaring/data=sparse-24           	     181	   1320190 ns/op	 3163436 B/op	   65384 allocs/op
+BenchmarkFromBytes/codec=roaring/data=sparse-24           	     176	   1345430 ns/op	 3163438 B/op	   65384 allocs/op
+BenchmarkFromBytes/codec=roaring/data=sparse-24           	     172	   1365626 ns/op	 3163437 B/op	   65384 allocs/op
+BenchmarkFromBytes/codec=roaring/data=sparse-24           	     177	   1360305 ns/op	 3163437 B/op	   65384 allocs/op
+BenchmarkFromBytes/codec=roaring/data=sparse-24           	     177	   1359446 ns/op	 3163436 B/op	   65384 allocs/op
+BenchmarkFromBytes/codec=roaring/data=sparse-24           	     163	   1557315 ns/op	 3163435 B/op	   65384 allocs/op
+BenchmarkFromBytes/codec=roaring/data=sparse-24           	     128	   1867115 ns/op	 3163433 B/op	   65384 allocs/op
+BenchmarkFromBytes/codec=raw/data=runs-24                 	    1329	    158294 ns/op	  745472 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=runs-24                 	    1302	    168978 ns/op	  745472 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=runs-24                 	    1501	    144698 ns/op	  745473 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=runs-24                 	    1424	    161766 ns/op	  745473 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=runs-24                 	    1414	    141876 ns/op	  745473 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=runs-24                 	    1602	    155578 ns/op	  745472 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=runs-24                 	    1731	    148703 ns/op	  745472 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=runs-24                 	    1814	    161702 ns/op	  745472 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=runs-24                 	    1701	    150695 ns/op	  745472 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=runs-24                 	    1603	    165826 ns/op	  745472 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=roaring/data=runs-24             	  118228	      1748 ns/op	    2488 B/op	      28 allocs/op
+BenchmarkFromBytes/codec=roaring/data=runs-24             	  159724	      1437 ns/op	    2488 B/op	      28 allocs/op
+BenchmarkFromBytes/codec=roaring/data=runs-24             	  160393	      1503 ns/op	    2488 B/op	      28 allocs/op
+BenchmarkFromBytes/codec=roaring/data=runs-24             	  134562	      1692 ns/op	    2488 B/op	      28 allocs/op
+BenchmarkFromBytes/codec=roaring/data=runs-24             	  161278	      1605 ns/op	    2488 B/op	      28 allocs/op
+BenchmarkFromBytes/codec=roaring/data=runs-24             	  131010	      1668 ns/op	    2488 B/op	      28 allocs/op
+BenchmarkFromBytes/codec=roaring/data=runs-24             	  147699	      1488 ns/op	    2488 B/op	      28 allocs/op
+BenchmarkFromBytes/codec=roaring/data=runs-24             	  160263	      1389 ns/op	    2488 B/op	      28 allocs/op
+BenchmarkFromBytes/codec=roaring/data=runs-24             	  176131	      1541 ns/op	    2488 B/op	      28 allocs/op
+BenchmarkFromBytes/codec=roaring/data=runs-24             	  142767	      1690 ns/op	    2488 B/op	      28 allocs/op
+BenchmarkFromBytes/codec=raw/data=zipf-24                 	    1123	    182711 ns/op	  794624 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=zipf-24                 	    1848	    181339 ns/op	  794624 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=zipf-24                 	    1345	    151508 ns/op	  794624 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=zipf-24                 	    1826	    133196 ns/op	  794625 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=zipf-24                 	    1812	    129245 ns/op	  794625 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=zipf-24                 	    1530	    133172 ns/op	  794626 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=zipf-24                 	    1750	    136204 ns/op	  794626 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=zipf-24                 	    1635	    168666 ns/op	  794624 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=zipf-24                 	    1538	    152199 ns/op	  794625 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=raw/data=zipf-24                 	    1867	    151027 ns/op	  794624 B/op	       1 allocs/op
+BenchmarkFromBytes/codec=roaring/data=zipf-24             	    8742	     27399 ns/op	   55536 B/op	     730 allocs/op
+BenchmarkFromBytes/codec=roaring/data=zipf-24             	    8689	     31420 ns/op	   55536 B/op	     730 allocs/op
+BenchmarkFromBytes/codec=roaring/data=zipf-24             	    5352	     39185 ns/op	   55536 B/op	     730 allocs/op
+BenchmarkFromBytes/codec=roaring/data=zipf-24             	    8168	     35145 ns/op	   55536 B/op	     730 allocs/op
+BenchmarkFromBytes/codec=roaring/data=zipf-24             	    8802	     36522 ns/op	   55536 B/op	     730 allocs/op
+BenchmarkFromBytes/codec=roaring/data=zipf-24             	    6230	     37115 ns/op	   55536 B/op	     730 allocs/op
+BenchmarkFromBytes/codec=roaring/data=zipf-24             	    7920	     29923 ns/op	   55536 B/op	     730 allocs/op
+BenchmarkFromBytes/codec=roaring/data=zipf-24             	    8593	     27641 ns/op	   55536 B/op	     730 allocs/op
+BenchmarkFromBytes/codec=roaring/data=zipf-24             	    9662	     34951 ns/op	   55536 B/op	     730 allocs/op
+BenchmarkFromBytes/codec=roaring/data=zipf-24             	    7088	     34031 ns/op	   55536 B/op	     730 allocs/op
+BenchmarkRank/method=array/data=sparse-24                 	 2977881	        77.26 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=sparse-24                 	 3242718	        74.14 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=sparse-24                 	 2812675	        78.23 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=sparse-24                 	 3217320	        80.27 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=sparse-24                 	 3251179	        74.42 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=sparse-24                 	 3241935	        74.00 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=sparse-24                 	 3227976	        74.01 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=sparse-24                 	 3184326	        74.55 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=sparse-24                 	 3227853	        74.03 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=sparse-24                 	 3226158	        73.84 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=sparse-24               	 2491894	        98.83 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=sparse-24               	 2437459	        97.21 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=sparse-24               	 2505116	        95.41 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=sparse-24               	 2535970	        95.01 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=sparse-24               	 2540832	        95.48 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=sparse-24               	 2544601	        94.04 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=sparse-24               	 2516394	        94.65 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=sparse-24               	 2494268	        95.69 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=sparse-24               	 2469928	        97.71 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=sparse-24               	 2018288	       109.2 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=runs-24                   	 7066341	        35.65 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=runs-24                   	 7249953	        32.59 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=runs-24                   	 7732299	        32.82 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=runs-24                   	 7791834	        30.65 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=runs-24                   	 7719350	        30.78 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=runs-24                   	 7519290	        31.07 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=runs-24                   	 7034049	        31.25 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=runs-24                   	 7777023	        32.14 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=runs-24                   	 7944645	        31.01 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=runs-24                   	 7701930	        30.25 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=runs-24                 	18890539	        12.82 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=runs-24                 	18783931	        12.87 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=runs-24                 	18399958	        12.91 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=runs-24                 	18227235	        13.29 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=runs-24                 	17811586	        12.95 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=runs-24                 	18732856	        12.99 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=runs-24                 	18759616	        12.99 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=runs-24                 	18902911	        13.54 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=runs-24                 	18437559	        12.99 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=runs-24                 	17046458	        12.93 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=zipf-24                   	 5887909	        40.09 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=zipf-24                   	 6095479	        39.85 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=zipf-24                   	 6009944	        39.85 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=zipf-24                   	 5998016	        39.64 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=zipf-24                   	 6046514	        39.66 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=zipf-24                   	 6041913	        40.34 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=zipf-24                   	 5962221	        41.83 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=zipf-24                   	 5567652	        43.86 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=zipf-24                   	 5697156	        41.23 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=array/data=zipf-24                   	 6092002	        40.52 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=zipf-24                 	 9265182	        27.09 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=zipf-24                 	 8390044	        28.09 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=zipf-24                 	 8311814	        27.72 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=zipf-24                 	 7382475	        27.37 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=zipf-24                 	 8923668	        27.06 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=zipf-24                 	 8990715	        26.91 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=zipf-24                 	 8728310	        27.27 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=zipf-24                 	 8626752	        26.54 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=zipf-24                 	 7453783	        27.50 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkRank/method=roaring/data=zipf-24                 	 9094308	        26.94 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=sparse-24               	171376819	         1.405 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=sparse-24               	143327988	         1.640 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=sparse-24               	149086808	         1.650 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=sparse-24               	169653324	         1.417 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=sparse-24               	169106935	         1.447 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=sparse-24               	156588718	         1.502 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=sparse-24               	148900606	         1.558 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=sparse-24               	167868070	         1.430 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=sparse-24               	167238873	         1.434 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=sparse-24               	168862562	         1.498 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=sparse-24             	 3471816	        68.62 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=sparse-24             	 3527230	        67.34 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=sparse-24             	 3579482	        66.87 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=sparse-24             	 3510882	        68.07 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=sparse-24             	 3500145	        67.74 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=sparse-24             	 3535286	        67.25 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=sparse-24             	 3531411	        67.11 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=sparse-24             	 3622450	        66.22 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=sparse-24             	 3389431	        68.44 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=sparse-24             	 3579711	        68.35 ns/op	         1.308 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=runs-24                 	155945305	         1.505 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=runs-24                 	150362866	         1.563 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=runs-24                 	169409527	         1.498 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=runs-24                 	156160477	         1.539 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=runs-24                 	142389904	         1.711 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=runs-24                 	163138860	         1.493 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=runs-24                 	154964472	         1.539 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=runs-24                 	143933841	         1.655 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=runs-24                 	146758574	         1.588 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=runs-24                 	144925195	         1.669 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=runs-24               	17925182	        13.26 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=runs-24               	18098503	        13.20 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=runs-24               	18213224	        13.22 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=runs-24               	17272657	        13.26 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=runs-24               	18267194	        13.35 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=runs-24               	18099104	        13.23 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=runs-24               	17674413	        13.24 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=runs-24               	18189754	        13.25 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=runs-24               	17678940	        13.39 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=runs-24               	16646420	        13.39 ns/op	         0.0005632 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=zipf-24                 	156546384	         1.529 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=zipf-24                 	163681520	         1.476 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=zipf-24                 	157234376	         1.528 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=zipf-24                 	158971582	         1.449 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=zipf-24                 	177821348	         1.346 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=zipf-24                 	178434838	         1.355 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=zipf-24                 	182295019	         1.326 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=zipf-24                 	158161794	         1.452 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=zipf-24                 	134800800	         1.720 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=array/data=zipf-24                 	179196042	         1.335 ns/op	         4.000 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=zipf-24               	 5740668	        39.49 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=zipf-24               	 6230886	        39.03 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=zipf-24               	 6172011	        39.34 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=zipf-24               	 5460012	        39.10 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=zipf-24               	 5818705	        39.50 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=zipf-24               	 6052029	        38.68 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=zipf-24               	 5866551	        39.49 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=zipf-24               	 6036094	        38.60 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=zipf-24               	 5990642	        38.22 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
+BenchmarkSelect/method=roaring/data=zipf-24               	 6323581	        37.71 ns/op	         0.01480 aux-bytes/value	       0 B/op	       0 allocs/op
 PASS
-ok  	goalgo/roaring_bitmaps/bench	187.293s
+ok  	goalgo/roaring_bitmaps/bench	197.987s

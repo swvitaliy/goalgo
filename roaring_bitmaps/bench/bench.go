@@ -18,6 +18,7 @@ type Bitmap interface {
 	Add(v uint32) bool
 	Contains(v uint32) bool
 	Cardinality() int
+	SizeInBytes() int
 	And(other Bitmap) Bitmap
 	Or(other Bitmap) Bitmap
 	AndNot(other Bitmap) Bitmap
@@ -84,10 +85,16 @@ func datasetSize() int {
 //   - runs: stretches of 512 consecutive values separated by random gaps.
 //     Without RunOptimize these fill bitmap containers; with it they collapse
 //     into a few intervals each. This is the shape run containers were built for.
-//   - zipf: a skewed distribution with a crowded low end and a sparse tail, so one
-//     bitmap mixes bitmap, array and run containers the way real data does.
+//   - zipf: short stretches of consecutive values at skewed positions, a crowded
+//     low end and a sparse tail. Without RunOptimize the head is a few bitmap
+//     containers and the rest arrays; with it nearly every chunk becomes runs,
+//     so this is where the three encodings meet in one bitmap.
 func datasets(offset uint32) []dataset {
-	n := datasetSize()
+	return datasetsOfSize(datasetSize(), offset)
+}
+
+// datasetsOfSize is datasets with an explicit number of values per dataset.
+func datasetsOfSize(n int, offset uint32) []dataset {
 	rng := rand.New(rand.NewPCG(uint64(offset)+1, 0x5eed))
 
 	sparse := make([]uint32, n)
@@ -102,11 +109,17 @@ func datasets(offset uint32) []dataset {
 		}
 	}
 
-	// A skewed draw: most values land in a small prefix of the key space, a few
-	// stray far out.
-	zipf := make([]uint32, n)
-	for i := range zipf {
-		zipf[i] = offset + uint32(float64(1<<28)*rng.Float64()*rng.Float64()*rng.Float64())
+	// A skewed draw of short stretches: each draw starts at a position that is
+	// most likely near the bottom of a 2^25 key space and continues for 1 to 64
+	// consecutive values, the way identifiers are handed out in batches. The
+	// crowded head fills its chunks past the array limit, the tail leaves a
+	// stretch or two per chunk.
+	zipf := make([]uint32, 0, n)
+	for len(zipf) < n {
+		start := offset + uint32(float64(1<<25)*rng.Float64()*rng.Float64()*rng.Float64())
+		for j, l := 0, 1+rng.IntN(64); j < l && len(zipf) < n; j++ {
+			zipf = append(zipf, start+uint32(j))
+		}
 	}
 
 	return []dataset{

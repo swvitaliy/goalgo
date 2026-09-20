@@ -37,6 +37,8 @@ c, err := roaring.FromBytes(data) // c.ToArray() == a.ToArray()
 
 a.Rank(100_000) // 4: how many values are <= 100000
 a.Select(3)     // 100000, true: the 4th smallest value
+
+a.SizeInBytes() // heap bytes the bitmap occupies
 ```
 
 `Or`, `And`, `AndNot` and `Xor` return a new bitmap and leave both operands
@@ -113,8 +115,16 @@ dependency at a pseudo-version the proxy no longer serves. Build it from a
 checkout instead, dropping its `tools.go` (which only pins the linter it uses on
 itself) and bumping the `go` directive so module pruning skips the rest. The
 copy used here is also patched to pad the plot area, drop the legend and axis
-label, colour each bar separately and label the time axis in ns/us/ms rather
-than raw nanoseconds.
+label, colour each bar separately and label the time axis in ns/us/ms and the
+allocation axis in B/KB/MB rather than raw numbers.
+
+`BenchmarkMemory` and `BenchmarkSerializedSize` report `bytes/value` rather
+than a time: the bitmap's heap footprint per value (from `Bitmap.SizeInBytes`,
+which counts the key and container slices, every container struct and its
+payload, and the Rank/Select cache) and the serialised size. `BenchmarkMemory`
+measures `zipf` at twice the dataset size. The set operations
+carry `B/op` and `allocs/op` from `-benchmem`, and `plots/alloc_*.svg` chart
+the bytes each allocates per call.
 
 Case names have the form `runopt=on/data=runs` (`codec=raw/data=runs`,
 `method=array/data=runs` for serialisation and Rank/Select, `simd=on/data=runs`
@@ -146,19 +156,22 @@ than intervals. From `bench_results_simd.csv` (medians of 10 runs, 200k values
 per dataset, `plots/simd_*.svg`):
 
 - **Bitmap containers are where it pays.** On `runs`, `AndCardinality` goes
-  from 9.4us to 3.5us (2.7x), `And` from 80us to 47us (1.7x), `Or`, `AndNot`
-  and `Xor` from 35–38us to 25us (1.4–1.5x), `ToArray` from 496us to 348us
-  (1.4x). On `zipf`, whose crowded low end is bitmap containers too, `And` and
-  `AndCardinality` gain 2.3x.
+  from 3.6us to 1.4us (2.5x), `Xor` from 20.5us to 12.1us (1.7x), `And` from
+  32.3us to 21.6us (1.5x), `Or`, `AndNot` and `ToArray` gain 1.3x.
+- **Array containers gain little.** `zipf` is mostly arrays of a few hundred
+  values with a handful of bitmaps at its head: `And` and `AndCardinality`
+  gain 1.3x through the vectorised array intersection and the bitmap head,
+  `ToArray` 1.2x, while `Or`, `AndNot` and `Xor` come out 1.1–1.3x slower on
+  the vector build in this run (the previous run had them even or slightly
+  faster; their merges are scalar in both builds and the difference is inside
+  run-to-run variation). On `sparse`, 32k arrays of a handful of values each,
+  the builds differ by up to 1.15x either way with confidence intervals up to
+  35%: the work is walking keys and allocating, not comparing values.
 - **The gain is capped by allocation.** `And` on `runs` allocates 39 result
   containers of 8KiB each per call; zeroing and freeing them is the same in
-  both builds, which is why the fused loop shows 1.7x where the primitive
+  both builds, which is why the fused loop shows 1.5x where the primitive
   alone would show more. `AndCardinality`, which allocates nothing, is the
   cleanest view of the loop itself.
-- **Array containers gain nothing.** `sparse` is 32k tiny arrays, and every
-  difference there (0.9–1.2x) is inside the 3–16% confidence intervals: the
-  work is walking keys and allocating, not comparing values. `Or`, `AndNot`
-  and `Xor` on `zipf` are the same story, dominated by their array-side merges.
 - **`Contains` is untouched.** A binary search over keys plus one bit test or
   array probe has no loop to vectorise; the two builds are identical.
 
@@ -170,7 +183,11 @@ builds the bitmap and leaves it alone, `runopt=on` calls `RunOptimize` first.
 difference between the two is exactly what run containers buy or cost. The
 datasets: `sparse` (random values across 2^31, every chunk a tiny array),
 `runs` (stretches of 512 consecutive values, the shape run containers exist
-for) and `zipf` (a skewed distribution that mixes container kinds).
+for) and `zipf` (stretches of 1 to 64 consecutive values at skewed positions
+over a 2^25 key space, the way identifiers are handed out in batches: a
+crowded head of bitmap containers, a tail of arrays, and nearly all of it runs
+once `RunOptimize` has been called — the one dataset where the three encodings
+meet).
 Serialisation and Rank/Select have no "off" variant, so each is compared with
 the alternative one would keep without it: a sorted `[]uint32` beside the
 bitmap (`codec=raw|roaring`, `method=array|roaring`), prepared once rather than
@@ -179,30 +196,49 @@ on every call.
 From `bench_results.csv` (medians of 10 runs, 200k values per dataset):
 
 - **Run containers are worth an order of magnitude on data that has runs.**
-  On `runs`, `And` goes from 23.9us to 1.5us (16x), `AndNot` from 14.5us to
-  1.9us (8x), `Or` from 14.3us to 2.4us (6x), `Xor` from 14.8us to 5.4us (3x).
-  Operations between two run containers stay in interval arithmetic and never
-  materialise the values.
-- **They also cost something.** `Contains` on `runs` goes from 5.8ns to 16.5ns —
+  On `runs`, `And` goes from 20.8us to 1.3us (16x), `AndNot` from 11.7us to
+  1.6us (7x), `Or` from 11.9us to 2.0us (6x), `Xor` from 12.0us to 4.2us (3x).
+  On `zipf`, whose head is bitmap containers and whose stretches all become
+  runs, `And` goes from 209us to 23us (9x), `Or` from 411us to 47us (9x),
+  `AndNot` from 279us to 29us (10x), `AndCardinality` from 193us to 22us (9x)
+  and `Xor` from 412us to 129us (3x). Operations between two run containers
+  stay in interval arithmetic and never materialise the values.
+- **Run containers save memory the same way.** `BenchmarkMemory` reports the
+  heap footprint from `SizeInBytes`: on `runs` the bitmap shrinks from 0.54 to
+  0.013 bytes per value (42x), because a chunk of bitmap words becomes a few
+  intervals; on `zipf` (measured at 400k values) from 2.1 to 0.20 bytes per
+  value (10x), as bitmaps and arrays alike collapse into a stretch or two per
+  chunk. What the set operations allocate per call follows: `And` on `runs`
+  from 144KB to 2.5KB, `Or` and `AndNot` from 99KB to 4KB, `Xor` to 9.5KB; on
+  `zipf` `And` from 376KB to 46KB, `Or` from 907KB to 88KB, `AndNot` from
+  434KB to 85KB, `Xor` from 899KB to 187KB. `sparse` stays at 15 bytes per
+  value, most of it the 64-byte container struct and its slot per handful of
+  values: no chunk is re-encoded.
+- **They also cost something.** `Contains` on `runs` goes from 5.7ns to 15.8ns —
   a binary search over intervals instead of one bit test. Point lookups pay for
-  what set operations gain.
-- **On `sparse` and `zipf` the two variants are the same bitmap.** `RunOptimize`
-  finds nothing worth re-encoding, and every difference (0.8–1.2x) is inside the
-  15–23% confidence intervals. (Measured earlier against a separate
+  what set operations gain. On `zipf` it goes the other way, 37ns to 22ns: a
+  chunk of a few intervals is searched faster than an array of hundreds of
+  values.
+- **On `sparse` the two variants are the same bitmap.** `RunOptimize` finds
+  nothing worth re-encoding. The set operations there allocate 32k containers
+  per call, and the allocator dominates the timing: runs of the same bitmap
+  differ by up to 1.5x with confidence intervals up to 42%, so nothing on
+  `sparse` separates the variants. (Measured earlier against a separate
   two-container implementation, merely carrying the third encoding cost one
   slice header per container — 64 bytes against 48 — visible as 5–35% on
   `sparse`; with a single implementation both variants pay it.)
-- **Serialisation wins only where run containers do.** On `runs` the stream is
-  0.008 bytes per value against 4, writing is 180x faster and reading 120x,
-  because containers land in place. On `sparse` and `zipf` the sorted copy is a
-  plain memory pass and beats the format: writing 3.6x and reading 6x faster on
-  `sparse`, 1.2x and 1.8x on `zipf`, with 3.3 and 2.1 bytes per value saved
-  against 4.
+- **Serialisation wins where run containers do.** On `runs` the stream is
+  0.008 bytes per value against 4, writing is 170x faster and reading 100x,
+  because containers land in place. On `zipf` it is 0.14 bytes per value
+  against 4, writing 10x and reading 4x faster. On `sparse` the sorted copy is
+  a plain memory pass and beats the format: writing 4x and reading 8x faster,
+  with 0.7 bytes per value saved against 4.
 - **Rank/Select trade speed for memory.** The sorted copy answers `Select` in
-  ~1.5ns against 14–76ns — an index is unbeatable — but costs 4 bytes per value
-  where the prefix-sum cache costs one int per container (0.0006–1.3 bytes per
-  value). `Rank` is even: 1.1–1.3x slower than the copy on `zipf` and `sparse`,
-  twice as fast on `runs`.
+  ~1.5ns against 13–68ns — an index is unbeatable — but costs 4 bytes per
+  value where the prefix-sum cache costs one int per container (0.0006–1.3
+  bytes per value). `Rank` favours the bitmap wherever containers are few:
+  2.4x faster than the copy on `runs`, 1.5x on `zipf`, 1.3x slower on
+  `sparse`.
 
 ## Correctness
 
