@@ -68,7 +68,9 @@ binary search over the keys.
 `simdops` has two implementations of its hot primitives, chosen by build tag:
 `vector_amd64.go` under `GOEXPERIMENT=simd` on amd64, and `scalar.go` everywhere
 else. Both export the same API and pass the same tests; `simdops.Vectorized`
-says which one is compiled in. Everything above `simdops` is tag-free, so a
+says which one is compiled in. The vector build also exports
+`simdops.VectorOps` (`vector_ops.go`), a struct whose methods forward to the
+AVX-512 primitives. Everything above `simdops` is tag-free, so a
 plain `go test ./...` at the repository root exercises the scalar build.
 
 The vector build needs the Go 1.27 toolchain invoked directly, because the `go`
