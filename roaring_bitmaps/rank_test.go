@@ -71,8 +71,6 @@ func TestRankOnValuesOutsideTheSet(t *testing.T) {
 		query uint32
 	}
 
-	b := New(10, 20, 1<<16, 1<<16+5)
-
 	tests := []struct {
 		name string
 		args args
@@ -89,6 +87,8 @@ func TestRankOnValuesOutsideTheSet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
+			// Rank caches prefix sums on the bitmap, so each subtest needs its own.
+			b := New(10, 20, 1<<16, 1<<16+5)
 			require.Equal(t, tt.want, b.Rank(tt.args.query))
 		})
 	}
