@@ -260,7 +260,8 @@ figcaption {
     <p class="eyebrow">goalgo / roaring_bitmaps</p>
     <h1>Roaring под AVX-512</h1>
     <p class="standfirst">
-      Один Roaring bitmap на SIMD-примитивах, каждый замер — с <code>RunOptimize</code> и без.
+      Один Roaring bitmap на SIMD-примитивах, каждый замер — с <code>RunOptimize</code> и без,
+      а основные операции — ещё и на скалярной сборке примитивов против AVX-512.
       Разница между столбиками — цена и выигрыш каждой оптимизации.
     </p>
     <dl class="runmeta">
@@ -277,12 +278,12 @@ figcaption {
     <h2>Варианты и датасеты</h2>
     <div class="findings">
       <div class="finding">
-        <div class="metric">off</div>
-        <div><h3>Без RunOptimize</h3><p>Только массивы и битмапы. Базовая линия.</p></div>
+        <div class="metric">on</div>
+        <div><h3>Включённая оптимизация</h3><p>В разделе «RunOptimize» — вызван <code>RunOptimize</code>: серии значений схлопнуты в интервалы, тот же код, одним вызовом больше. В разделе «Векторизация» — примитивы собраны под AVX-512.</p></div>
       </div>
       <div class="finding">
-        <div class="metric">on</div>
-        <div><h3>С RunOptimize</h3><p>Серии значений схлопнуты в интервалы. Тот же код, одним вызовом больше. Сериализация и Rank/Select сравниваются со своими альтернативами.</p></div>
+        <div class="metric">off</div>
+        <div><h3>Выключенная оптимизация</h3><p>Базовая линия. В «RunOptimize» — без вызова <code>RunOptimize</code>, только массивы и битмапы. В «Векторизации» — скалярная сборка примитивов на чистом Go. Сериализация и Rank/Select сравниваются со своими альтернативами.</p></div>
       </div>
     </div>
     <div class="findings" style="margin-top:0;border-top:0">
@@ -303,7 +304,7 @@ figcaption {
 
 
   <section>
-    <h2>Операции</h2>
+    <h2>RunOptimize</h2>
     <p class="section-intro">
       Один график на пару «операция × датасет»: между датасетами порядки величины. Ось X — вызывался ли <code>RunOptimize</code>.
     </p>
@@ -1650,7 +1651,7 @@ figcaption {
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 ns</text>
 <text x="34.616" y="-153.34" transform="scale(1, -1)"
 	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">15 ns</text>
-<path d="M58.508,26.814L66.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,26.th:0.5" />
 <path d="M58.508,70.565L66.508,70.565" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M58.508,114.31L66.508,114.31" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M58.508,158.07L66.508,158.07" style="fill:none;stroke:#000000;stroke-width:0.5" />
@@ -1676,6 +1677,1023 @@ figcaption {
 </svg>
 
             <figcaption>Select — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section>
+    <h2>Векторизация</h2>
+    <p class="section-intro">
+      Те же операции, те же данные, ось X — сборка примитивов <code>simdops</code>: <code>off</code> — чистый Go,
+      <code>on</code> — AVX-512. <code>RunOptimize</code> не вызывается, чтобы runs оставался битмап-контейнерами —
+      единственным местом, где работают векторные циклы. Два прохода одного бенчмарка, по одному на сборку
+      (<code>make roaring_bench_simd</code>).
+    </p>
+    <div class="plots">
+      <section class="op" id="simd-contains">
+        <div class="op-head">
+          <h3>Contains</h3>
+          <p>точечная проверка принадлежности</p>
+        </div>
+        <p class="op-note measure">Бинарный поиск по ключам и один битовый тест или проба массива. Векторного цикла здесь нет — контрольная точка: обе сборки должны совпасть.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="Contains — sparse, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="106.49" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Contains, sparse: scalar vs AVX-512</text>
+<text x="87.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="44.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-83.247" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">100 ns</text>
+<text x="34.616" y="-144.4" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">200 ns</text>
+<path d="M63.508,26.814L71.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.508,87.968L71.508,87.968" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.508,149.12L71.508,149.12" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,39.045L71.508,39.045" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,51.276L71.508,51.276" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,63.507L71.508,63.507" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,75.738L71.508,75.738" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,100.2L71.508,100.2" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,112.43L71.508,112.43" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,124.66L71.508,124.66" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,136.89L71.508,136.89" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,161.35L71.508,161.35" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M71.508,26.814L71.508,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M77.997,26.814L77.997,170.15L108,170.15L108,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M77.997,26.814L77.997,26.814L108,26.814L108,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Contains — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Contains — runs, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="111.15" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Contains, runs: scalar vs AVX-512</text>
+<text x="82.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="39.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-66.169" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4 ns</text>
+<text x="39.616" y="-110.25" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">8 ns</text>
+<text x="34.616" y="-154.32" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">12 ns</text>
+<path d="M58.508,26.814L66.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,70.891L66.508,70.891" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,114.97L66.508,114.97" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,159.04L66.508,159.04" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,37.834L66.508,37.834" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,48.853L66.508,48.853" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,59.872L66.508,59.872" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,81.91L66.508,81.91" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,92.929L66.508,92.929" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,103.95L66.508,103.95" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,125.99L66.508,125.99" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,137.01L66.508,137.01" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,148.03L66.508,148.03" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,170.06L66.508,170.06" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M66.508,26.814L66.508,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.997,26.814L72.997,171.58L103,171.58L103,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M72.997,26.814L72.997,26.814L103,26.814L103,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,163.74L369.2,163.74L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Contains — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Contains — zipf, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="112.15" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Contains, zipf: scalar vs AVX-512</text>
+<text x="87.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="70.899" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="44.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">100 ns</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">200 ns</text>
+<path d="M63.508,26.814L71.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.508,96.746L71.508,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.508,166.68L71.508,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,40.801L71.508,40.801" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,54.787L71.508,54.787" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,68.773L71.508,68.773" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,82.759L71.508,82.759" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,110.73L71.508,110.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,124.72L71.508,124.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,138.7L71.508,138.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,152.69L71.508,152.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M71.508,26.814L71.508,169.63" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M77.997,26.814L77.997,169.63L108,169.63L108,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M77.997,26.814L77.997,26.814L108,26.814L108,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,167.98L369.2,167.98L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Contains — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="simd-and">
+        <div class="op-head">
+          <h3>And</h3>
+          <p>пересечение</p>
+        </div>
+        <p class="op-note measure">На битмап-контейнерах — слитый цикл: 8 слов за раз, результат и его мощность за один проход.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="And — sparse, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="117.49" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">And, sparse: scalar vs AVX-512</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-85.891" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4 ms</text>
+<text x="34.616" y="-149.69" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">8 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,90.612L64.286,90.612" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,154.41L64.286,154.41" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,42.764L64.286,42.764" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,58.713L64.286,58.713" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,74.663L64.286,74.663" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,106.56L64.286,106.56" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,122.51L64.286,122.51" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,138.46L64.286,138.46" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,170.36L64.286,170.36" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,167.25L100.78,167.25L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>And — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="And — runs, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="122.15" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">And, runs: scalar vs AVX-512</text>
+<text x="83.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="69.797" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="40.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">40 µs</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">80 µs</text>
+<path d="M59.269,26.814L67.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,96.746L67.269,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,166.68L67.269,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,44.297L67.269,44.297" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,61.78L67.269,61.78" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,79.263L67.269,79.263" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,114.23L67.269,114.23" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,131.71L67.269,131.71" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,149.19L67.269,149.19" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.269,26.814L67.269,167.43" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M73.759,26.814L73.759,167.43L103.76,167.43L103.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M73.759,26.814L73.759,26.814L103.76,26.814L103.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,108.84L369.2,108.84L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>And — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="And — zipf, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="123.16" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">And, zipf: scalar vs AVX-512</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-59.885" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">1 ms</text>
+<text x="34.616" y="-97.677" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2 ms</text>
+<text x="34.616" y="-135.47" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">3 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,64.607L64.286,64.607" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,102.4L64.286,102.4" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,140.19L64.286,140.19" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,34.373L64.286,34.373" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,41.931L64.286,41.931" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,49.49L64.286,49.49" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,57.048L64.286,57.048" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,72.165L64.286,72.165" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,79.723L64.286,79.723" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,87.282L64.286,87.282" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,94.84L64.286,94.84" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,109.96L64.286,109.96" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,117.52L64.286,117.52" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,125.07L64.286,125.07" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,132.63L64.286,132.63" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,147.75L64.286,147.75" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,155.31L64.286,155.31" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,162.87L64.286,162.87" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,170.42L64.286,170.42" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,171.58L100.78,171.58L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,90.578L369.2,90.578L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>And — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="simd-or">
+        <div class="op-head">
+          <h3>Or</h3>
+          <p>объединение</p>
+        </div>
+        <p class="op-note measure">Тот же слитый цикл, что и у And; на zipf результат в основном строится слиянием массивов.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="Or — sparse, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="121.73" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Or, sparse: scalar vs AVX-512</text>
+<text x="85.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="70.541" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="42.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">5 ms</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 ms</text>
+<path d="M61.286,26.814L69.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M61.286,96.746L69.286,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M61.286,166.68L69.286,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,40.801L69.286,40.801" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,54.787L69.286,54.787" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,68.773L69.286,68.773" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,82.759L69.286,82.759" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,110.73L69.286,110.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,124.72L69.286,124.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,138.7L69.286,138.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,152.69L69.286,152.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M69.286,26.814L69.286,168.92" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M75.776,26.814L75.776,165.76L105.78,165.76L105.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M75.776,26.814L75.776,26.814L105.78,26.814L105.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,168.92L369.2,168.92L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Or — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Or — runs, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="126.39" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Or, runs: scalar vs AVX-512</text>
+<text x="83.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="40.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-62.253" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 µs</text>
+<text x="34.616" y="-102.41" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">20 µs</text>
+<text x="34.616" y="-142.57" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">30 µs</text>
+<path d="M59.269,26.814L67.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,66.975L67.269,66.975" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,107.13L67.269,107.13" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,147.3L67.269,147.3" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,34.846L67.269,34.846" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,42.879L67.269,42.879" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,50.911L67.269,50.911" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,58.943L67.269,58.943" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,75.007L67.269,75.007" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,83.039L67.269,83.039" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,91.071L67.269,91.071" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,99.103L67.269,99.103" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,115.17L67.269,115.17" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,123.2L67.269,123.2" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,131.23L67.269,131.23" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,139.26L67.269,139.26" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,155.33L67.269,155.33" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,163.36L67.269,163.36" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,171.39L67.269,171.39" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.269,26.814L67.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M73.759,26.814L73.759,171.58L103.76,171.58L103.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M73.759,26.814L73.759,26.814L103.76,26.814L103.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,128.91L369.2,128.91L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Or — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Or — zipf, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="127.4" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Or, zipf: scalar vs AVX-512</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-90.656" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2 ms</text>
+<text x="34.616" y="-159.22" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,95.377L64.286,95.377" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,163.94L64.286,163.94" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,61.096L64.286,61.096" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,129.66L64.286,129.66" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,171.58L100.78,171.58L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,169.35L369.2,169.35L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Or — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="simd-andnot">
+        <div class="op-head">
+          <h3>AndNot</h3>
+          <p>разность</p>
+        </div>
+        <p class="op-note measure">Слитый цикл на битмапах; на sparse и zipf работу задают массивы и аллокации.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="AndNot — sparse, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="108.49" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">AndNot, sparse: scalar vs AVX-512</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-66.686" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">3 ms</text>
+<text x="34.616" y="-111.28" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">6 ms</text>
+<text x="34.616" y="-155.87" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">9 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,71.408L64.286,71.408" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,116L64.286,116" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,160.59L64.286,160.59" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,41.679L64.286,41.679" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,56.543L64.286,56.543" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,86.272L64.286,86.272" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,101.14L64.286,101.14" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,130.87L64.286,130.87" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,145.73L64.286,145.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,167.27L100.78,167.27L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>AndNot — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="AndNot — runs, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="113.15" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">AndNot, runs: scalar vs AVX-512</text>
+<text x="83.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="40.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-60.805" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 µs</text>
+<text x="34.616" y="-99.517" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">20 µs</text>
+<text x="34.616" y="-138.23" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">30 µs</text>
+<path d="M59.269,26.814L67.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,65.527L67.269,65.527" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,104.24L67.269,104.24" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,142.95L67.269,142.95" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,34.557L67.269,34.557" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,42.299L67.269,42.299" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,50.042L67.269,50.042" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,57.784L67.269,57.784" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,73.269L67.269,73.269" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,81.011L67.269,81.011" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,88.754L67.269,88.754" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,96.496L67.269,96.496" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,111.98L67.269,111.98" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,119.72L67.269,119.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,127.47L67.269,127.47" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,135.21L67.269,135.21" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,150.69L67.269,150.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,158.44L67.269,158.44" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,166.18L67.269,166.18" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.269,26.814L67.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M73.759,26.814L73.759,171.58L103.76,171.58L103.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M73.759,26.814L73.759,26.814L103.76,26.814L103.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,121.95L369.2,121.95L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>AndNot — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="AndNot — zipf, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="114.16" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">AndNot, zipf: scalar vs AVX-512</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.838" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2 ms</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,96.746L64.286,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,166.68L64.286,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,61.78L64.286,61.78" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,131.71L64.286,131.71" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.51" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,169.88L100.78,169.88L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.51L369.2,171.51L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>AndNot — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="simd-xor">
+        <div class="op-head">
+          <h3>Xor</h3>
+          <p>симметрическая разность</p>
+        </div>
+        <p class="op-note measure">Слитый цикл на битмапах; на sparse и zipf работу задают массивы и аллокации.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="Xor — sparse, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="118.73" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Xor, sparse: scalar vs AVX-512</text>
+<text x="85.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.18" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="42.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">5 ms</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 ms</text>
+<path d="M61.286,26.814L69.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M61.286,96.746L69.286,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M61.286,166.68L69.286,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,40.801L69.286,40.801" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,54.787L69.286,54.787" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,68.773L69.286,68.773" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,82.759L69.286,82.759" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,110.73L69.286,110.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,124.72L69.286,124.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,138.7L69.286,138.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M65.286,152.69L69.286,152.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M69.286,26.814L69.286,170.2" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M75.776,26.814L75.776,170.2L105.78,170.2L105.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M75.776,26.814L75.776,26.814L105.78,26.814L105.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,166.18L369.2,166.18L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Xor — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Xor — runs, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="123.39" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Xor, runs: scalar vs AVX-512</text>
+<text x="83.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="40.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-63.154" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 µs</text>
+<text x="34.616" y="-104.21" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">20 µs</text>
+<text x="34.616" y="-145.28" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">30 µs</text>
+<path d="M59.269,26.814L67.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,67.875L67.269,67.875" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,108.94L67.269,108.94" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,150L67.269,150" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,35.027L67.269,35.027" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,43.239L67.269,43.239" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,51.451L67.269,51.451" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,59.663L67.269,59.663" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,76.088L67.269,76.088" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,84.3L67.269,84.3" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,92.512L67.269,92.512" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,100.72L67.269,100.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,117.15L67.269,117.15" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,125.36L67.269,125.36" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,133.57L67.269,133.57" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,141.79L67.269,141.79" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,158.21L67.269,158.21" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,166.42L67.269,166.42" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.269,26.814L67.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M73.759,26.814L73.759,171.58L103.76,171.58L103.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M73.759,26.814L73.759,26.814L103.76,26.814L103.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,126.3L369.2,126.3L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Xor — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Xor — zipf, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="124.4" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Xor, zipf: scalar vs AVX-512</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-86.025" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2 ms</text>
+<text x="34.616" y="-149.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,90.746L64.286,90.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,154.68L64.286,154.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,58.78L64.286,58.78" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,122.71L64.286,122.71" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,160.24L100.78,160.24L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Xor — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="simd-andcardinality">
+        <div class="op-head">
+          <h3>AndCardinality</h3>
+          <p>мощность пересечения без построения результата</p>
+        </div>
+        <p class="op-note measure">Ничего не аллоцирует, поэтому это самый чистый взгляд на сам векторный цикл.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="AndCardinality — sparse, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="90.885" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">AndCardinality, sparse: scalar vs AVX-512</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-82.313" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4 ms</text>
+<text x="34.616" y="-142.53" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">8 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,87.035L64.286,87.035" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,147.25L64.286,147.25" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,41.87L64.286,41.87" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,56.925L64.286,56.925" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,71.98L64.286,71.98" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,102.09L64.286,102.09" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,117.14L64.286,117.14" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,132.2L64.286,132.2" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,162.31L64.286,162.31" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,149.59L100.78,149.59L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>AndCardinality — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="AndCardinality — runs, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="95.546" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">AndCardinality, runs: scalar vs AVX-512</text>
+<text x="78.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="35.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-83.3" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4 µs</text>
+<text x="34.616" y="-144.51" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">8 µs</text>
+<path d="M54.269,26.814L62.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M54.269,88.021L62.269,88.021" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M54.269,149.23L62.269,149.23" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.269,42.116L62.269,42.116" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.269,57.418L62.269,57.418" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.269,72.72L62.269,72.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.269,103.32L62.269,103.32" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.269,118.62L62.269,118.62" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.269,133.93L62.269,133.93" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.269,164.53L62.269,164.53" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.269,26.814L62.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.759,26.814L68.759,171.58L98.759,171.58L98.759,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M68.759,26.814L68.759,26.814L98.759,26.814L98.759,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,80.346L369.2,80.346L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>AndCardinality — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="AndCardinality — zipf, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="96.551" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">AndCardinality, zipf: scalar vs AVX-512</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-58.949" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">1 ms</text>
+<text x="34.616" y="-95.805" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2 ms</text>
+<text x="34.616" y="-132.66" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">3 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,63.671L64.286,63.671" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,100.53L64.286,100.53" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,137.38L64.286,137.38" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,34.186L64.286,34.186" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,41.557L64.286,41.557" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,48.928L64.286,48.928" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,56.299L64.286,56.299" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,71.042L64.286,71.042" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,78.413L64.286,78.413" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,85.784L64.286,85.784" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,93.156L64.286,93.156" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,107.9L64.286,107.9" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,115.27L64.286,115.27" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,122.64L64.286,122.64" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,130.01L64.286,130.01" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,144.75L64.286,144.75" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,152.13L64.286,152.13" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,159.5L64.286,159.5" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,166.87L64.286,166.87" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,171.58L100.78,171.58L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,88.294L369.2,88.294L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>AndCardinality — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="simd-toarray">
+        <div class="op-head">
+          <h3>ToArray</h3>
+          <p>выгрузка всех значений</p>
+        </div>
+        <p class="op-note measure">На битмап-контейнерах — маска в позиции через VPCOMPRESSW вместо обхода бит по одному.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="ToArray — sparse, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="107.97" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">ToArray, sparse: scalar vs AVX-512</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-80.769" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">600 µs</text>
+<text x="35.099" y="-139.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">1.2 ms</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,85.491L72.269,85.491" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,144.17L72.269,144.17" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,56.153L72.269,56.153" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,114.83L72.269,114.83" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M78.759,26.814L78.759,171.58L108.76,171.58L108.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M78.759,26.814L78.759,26.814L108.76,26.814L108.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,152.11L369.2,152.11L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>ToArray — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="ToArray — runs, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="112.63" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">ToArray, runs: scalar vs AVX-512</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="69.899" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">250 µs</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">500 µs</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,96.746L72.269,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,166.68L72.269,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,40.801L72.269,40.801" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,54.787L72.269,54.787" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,68.773L72.269,68.773" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,82.759L72.269,82.759" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,110.73L72.269,110.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,124.72L72.269,124.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,138.7L72.269,138.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,152.69L72.269,152.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,167.63" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M78.759,26.814L78.759,167.63L108.76,167.63L108.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M78.759,26.814L78.759,26.814L108.76,26.814L108.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,123.77L369.2,123.77L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>ToArray — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="ToArray — zipf, скалярная и векторная сборка" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="113.64" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">ToArray, zipf: scalar vs AVX-512</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-61.48" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">100 µs</text>
+<text x="34.616" y="-100.87" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">200 µs</text>
+<text x="34.616" y="-140.25" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">300 µs</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,66.201L72.269,66.201" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,105.59L72.269,105.59" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,144.98L72.269,144.98" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,34.692L72.269,34.692" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,42.569L72.269,42.569" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,50.447L72.269,50.447" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,58.324L72.269,58.324" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,74.079L72.269,74.079" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,81.956L72.269,81.956" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,89.834L72.269,89.834" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,97.711L72.269,97.711" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,113.47L72.269,113.47" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,121.34L72.269,121.34" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,129.22L72.269,129.22" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,137.1L72.269,137.1" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,152.85L72.269,152.85" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,160.73L72.269,160.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,168.61L72.269,168.61" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M78.759,26.814L78.759,171.58L108.76,171.58L108.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M78.759,26.814L78.759,26.814L108.76,26.814L108.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,154.22L369.2,154.22L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>ToArray — zipf</figcaption>
           </figure>
         </div>
       </section>
@@ -1723,6 +2741,17 @@ figcaption {
         Отсортированная копия отвечает на <code>Select</code> за <strong>1.5 нс</strong> против 14–76 —
         индекс не обыграть. Зато она стоит <strong>4 байта на значение</strong>, а кэш префиксов — от
         тысячных до 1.3. <code>Rank</code> вровень: на runs формат даже вдвое быстрее.
+      </p>
+
+      <h3>Векторизация окупается только на битмап-контейнерах</h3>
+      <p>
+        На runs без <code>RunOptimize</code> <code>AndCardinality</code> — <strong>в 2.7 раза быстрее</strong>
+        на AVX-512, <code>And</code> — в 1.7, <code>Or</code>, <code>AndNot</code>, <code>Xor</code> и
+        <code>ToArray</code> — в 1.4–1.5. На zipf <code>And</code> и <code>AndCardinality</code> — в 2.3 раза:
+        плотная голова там тоже битмапы. Потолок задают аллокации: <code>And</code> на runs выделяет
+        39 контейнеров по 8 КиБ на вызов, и обнулить их обе сборки должны одинаково. На sparse всё
+        внутри шума — работа там в обходе ключей, а не в сравнении значений. <code>Contains</code> —
+        одинаков: векторизовать нечего.
       </p>
 
       <h3>Что из этого следует</h3>

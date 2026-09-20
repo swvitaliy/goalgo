@@ -8,7 +8,7 @@ portable serialisation format, and positional queries.
 |---|---|
 | `internal/simdops` | the bit-level primitives: bitwise ops fused with population count, sorted-array intersection, range edits — in a vector build and a scalar one |
 | `roaring_bitmaps` (this directory) | the bitmap: array, bitmap and run containers, `RunOptimize`, portable-format serialisation, `Rank`/`Select` |
-| `bench` | the workloads, each run with and without `RunOptimize` |
+| `bench` | the workloads, each run with and without `RunOptimize`; a second set of the main operations run on the vector and the scalar `simdops` build |
 
 ## Usage
 
@@ -86,14 +86,21 @@ For the vector build the CPU must have AVX-512 F/BW/VL, VPOPCNTDQ and VBMI2;
 ## Reproducing the benchmarks
 
 ```
-make roaring_bench   # 10 runs -> bench_results_count10.txt + bench_results.csv
-make roaring_plots   # plots/*.svg via benchdraw
+make roaring_bench        # 10 runs -> bench_results_count10.txt + bench_results.csv
+make roaring_bench_simd   # scalar + vector passes -> bench_results_simd_count10.txt + bench_results_simd.csv
+make roaring_plots        # plots/*.svg via benchdraw
 ```
 
 `roaring_bench` runs every case ten times at 200ms each on the vector build
 (about four minutes) and feeds the raw output through `benchstat -format=csv`,
 so the CSV carries medians with 95% confidence intervals. Set `ROARING_N` to change the values per dataset
 from the default 200k.
+
+`roaring_bench_simd` runs the `BenchmarkSIMD*` cases twice, first with the
+plain `go` (scalar `simdops`) and then with the vector toolchain, into one file.
+A binary carries one `simdops` implementation, so this is the only way to get
+both on a chart; the cases read the build they run on from `simdops.Vectorized`
+and tag themselves `simd=off` or `simd=on`. The main target skips these cases.
 
 Both tools are installed with `go install`:
 
@@ -110,7 +117,8 @@ label, colour each bar separately and label the time axis in ns/us/ms rather
 than raw nanoseconds.
 
 Case names have the form `runopt=on/data=runs` (`codec=raw/data=runs`,
-`method=array/data=runs` for serialisation and Rank/Select), which is what lets both `benchstat -col` and `benchdraw` slice
+`method=array/data=runs` for serialisation and Rank/Select, `simd=on/data=runs`
+for the vectorisation set), which is what lets both `benchstat -col` and `benchdraw` slice
 a single run by dimension.
 
 ## What the vectorisation actually buys
@@ -130,6 +138,29 @@ cover only the pure bitwise loops and drop to `archsimd` everywhere else.
   their positions without a bit-at-a-time loop.
 - **Range edits.** Run containers meet bitmaps through `SetRange`, `ClearRange`,
   `FlipRange` and `CopyRange`, which vectorise the whole-word middle of a range.
+
+`make roaring_bench_simd` measures this directly: the `BenchmarkSIMD*` cases run
+the main operations on the scalar build and then on the vector one, without
+`RunOptimize`, so that the `runs` dataset is made of bitmap containers rather
+than intervals. From `bench_results_simd.csv` (medians of 10 runs, 200k values
+per dataset, `plots/simd_*.svg`):
+
+- **Bitmap containers are where it pays.** On `runs`, `AndCardinality` goes
+  from 9.4us to 3.5us (2.7x), `And` from 80us to 47us (1.7x), `Or`, `AndNot`
+  and `Xor` from 35–38us to 25us (1.4–1.5x), `ToArray` from 496us to 348us
+  (1.4x). On `zipf`, whose crowded low end is bitmap containers too, `And` and
+  `AndCardinality` gain 2.3x.
+- **The gain is capped by allocation.** `And` on `runs` allocates 39 result
+  containers of 8KiB each per call; zeroing and freeing them is the same in
+  both builds, which is why the fused loop shows 1.7x where the primitive
+  alone would show more. `AndCardinality`, which allocates nothing, is the
+  cleanest view of the loop itself.
+- **Array containers gain nothing.** `sparse` is 32k tiny arrays, and every
+  difference there (0.9–1.2x) is inside the 3–16% confidence intervals: the
+  work is walking keys and allocating, not comparing values. `Or`, `AndNot`
+  and `Xor` on `zipf` are the same story, dominated by their array-side merges.
+- **`Contains` is untouched.** A binary search over keys plus one bit test or
+  array probe has no loop to vectorise; the two builds are identical.
 
 ## What the benchmarks show
 
@@ -181,4 +212,9 @@ round-trips, Rank/Select and parsing of arbitrary bytes. The same suite runs on
 the vector and the scalar `simdops` build. `bench` additionally asserts, before
 any timing is reported, that the bitmap answers the same with and without
 `RunOptimize`, that both codecs round-trip to the same values, and that the
-array baseline and the bitmap agree on every Rank and Select it measures.
+array baseline and the bitmap agree on every Rank and Select it measures. For
+the vectorisation set it checks, on whichever build is compiled in, that the
+operations it times satisfy the set identities that tie them together
+(`|A|+|B| = |A∪B|+|A∩B|`, `|A∖B| = |A|-|A∩B|`, `|A⊕B| = |A∪B|-|A∩B|`,
+`AndCardinality` equal to the cardinality of `And`) and that `ToArray` lists
+exactly the set, so the two passes are known to time the same answers.

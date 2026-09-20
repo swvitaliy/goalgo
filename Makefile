@@ -45,8 +45,16 @@ roaring_test:
 
 .PHONY: roaring_bench
 roaring_bench:
-	$(GO_SIMD) test -run='^$$' -bench=. -benchmem -benchtime=200ms -count=10 ./roaring_bitmaps/bench | tee ./roaring_bitmaps/bench_results_count10.txt
+	$(GO_SIMD) test -run='^$$' -bench=. -skip='^BenchmarkSIMD' -benchmem -benchtime=200ms -count=10 ./roaring_bitmaps/bench | tee ./roaring_bitmaps/bench_results_count10.txt
 	benchstat -format=csv ./roaring_bitmaps/bench_results_count10.txt > ./roaring_bitmaps/bench_results.csv
+
+# Two passes over the SIMD benchmarks: the scalar primitives first, then the
+# AVX-512 ones. Cases carry a simd=off|on tag, so both land in one file.
+.PHONY: roaring_bench_simd
+roaring_bench_simd:
+	go test -run='^$$' -bench='^BenchmarkSIMD' -benchmem -benchtime=200ms -count=10 ./roaring_bitmaps/bench | tee ./roaring_bitmaps/bench_results_simd_count10.txt
+	$(GO_SIMD) test -run='^$$' -bench='^BenchmarkSIMD' -benchmem -benchtime=200ms -count=10 ./roaring_bitmaps/bench | tee -a ./roaring_bitmaps/bench_results_simd_count10.txt
+	benchstat -format=csv ./roaring_bitmaps/bench_results_simd_count10.txt > ./roaring_bitmaps/bench_results_simd.csv
 
 .PHONY: roaring_plots
 roaring_plots:
