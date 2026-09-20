@@ -26,10 +26,15 @@ import (
 )
 
 // Bitmap is a compressed set of uint32 values. The zero value is an empty set
-// ready for use. A Bitmap is not safe for concurrent modification.
+// ready for use and runs on defaultOps. A Bitmap is not safe for concurrent
+// modification.
 type Bitmap struct {
 	keys  []uint16     // high 16 bits of each chunk, ascending
 	conts []*container // chunk contents, parallel to keys
+
+	// simd is the Ops implementation every container operation goes through,
+	// inherited by every bitmap derived from this one. nil means defaultOps.
+	simd Ops
 
 	// prefix[i] is the number of values in the first i containers, built on
 	// demand by Rank/Select and dropped by any change to the contents. It turns
@@ -37,11 +42,35 @@ type Bitmap struct {
 	prefix []int
 }
 
-// New returns a Bitmap holding the given values.
+// defaultOps is what New, FromBytes and the zero Bitmap run on.
+var defaultOps Ops = simdops.Ops{}
+
+// New returns a Bitmap holding the given values, running on internal/simdops.
 func New(values ...uint32) *Bitmap {
-	b := &Bitmap{}
+	return NewWithOps(defaultOps, values...)
+}
+
+// NewWithOps returns a Bitmap holding the given values, running every
+// container operation through ops. Bitmaps derived from it by And, Or, AndNot,
+// Xor and Clone inherit ops.
+func NewWithOps(ops Ops, values ...uint32) *Bitmap {
+	b := &Bitmap{simd: ops}
 	b.AddMany(values...)
 	return b
+}
+
+// ops returns the Ops implementation to run on, falling back to defaultOps for
+// the zero Bitmap.
+func (b *Bitmap) ops() Ops {
+	if b.simd == nil {
+		return defaultOps
+	}
+	return b.simd
+}
+
+// derived returns an empty Bitmap that runs on the same Ops as b.
+func (b *Bitmap) derived() *Bitmap {
+	return &Bitmap{simd: b.simd}
 }
 
 func hi(v uint32) uint16 { return uint16(v >> 16) }
@@ -55,7 +84,7 @@ func (b *Bitmap) Add(v uint32) bool {
 	if !found {
 		b.insertAt(i, k, newArrayContainer(4))
 	}
-	return b.conts[i].add(lo(v))
+	return b.conts[i].add(b.ops(), lo(v))
 }
 
 // AddMany inserts every value, reusing the container lookup for runs of values
@@ -66,6 +95,7 @@ func (b *Bitmap) AddMany(values ...uint32) {
 		lastKey  uint16
 		lastCont *container
 	)
+	ops := b.ops()
 	for _, v := range values {
 		k := hi(v)
 		if lastCont == nil || k != lastKey {
@@ -75,7 +105,7 @@ func (b *Bitmap) AddMany(values ...uint32) {
 			}
 			lastKey, lastCont = k, b.conts[i]
 		}
-		lastCont.add(lo(v))
+		lastCont.add(ops, lo(v))
 	}
 }
 
@@ -87,7 +117,7 @@ func (b *Bitmap) Remove(v uint32) bool {
 		return false
 	}
 
-	changed := b.conts[i].remove(lo(v))
+	changed := b.conts[i].remove(b.ops(), lo(v))
 	if b.conts[i].card == 0 {
 		b.removeAt(i)
 	}
@@ -114,10 +144,9 @@ func (b *Bitmap) IsEmpty() bool { return len(b.conts) == 0 }
 
 // Clone returns a deep copy of b.
 func (b *Bitmap) Clone() *Bitmap {
-	out := &Bitmap{
-		keys:  slices.Clone(b.keys),
-		conts: make([]*container, len(b.conts)),
-	}
+	out := b.derived()
+	out.keys = slices.Clone(b.keys)
+	out.conts = make([]*container, len(b.conts))
 	for i, c := range b.conts {
 		out.conts[i] = c.clone()
 	}
@@ -127,15 +156,17 @@ func (b *Bitmap) Clone() *Bitmap {
 // ToArray returns every value in ascending order.
 func (b *Bitmap) ToArray() []uint32 {
 	out := make([]uint32, 0, b.Cardinality())
+	ops := b.ops()
 	for i, c := range b.conts {
-		out = c.appendValues(out, uint32(b.keys[i])<<16)
+		out = c.appendValues(ops, out, uint32(b.keys[i])<<16)
 	}
 	return out
 }
 
 // And returns the intersection of b and other.
 func (b *Bitmap) And(other *Bitmap) *Bitmap {
-	out := &Bitmap{}
+	out := b.derived()
+	ops := b.ops()
 	i, j := 0, 0
 	for i < len(b.keys) && j < len(other.keys) {
 		switch {
@@ -144,7 +175,7 @@ func (b *Bitmap) And(other *Bitmap) *Bitmap {
 		case b.keys[i] > other.keys[j]:
 			j++
 		default:
-			out.appendContainer(b.keys[i], andContainers(b.conts[i], other.conts[j]))
+			out.appendContainer(b.keys[i], andContainers(ops, b.conts[i], other.conts[j]))
 			i++
 			j++
 		}
@@ -154,7 +185,8 @@ func (b *Bitmap) And(other *Bitmap) *Bitmap {
 
 // Or returns the union of b and other.
 func (b *Bitmap) Or(other *Bitmap) *Bitmap {
-	out := &Bitmap{}
+	out := b.derived()
+	ops := b.ops()
 	i, j := 0, 0
 	for i < len(b.keys) && j < len(other.keys) {
 		switch {
@@ -165,7 +197,7 @@ func (b *Bitmap) Or(other *Bitmap) *Bitmap {
 			out.appendContainer(other.keys[j], other.conts[j].clone())
 			j++
 		default:
-			out.appendContainer(b.keys[i], orContainers(b.conts[i], other.conts[j]))
+			out.appendContainer(b.keys[i], orContainers(ops, b.conts[i], other.conts[j]))
 			i++
 			j++
 		}
@@ -177,7 +209,8 @@ func (b *Bitmap) Or(other *Bitmap) *Bitmap {
 
 // AndNot returns the values of b that are not in other.
 func (b *Bitmap) AndNot(other *Bitmap) *Bitmap {
-	out := &Bitmap{}
+	out := b.derived()
+	ops := b.ops()
 	i, j := 0, 0
 	for i < len(b.keys) && j < len(other.keys) {
 		switch {
@@ -187,7 +220,7 @@ func (b *Bitmap) AndNot(other *Bitmap) *Bitmap {
 		case b.keys[i] > other.keys[j]:
 			j++
 		default:
-			out.appendContainer(b.keys[i], andNotContainers(b.conts[i], other.conts[j]))
+			out.appendContainer(b.keys[i], andNotContainers(ops, b.conts[i], other.conts[j]))
 			i++
 			j++
 		}
@@ -198,7 +231,8 @@ func (b *Bitmap) AndNot(other *Bitmap) *Bitmap {
 
 // Xor returns the symmetric difference of b and other.
 func (b *Bitmap) Xor(other *Bitmap) *Bitmap {
-	out := &Bitmap{}
+	out := b.derived()
+	ops := b.ops()
 	i, j := 0, 0
 	for i < len(b.keys) && j < len(other.keys) {
 		switch {
@@ -209,7 +243,7 @@ func (b *Bitmap) Xor(other *Bitmap) *Bitmap {
 			out.appendContainer(other.keys[j], other.conts[j].clone())
 			j++
 		default:
-			out.appendContainer(b.keys[i], xorContainers(b.conts[i], other.conts[j]))
+			out.appendContainer(b.keys[i], xorContainers(ops, b.conts[i], other.conts[j]))
 			i++
 			j++
 		}
@@ -222,6 +256,7 @@ func (b *Bitmap) Xor(other *Bitmap) *Bitmap {
 // Intersects reports whether b and other share any value, without building the
 // intersection.
 func (b *Bitmap) Intersects(other *Bitmap) bool {
+	ops := b.ops()
 	i, j := 0, 0
 	for i < len(b.keys) && j < len(other.keys) {
 		switch {
@@ -230,7 +265,7 @@ func (b *Bitmap) Intersects(other *Bitmap) bool {
 		case b.keys[i] > other.keys[j]:
 			j++
 		default:
-			if intersects(b.conts[i], other.conts[j]) {
+			if intersects(ops, b.conts[i], other.conts[j]) {
 				return true
 			}
 			i++
@@ -242,6 +277,7 @@ func (b *Bitmap) Intersects(other *Bitmap) bool {
 
 // AndCardinality returns the size of the intersection without building it.
 func (b *Bitmap) AndCardinality(other *Bitmap) int {
+	ops := b.ops()
 	n, i, j := 0, 0, 0
 	for i < len(b.keys) && j < len(other.keys) {
 		switch {
@@ -251,8 +287,8 @@ func (b *Bitmap) AndCardinality(other *Bitmap) int {
 			j++
 		default:
 			if a, o := b.conts[i], other.conts[j]; a.kind == kindBitmap && o.kind == kindBitmap {
-				n += simdops.AndCardinality(a.bm[:], o.bm[:])
-			} else if c := andContainers(a, o); c != nil {
+				n += ops.AndCardinality(a.bm[:], o.bm[:])
+			} else if c := andContainers(ops, a, o); c != nil {
 				n += int(c.card)
 			}
 			i++

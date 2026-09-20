@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 func TestAddContainsRemove(t *testing.T) {
@@ -417,4 +418,104 @@ func keysOf(set map[uint32]struct{}) []uint32 {
 		out = append(out, v)
 	}
 	return out
+}
+
+func TestNewWithOps(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		a []uint32
+		b []uint32
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		prepare func(m *MockOps)
+		run     func(a, b *Bitmap) int
+		want    int
+	}{
+		{
+			name: "And of two bitmap containers goes through AndTo",
+			args: args{a: sequence(0, 5000), b: sequence(0, 5000)},
+			prepare: func(m *MockOps) {
+				m.EXPECT().
+					AndTo(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(5000).
+					Times(1)
+			},
+			run:  func(a, b *Bitmap) int { return a.And(b).Cardinality() },
+			want: 5000,
+		},
+		{
+			name: "AndCardinality of two bitmap containers goes through AndCardinality",
+			args: args{a: sequence(0, 5000), b: sequence(0, 5000)},
+			prepare: func(m *MockOps) {
+				m.EXPECT().
+					AndCardinality(gomock.Any(), gomock.Any()).
+					Return(7).
+					Times(1)
+			},
+			run:  func(a, b *Bitmap) int { return a.AndCardinality(b) },
+			want: 7,
+		},
+		{
+			name: "derived bitmap keeps the injected ops",
+			args: args{a: sequence(0, 5000), b: sequence(0, 5000)},
+			prepare: func(m *MockOps) {
+				m.EXPECT().
+					OrTo(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(5000).
+					Times(1)
+				m.EXPECT().
+					XorTo(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(4500).
+					Times(1)
+			},
+			run:  func(a, b *Bitmap) int { return a.Or(b).Xor(b).Cardinality() },
+			want: 4500,
+		},
+		{
+			name: "Rank on a bitmap container goes through PopcountPrefix",
+			args: args{a: sequence(0, 5000)},
+			prepare: func(m *MockOps) {
+				m.EXPECT().
+					PopcountPrefix(gomock.Any(), 11).
+					Return(3).
+					Times(1)
+			},
+			run:  func(a, _ *Bitmap) int { return a.Rank(10) },
+			want: 3,
+		},
+		{
+			name: "array containers go through the array primitives",
+			args: args{a: sequence(0, 10), b: sequence(5, 10)},
+			prepare: func(m *MockOps) {
+				m.EXPECT().
+					IntersectArrays(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(5).
+					Times(1)
+				m.EXPECT().
+					UnionArrays(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(15).
+					Times(1)
+			},
+			run:  func(a, b *Bitmap) int { return a.And(b).Cardinality() + a.Or(b).Cardinality() },
+			want: 20,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			ctrl := gomock.NewController(t)
+			m := NewMockOps(ctrl)
+			tt.prepare(m)
+
+			a := NewWithOps(m, tt.args.a...)
+			b := NewWithOps(m, tt.args.b...)
+			require.Equal(t, tt.want, tt.run(a, b))
+		})
+	}
 }

@@ -63,6 +63,14 @@ above that, runs only if it was already runs and still the smallest.
 Point operations — `Add`, `Remove`, `Contains` — find their chunk with one
 binary search over the keys.
 
+The bitmap never calls `simdops` directly. Every primitive it needs is listed in
+the `Ops` interface (`ports.go`), and each `Bitmap` carries the implementation
+it runs on: `New` and `FromBytes` use `simdops.Ops{}`, `NewWithOps` and
+`FromBytesWithOps` take any other, and every bitmap derived by `And`, `Or`,
+`Clone` and friends inherits it. Containers do not store it — that would grow
+the 64-byte struct — so the container functions take it as their first
+argument. `ports_mock.go` is the gomock double, regenerated with `go generate`.
+
 ## Building
 
 `simdops` has two implementations of its hot primitives, chosen by build tag:

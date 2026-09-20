@@ -3,8 +3,6 @@ package roaring_bitmaps
 import (
 	"math/bits"
 	"slices"
-
-	"goalgo/roaring_bitmaps/internal/simdops"
 )
 
 // interval is one run of consecutive values, inclusive at both ends. Runs inside
@@ -235,10 +233,10 @@ func runsToArray(dst []uint16, runs []interval) int {
 	return n
 }
 
-func runsToBitmap(runs []interval) *bitmapWords {
+func runsToBitmap(ops Ops, runs []interval) *bitmapWords {
 	bm := new(bitmapWords)
 	for _, iv := range runs {
-		simdops.SetRange(bm[:], int(iv.start), int(iv.last)+1)
+		ops.SetRange(bm[:], int(iv.start), int(iv.last)+1)
 	}
 	return bm
 }

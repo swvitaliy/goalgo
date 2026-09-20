@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 func TestSerializationRoundTrip(t *testing.T) {
@@ -160,4 +161,52 @@ func FuzzFromBytesDoesNotPanic(f *testing.F) {
 			require.Equal(t, len(b.ToArray()), b.Cardinality())
 		}
 	})
+}
+
+func TestFromBytesWithOps(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		values []uint32
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		prepare func(m *MockOps)
+		want    int
+	}{
+		{
+			name: "bitmap container counts its bits through Popcount",
+			args: args{values: sequence(0, 5000)},
+			prepare: func(m *MockOps) {
+				m.EXPECT().
+					Popcount(gomock.Any()).
+					Return(5000).
+					Times(1)
+			},
+			want: 5000,
+		},
+		{
+			name:    "array container never touches ops",
+			args:    args{values: sequence(0, 10)},
+			prepare: func(_ *MockOps) {},
+			want:    10,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			ctrl := gomock.NewController(t)
+			m := NewMockOps(ctrl)
+			tt.prepare(m)
+
+			got, err := FromBytesWithOps(m, New(tt.args.values...).ToBytes())
+			require.NoError(t, err)
+			require.Equal(t, tt.want, got.Cardinality())
+			require.Same(t, m, got.ops())
+		})
+	}
 }

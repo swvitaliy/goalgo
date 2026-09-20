@@ -15,7 +15,7 @@ const Vectorized = false
 func AndTo(dst, a, b []uint64) int {
 	n := checkTriple(dst, a, b)
 	total := 0
-	for i := 0; i < n; i++ {
+	for i := range n {
 		dst[i] = a[i] & b[i]
 		total += bits.OnesCount64(dst[i])
 	}
@@ -26,7 +26,7 @@ func AndTo(dst, a, b []uint64) int {
 func OrTo(dst, a, b []uint64) int {
 	n := checkTriple(dst, a, b)
 	total := 0
-	for i := 0; i < n; i++ {
+	for i := range n {
 		dst[i] = a[i] | b[i]
 		total += bits.OnesCount64(dst[i])
 	}
@@ -48,7 +48,7 @@ func AndNotTo(dst, a, b []uint64) int {
 func XorTo(dst, a, b []uint64) int {
 	n := checkTriple(dst, a, b)
 	total := 0
-	for i := 0; i < n; i++ {
+	for i := range n {
 		dst[i] = a[i] ^ b[i]
 		total += bits.OnesCount64(dst[i])
 	}

@@ -8,6 +8,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/spaolacci/murmur3 v1.1.0
 	github.com/stretchr/testify v1.12.1
+	go.uber.org/mock v0.6.0
 	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba
 	gonum.org/v1/plot v0.17.0
 )

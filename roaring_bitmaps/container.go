@@ -82,7 +82,7 @@ func (c *container) contains(v uint16) bool {
 	}
 }
 
-func (c *container) add(v uint16) bool {
+func (c *container) add(ops Ops, v uint16) bool {
 	switch c.kind {
 	case kindBitmap:
 		if !c.setBit(v) {
@@ -97,7 +97,7 @@ func (c *container) add(v uint16) bool {
 		}
 		c.runs = runs
 		c.card++
-		c.normalize()
+		c.normalize(ops)
 
 	default:
 		i, found := slices.BinarySearch(c.arr, v)
@@ -107,13 +107,13 @@ func (c *container) add(v uint16) bool {
 		c.arr = slices.Insert(c.arr, i, v)
 		c.card++
 		if c.card > arrayMax {
-			c.convertToBitmap()
+			c.convertToBitmap(ops)
 		}
 	}
 	return true
 }
 
-func (c *container) remove(v uint16) bool {
+func (c *container) remove(ops Ops, v uint16) bool {
 	switch c.kind {
 	case kindBitmap:
 		if !c.clearBit(v) {
@@ -121,7 +121,7 @@ func (c *container) remove(v uint16) bool {
 		}
 		c.card--
 		if c.card <= arrayMax {
-			c.convertToArray()
+			c.convertToArray(ops)
 		}
 
 	case kindRun:
@@ -131,7 +131,7 @@ func (c *container) remove(v uint16) bool {
 		}
 		c.runs = runs
 		c.card--
-		c.normalize()
+		c.normalize(ops)
 
 	default:
 		i, found := slices.BinarySearch(c.arr, v)
@@ -164,7 +164,7 @@ func (c *container) clearBit(v uint16) bool {
 	return true
 }
 
-func (c *container) convertToBitmap() {
+func (c *container) convertToBitmap(ops Ops) {
 	switch c.kind {
 	case kindArray:
 		bm := new(bitmapWords)
@@ -173,16 +173,16 @@ func (c *container) convertToBitmap() {
 		}
 		c.bm, c.arr = bm, nil
 	case kindRun:
-		c.bm, c.runs = runsToBitmap(c.runs), nil
+		c.bm, c.runs = runsToBitmap(ops, c.runs), nil
 	}
 	c.kind = kindBitmap
 }
 
-func (c *container) convertToArray() {
+func (c *container) convertToArray(ops Ops) {
 	arr := make([]uint16, c.card)
 	switch c.kind {
 	case kindBitmap:
-		simdops.BitmapToArray(arr, c.bm[:])
+		ops.BitmapToArray(arr, c.bm[:])
 		c.bm = nil
 	case kindRun:
 		runsToArray(arr, c.runs)
@@ -236,7 +236,7 @@ func (c *container) currentBytes() int {
 // A run container is kept only while runs remain the smallest encoding; array and
 // bitmap containers convert between each other at arrayMax but never turn into
 // runs on their own.
-func (c *container) normalize() *container {
+func (c *container) normalize(ops Ops) *container {
 	if c == nil || c.card == 0 {
 		return nil
 	}
@@ -245,25 +245,25 @@ func (c *container) normalize() *container {
 	case kindRun:
 		if runsBytes(len(c.runs)) > min(2*int(c.card), bitmapBytes) {
 			if c.card <= arrayMax {
-				c.convertToArray()
+				c.convertToArray(ops)
 			} else {
-				c.convertToBitmap()
+				c.convertToBitmap(ops)
 			}
 		}
 	case kindArray:
 		if c.card > arrayMax {
-			c.convertToBitmap()
+			c.convertToBitmap(ops)
 		}
 	case kindBitmap:
 		if c.card <= arrayMax {
-			c.convertToArray()
+			c.convertToArray(ops)
 		}
 	}
 	return c
 }
 
 // appendValues appends every value of the container to dst, offset by base.
-func (c *container) appendValues(dst []uint32, base uint32) []uint32 {
+func (c *container) appendValues(ops Ops, dst []uint32, base uint32) []uint32 {
 	switch c.kind {
 	case kindArray:
 		for _, v := range c.arr {
@@ -277,7 +277,7 @@ func (c *container) appendValues(dst []uint32, base uint32) []uint32 {
 		}
 	default:
 		buf := make([]uint16, c.card)
-		simdops.BitmapToArray(buf, c.bm[:])
+		ops.BitmapToArray(buf, c.bm[:])
 		for _, v := range buf {
 			dst = append(dst, base|uint32(v))
 		}

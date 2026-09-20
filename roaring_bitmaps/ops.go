@@ -2,112 +2,110 @@ package roaring_bitmaps
 
 import "slices"
 
-import "goalgo/roaring_bitmaps/internal/simdops"
-
 // The binary operations dispatch on the encodings of both operands. Run operands
 // are handled by interval arithmetic where both sides are runs, and otherwise by
 // whichever side already has the cheaper structure to walk: array values are
 // probed against runs, and bitmaps are edited range by range.
 
-func andContainers(a, b *container) *container {
+func andContainers(ops Ops, a, b *container) *container {
 	switch {
 	case a.kind == kindRun && b.kind == kindRun:
-		return newRunContainer(intersectRuns(a.runs, b.runs)).normalize()
+		return newRunContainer(intersectRuns(a.runs, b.runs)).normalize(ops)
 
 	case a.kind == kindRun && b.kind == kindArray:
-		return andRunArray(a, b).normalize()
+		return andRunArray(a, b).normalize(ops)
 	case a.kind == kindArray && b.kind == kindRun:
-		return andRunArray(b, a).normalize()
+		return andRunArray(b, a).normalize(ops)
 
 	case a.kind == kindRun && b.kind == kindBitmap:
-		return andRunBitmap(a, b).normalize()
+		return andRunBitmap(ops, a, b).normalize(ops)
 	case a.kind == kindBitmap && b.kind == kindRun:
-		return andRunBitmap(b, a).normalize()
+		return andRunBitmap(ops, b, a).normalize(ops)
 
 	case a.kind == kindArray && b.kind == kindArray:
 		out := newArrayContainer(int(min(a.card, b.card)))
 		out.arr = out.arr[:min(a.card, b.card)]
-		out.card = int32(simdops.IntersectArrays(out.arr, a.arr, b.arr))
+		out.card = int32(ops.IntersectArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
-		return out.normalize()
+		return out.normalize(ops)
 
 	case a.kind == kindArray:
-		return filterArray(a, b, true).normalize()
+		return filterArray(a, b, true).normalize(ops)
 	case b.kind == kindArray:
-		return filterArray(b, a, true).normalize()
+		return filterArray(b, a, true).normalize(ops)
 
 	default:
 		out := newBitmapContainer()
-		out.card = int32(simdops.AndTo(out.bm[:], a.bm[:], b.bm[:]))
-		return out.normalize()
+		out.card = int32(ops.AndTo(out.bm[:], a.bm[:], b.bm[:]))
+		return out.normalize(ops)
 	}
 }
 
-func orContainers(a, b *container) *container {
+func orContainers(ops Ops, a, b *container) *container {
 	switch {
 	case a.kind == kindRun && b.kind == kindRun:
-		return newRunContainer(unionRuns(a.runs, b.runs)).normalize()
+		return newRunContainer(unionRuns(a.runs, b.runs)).normalize(ops)
 
 	case a.kind == kindRun && b.kind == kindArray:
-		return newRunContainer(unionRuns(a.runs, arrayToRuns(b.arr))).normalize()
+		return newRunContainer(unionRuns(a.runs, arrayToRuns(b.arr))).normalize(ops)
 	case a.kind == kindArray && b.kind == kindRun:
-		return newRunContainer(unionRuns(b.runs, arrayToRuns(a.arr))).normalize()
+		return newRunContainer(unionRuns(b.runs, arrayToRuns(a.arr))).normalize(ops)
 
 	case a.kind == kindRun && b.kind == kindBitmap:
-		return orRunBitmap(a, b).normalize()
+		return orRunBitmap(ops, a, b).normalize(ops)
 	case a.kind == kindBitmap && b.kind == kindRun:
-		return orRunBitmap(b, a).normalize()
+		return orRunBitmap(ops, b, a).normalize(ops)
 
 	case a.kind == kindArray && b.kind == kindArray:
 		out := newArrayContainer(int(a.card + b.card))
 		out.arr = out.arr[:a.card+b.card]
-		out.card = int32(simdops.UnionArrays(out.arr, a.arr, b.arr))
+		out.card = int32(ops.UnionArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
-		return out.normalize()
+		return out.normalize(ops)
 
 	case a.kind == kindArray:
-		return mergeArrayIntoBitmap(b, a).normalize()
+		return mergeArrayIntoBitmap(b, a).normalize(ops)
 	case b.kind == kindArray:
-		return mergeArrayIntoBitmap(a, b).normalize()
+		return mergeArrayIntoBitmap(a, b).normalize(ops)
 
 	default:
 		out := newBitmapContainer()
-		out.card = int32(simdops.OrTo(out.bm[:], a.bm[:], b.bm[:]))
-		return out.normalize()
+		out.card = int32(ops.OrTo(out.bm[:], a.bm[:], b.bm[:]))
+		return out.normalize(ops)
 	}
 }
 
-func andNotContainers(a, b *container) *container {
+func andNotContainers(ops Ops, a, b *container) *container {
 	switch {
 	case a.kind == kindRun && b.kind == kindRun:
-		return newRunContainer(differenceRuns(a.runs, b.runs)).normalize()
+		return newRunContainer(differenceRuns(a.runs, b.runs)).normalize(ops)
 
 	case a.kind == kindRun && b.kind == kindArray:
-		return newRunContainer(differenceRuns(a.runs, arrayToRuns(b.arr))).normalize()
+		return newRunContainer(differenceRuns(a.runs, arrayToRuns(b.arr))).normalize(ops)
 	case a.kind == kindArray && b.kind == kindRun:
-		return filterArrayByRuns(a, b.runs, false).normalize()
+		return filterArrayByRuns(a, b.runs, false).normalize(ops)
 
 	case a.kind == kindRun && b.kind == kindBitmap:
-		out := &container{kind: kindBitmap, bm: runsToBitmap(a.runs)}
-		out.card = int32(simdops.AndNotTo(out.bm[:], out.bm[:], b.bm[:]))
-		return out.normalize()
+		out := &container{kind: kindBitmap, bm: runsToBitmap(ops, a.runs)}
+		out.card = int32(ops.AndNotTo(out.bm[:], out.bm[:], b.bm[:]))
+		return out.normalize(ops)
 	case a.kind == kindBitmap && b.kind == kindRun:
 		out := a.clone()
 		for _, iv := range b.runs {
-			simdops.ClearRange(out.bm[:], int(iv.start), int(iv.last)+1)
+			ops.ClearRange(out.bm[:], int(iv.start), int(iv.last)+1)
 		}
-		out.card = int32(simdops.Popcount(out.bm[:]))
-		return out.normalize()
+		out.card = int32(ops.Popcount(out.bm[:]))
+		return out.normalize(ops)
 
 	case a.kind == kindArray && b.kind == kindArray:
 		out := newArrayContainer(int(a.card))
 		out.arr = out.arr[:a.card]
-		out.card = int32(simdops.DifferenceArrays(out.arr, a.arr, b.arr))
+		out.card = int32(ops.DifferenceArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
-		return out.normalize()
+		return out.normalize(ops)
 
 	case a.kind == kindArray:
-		return filterArray(a, b, false).normalize()
+		return filterArray(a, b, false).normalize(ops)
 
 	case b.kind == kindArray:
 		out := a.clone()
@@ -116,61 +114,61 @@ func andNotContainers(a, b *container) *container {
 				out.card--
 			}
 		}
-		return out.normalize()
+		return out.normalize(ops)
 
 	default:
 		out := newBitmapContainer()
-		out.card = int32(simdops.AndNotTo(out.bm[:], a.bm[:], b.bm[:]))
-		return out.normalize()
+		out.card = int32(ops.AndNotTo(out.bm[:], a.bm[:], b.bm[:]))
+		return out.normalize(ops)
 	}
 }
 
-func xorContainers(a, b *container) *container {
+func xorContainers(ops Ops, a, b *container) *container {
 	switch {
 	case a.kind == kindRun && b.kind == kindRun:
-		return newRunContainer(xorRuns(a.runs, b.runs)).normalize()
+		return newRunContainer(xorRuns(a.runs, b.runs)).normalize(ops)
 
 	case a.kind == kindRun && b.kind == kindArray:
-		return newRunContainer(xorRuns(a.runs, arrayToRuns(b.arr))).normalize()
+		return newRunContainer(xorRuns(a.runs, arrayToRuns(b.arr))).normalize(ops)
 	case a.kind == kindArray && b.kind == kindRun:
-		return newRunContainer(xorRuns(b.runs, arrayToRuns(a.arr))).normalize()
+		return newRunContainer(xorRuns(b.runs, arrayToRuns(a.arr))).normalize(ops)
 
 	case a.kind == kindRun && b.kind == kindBitmap:
-		return xorRunBitmap(a, b).normalize()
+		return xorRunBitmap(ops, a, b).normalize(ops)
 	case a.kind == kindBitmap && b.kind == kindRun:
-		return xorRunBitmap(b, a).normalize()
+		return xorRunBitmap(ops, b, a).normalize(ops)
 
 	case a.kind == kindArray && b.kind == kindArray:
 		out := newArrayContainer(int(a.card + b.card))
 		out.arr = out.arr[:a.card+b.card]
-		out.card = int32(simdops.XorArrays(out.arr, a.arr, b.arr))
+		out.card = int32(ops.XorArrays(out.arr, a.arr, b.arr))
 		out.arr = out.arr[:out.card]
-		return out.normalize()
+		return out.normalize(ops)
 
 	case a.kind == kindArray:
-		return flipArrayInBitmap(b, a).normalize()
+		return flipArrayInBitmap(b, a).normalize(ops)
 	case b.kind == kindArray:
-		return flipArrayInBitmap(a, b).normalize()
+		return flipArrayInBitmap(a, b).normalize(ops)
 
 	default:
 		out := newBitmapContainer()
-		out.card = int32(simdops.XorTo(out.bm[:], a.bm[:], b.bm[:]))
-		return out.normalize()
+		out.card = int32(ops.XorTo(out.bm[:], a.bm[:], b.bm[:]))
+		return out.normalize(ops)
 	}
 }
 
-func intersects(a, b *container) bool {
+func intersects(ops Ops, a, b *container) bool {
 	switch {
 	case a.kind == kindRun && b.kind == kindRun:
 		return runsIntersect(a.runs, b.runs)
 
 	case a.kind == kindRun:
-		return runsIntersectContainer(a.runs, b)
+		return runsIntersectContainer(ops, a.runs, b)
 	case b.kind == kindRun:
-		return runsIntersectContainer(b.runs, a)
+		return runsIntersectContainer(ops, b.runs, a)
 
 	case a.kind == kindBitmap && b.kind == kindBitmap:
-		return simdops.Intersects(a.bm[:], b.bm[:])
+		return ops.Intersects(a.bm[:], b.bm[:])
 
 	case a.kind == kindArray && b.kind == kindBitmap:
 		return anyContained(a.arr, b)
@@ -186,7 +184,7 @@ func intersects(a, b *container) bool {
 	}
 }
 
-func runsIntersectContainer(runs []interval, c *container) bool {
+func runsIntersectContainer(ops Ops, runs []interval, c *container) bool {
 	if c.kind == kindArray {
 		j := 0
 		for _, v := range c.arr {
@@ -203,7 +201,7 @@ func runsIntersectContainer(runs []interval, c *container) bool {
 		return false
 	}
 	for _, iv := range runs {
-		if simdops.HasBitInRange(c.bm[:], int(iv.start), int(iv.last)+1) {
+		if ops.HasBitInRange(c.bm[:], int(iv.start), int(iv.last)+1) {
 			return true
 		}
 	}
@@ -235,30 +233,30 @@ func filterArrayByRuns(arr *container, runs []interval, want bool) *container {
 
 // andRunBitmap copies only the bitmap ranges the runs cover, so untouched words
 // stay zero without a full AND against a materialised run bitmap.
-func andRunBitmap(r, bmc *container) *container {
+func andRunBitmap(ops Ops, r, bmc *container) *container {
 	out := newBitmapContainer()
 	for _, iv := range r.runs {
-		simdops.CopyRange(out.bm[:], bmc.bm[:], int(iv.start), int(iv.last)+1)
+		ops.CopyRange(out.bm[:], bmc.bm[:], int(iv.start), int(iv.last)+1)
 	}
-	out.card = int32(simdops.Popcount(out.bm[:]))
+	out.card = int32(ops.Popcount(out.bm[:]))
 	return out
 }
 
-func orRunBitmap(r, bmc *container) *container {
+func orRunBitmap(ops Ops, r, bmc *container) *container {
 	out := bmc.clone()
 	for _, iv := range r.runs {
-		simdops.SetRange(out.bm[:], int(iv.start), int(iv.last)+1)
+		ops.SetRange(out.bm[:], int(iv.start), int(iv.last)+1)
 	}
-	out.card = int32(simdops.Popcount(out.bm[:]))
+	out.card = int32(ops.Popcount(out.bm[:]))
 	return out
 }
 
-func xorRunBitmap(r, bmc *container) *container {
+func xorRunBitmap(ops Ops, r, bmc *container) *container {
 	out := bmc.clone()
 	for _, iv := range r.runs {
-		simdops.FlipRange(out.bm[:], int(iv.start), int(iv.last)+1)
+		ops.FlipRange(out.bm[:], int(iv.start), int(iv.last)+1)
 	}
-	out.card = int32(simdops.Popcount(out.bm[:]))
+	out.card = int32(ops.Popcount(out.bm[:]))
 	return out
 }
 

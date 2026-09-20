@@ -99,8 +99,15 @@ func (b *Bitmap) serializedSize(hasRun bool) int {
 	return size
 }
 
-// FromBytes parses a bitmap in the portable Roaring format.
+// FromBytes parses a bitmap in the portable Roaring format, running on
+// internal/simdops.
 func FromBytes(data []byte) (*Bitmap, error) {
+	return FromBytesWithOps(defaultOps, data)
+}
+
+// FromBytesWithOps parses a bitmap in the portable Roaring format that runs
+// every container operation through ops.
+func FromBytesWithOps(ops Ops, data []byte) (*Bitmap, error) {
 	r := &reader{data: data}
 
 	cookieWord, err := r.uint32()
@@ -140,6 +147,7 @@ func FromBytes(data []byte) (*Bitmap, error) {
 	b := &Bitmap{
 		keys:  make([]uint16, n),
 		conts: make([]*container, n),
+		simd:  ops,
 	}
 	cards := make([]int, n)
 	for i := 0; i < n; i++ {
@@ -163,7 +171,7 @@ func FromBytes(data []byte) (*Bitmap, error) {
 
 	for i := 0; i < n; i++ {
 		isRun := hasRun && runFlags[i/8]&(1<<(i%8)) != 0
-		c, err := readContainer(r, cards[i], isRun)
+		c, err := readContainer(ops, r, cards[i], isRun)
 		if err != nil {
 			return nil, fmt.Errorf("roaring: reading container %d: %w", i, err)
 		}
@@ -219,7 +227,7 @@ func (c *container) appendTo(buf []byte) []byte {
 	return buf
 }
 
-func readContainer(r *reader, card int, isRun bool) (*container, error) {
+func readContainer(ops Ops, r *reader, card int, isRun bool) (*container, error) {
 	switch {
 	case isRun:
 		nruns, err := r.uint16()
@@ -259,7 +267,7 @@ func readContainer(r *reader, card int, isRun bool) (*container, error) {
 		for i := range c.bm[:] {
 			c.bm[i] = binary.LittleEndian.Uint64(words[8*i:])
 		}
-		c.card = int32(simdops.Popcount(c.bm[:]))
+		c.card = int32(ops.Popcount(c.bm[:]))
 		if int(c.card) != card {
 			return nil, fmt.Errorf("bitmap cardinality %d does not match header %d", c.card, card)
 		}

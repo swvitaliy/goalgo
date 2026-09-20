@@ -3,8 +3,6 @@ package roaring_bitmaps
 import (
 	"slices"
 	"sort"
-
-	"goalgo/roaring_bitmaps/internal/simdops"
 )
 
 // Rank returns how many values in the set are less than or equal to v.
@@ -13,7 +11,7 @@ func (b *Bitmap) Rank(v uint32) int {
 	idx, found := slices.BinarySearch(b.keys, hi(v))
 	n := prefix[idx]
 	if found {
-		n += b.conts[idx].rank(lo(v))
+		n += b.conts[idx].rank(b.ops(), lo(v))
 	}
 	return n
 }
@@ -27,7 +25,7 @@ func (b *Bitmap) Select(i int) (uint32, bool) {
 	}
 	// The first container whose running total passes i is the one holding it.
 	idx := sort.Search(len(b.conts), func(k int) bool { return prefix[k+1] > i })
-	return uint32(b.keys[idx])<<16 | uint32(b.conts[idx].selectAt(i-prefix[idx])), true
+	return uint32(b.keys[idx])<<16 | uint32(b.conts[idx].selectAt(b.ops(), i-prefix[idx])), true
 }
 
 // prefixSums returns the cumulative cardinalities, rebuilding them after any
@@ -55,14 +53,14 @@ func (b *Bitmap) Maximum() (uint32, bool) {
 	}
 	last := len(b.conts) - 1
 	c := b.conts[last]
-	return uint32(b.keys[last])<<16 | uint32(c.selectAt(int(c.card)-1)), true
+	return uint32(b.keys[last])<<16 | uint32(c.selectAt(b.ops(), int(c.card)-1)), true
 }
 
 // rank returns how many values of the container are less than or equal to v.
-func (c *container) rank(v uint16) int {
+func (c *container) rank(ops Ops, v uint16) int {
 	switch c.kind {
 	case kindBitmap:
-		return simdops.PopcountPrefix(c.bm[:], int(v)+1)
+		return ops.PopcountPrefix(c.bm[:], int(v)+1)
 
 	case kindRun:
 		n := 0
@@ -90,10 +88,10 @@ func (c *container) rank(v uint16) int {
 
 // selectAt returns the i-th smallest value of the container, counting from zero.
 // i must be less than the container's cardinality.
-func (c *container) selectAt(i int) uint16 {
+func (c *container) selectAt(ops Ops, i int) uint16 {
 	switch c.kind {
 	case kindBitmap:
-		return uint16(simdops.SelectBit(c.bm[:], i))
+		return uint16(ops.SelectBit(c.bm[:], i))
 
 	case kindRun:
 		for _, iv := range c.runs {
